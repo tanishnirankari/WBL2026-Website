@@ -1144,6 +1144,43 @@ footer p {
 
 .mobile-auction-btn {
     display: none;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 10px;
+    border: 1px solid var(--lime);
+    border-radius: 20px;
+    background: rgba(156, 255, 0, 0.15);
+    color: var(--lime);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    box-shadow: 0 0 10px rgba(156, 255, 0, 0.35), inset 0 0 8px rgba(156, 255, 0, 0.08);
+    animation: auction-glow 2s ease-in-out infinite alternate;
+}
+
+.mobile-auction-btn:hover,
+.mobile-auction-btn:focus-visible {
+    color: var(--lime);
+    box-shadow: 0 0 16px rgba(156, 255, 0, 0.65), inset 0 0 10px rgba(156, 255, 0, 0.12);
+}
+
+@keyframes auction-glow {
+    from {
+        box-shadow: 0 0 7px rgba(156, 255, 0, 0.28), inset 0 0 6px rgba(156, 255, 0, 0.06);
+    }
+
+    to {
+        box-shadow: 0 0 13px rgba(156, 255, 0, 0.48), inset 0 0 9px rgba(156, 255, 0, 0.1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mobile-auction-btn {
+        animation: none;
+    }
 }
 
 @media (max-width: 1000px) {
@@ -1478,10 +1515,6 @@ footer p {
 }
 
 @media (max-width: 360px) {
-    .mobile-auction-btn {
-        display: none;
-    }
-
     .navbar {
         width: calc(100% - 20px);
         left: 10px;

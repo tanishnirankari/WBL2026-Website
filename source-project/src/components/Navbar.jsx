@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Gavel, Menu, X } from 'lucide-react';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -72,18 +72,8 @@ export default function Navbar() {
         <Link
           to="/auction"
           className="mobile-auction-btn"
-          style={{
-            padding: '7px 14px',
-            background: 'rgba(156, 255, 0, 0.15)',
-            border: '1px solid var(--lime)',
-            color: 'var(--lime)',
-            borderRadius: '20px',
-            fontSize: '11px',
-            fontWeight: 800,
-            letterSpacing: '1px',
-            textDecoration: 'none'
-          }}
         >
+          <Gavel size={14} aria-hidden="true" />
           AUCTION
         </Link>
         <button className="menu-button" onClick={toggleMenu} aria-label="Toggle Menu" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
