@@ -11,7 +11,7 @@ export default function FeatureCards() {
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6 }}
           className="feature-card"
-          style={{ '--feature-image': `url("${import.meta.env.BASE_URL}player.jpg")` }}
+          style={{ '--feature-image': `url("${import.meta.env.BASE_URL}gallery3.jpg")` }}
         >
           <h2>TALENT MEETS OPPORTUNITY</h2>
           <p>A competitive platform where teams, players and cricket lovers come together.</p>

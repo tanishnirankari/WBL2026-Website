@@ -55,12 +55,12 @@ export default function Register() {
 
   return (
     <Layout>
-      <main className="page" style={{ paddingTop: '120px', paddingBottom: '80px', maxWidth: '1000px', margin: '0 auto', paddingLeft: '20px', paddingRight: '20px' }}>
+      <main className="page content-page register-page">
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
           <div style={{ color: 'var(--lime)', fontSize: '12px', letterSpacing: '4px', fontWeight: 'bold' }}>
             TOURNAMENT REGISTRATION
           </div>
-          <h1 style={{ fontSize: '42px', marginTop: '10px', textTransform: 'uppercase' }}>Register Your Team</h1>
+          <h1 className="register-title">Register Your Team</h1>
         </div>
 
         {successId && (
@@ -81,10 +81,11 @@ export default function Register() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           onSubmit={handleSubmit}
-          style={{ background: 'rgba(11, 32, 51, 0.9)', padding: '35px', borderRadius: '18px', border: '1px solid var(--border)' }}
+          className="register-form"
+          style={{ background: 'rgba(11, 32, 51, 0.9)', borderRadius: '18px', border: '1px solid var(--border)' }}
         >
           <div style={{ color: 'var(--lime)', marginBottom: '16px', fontWeight: 'bold', textTransform: 'uppercase' }}>Team Information</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '20px' }}>
             <div className="field">
               <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Team Name</label>
               <input type="text" name="teamName" placeholder="Enter team name" required style={inputStyle} />
@@ -117,7 +118,7 @@ export default function Register() {
 
           <div style={{ marginTop: '45px' }}>
             <div style={{ color: 'var(--lime)', marginBottom: '16px', fontWeight: 'bold', textTransform: 'uppercase' }}>Player List (15 Players)</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '20px' }}>
               {Array.from({ length: 15 }).map((_, i) => (
                 <div key={i} style={{ background: 'rgba(255,255,255,0.02)', padding: '15px', borderRadius: '12px', border: '1px solid var(--border)' }}>
                   <div style={{ color: 'var(--lime)', fontSize: '12px', fontWeight: 'bold', marginBottom: '10px' }}>PLAYER {i + 1}</div>

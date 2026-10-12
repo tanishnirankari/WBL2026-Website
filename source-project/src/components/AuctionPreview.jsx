@@ -56,12 +56,7 @@ export default function AuctionPreview() {
           background: 'linear-gradient(135deg, rgba(12, 38, 60, 0.95), rgba(9, 28, 45, 0.95))',
           border: '1px solid rgba(156, 255, 0, 0.25)',
           borderRadius: '16px',
-          padding: '30px',
-          marginBottom: '35px',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '25px',
-          alignItems: 'center'
+          marginBottom: '35px'
         }}
       >
         <div>
@@ -97,24 +92,22 @@ export default function AuctionPreview() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '15px',
+          gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
           textAlign: 'center',
           background: 'rgba(5, 17, 28, 0.6)',
-          padding: '20px',
           borderRadius: '12px',
           border: '1px solid var(--border)'
-        }}>
+        }} className="auction-stats">
           <div>
-            <strong style={{ display: 'block', fontSize: '28px', color: 'var(--lime)', fontWeight: 900 }}>10+</strong>
+            <strong style={{ display: 'block', fontSize: 'clamp(20px, 7vw, 28px)', color: 'var(--lime)', fontWeight: 900 }}>10+</strong>
             <small style={{ color: 'var(--muted)', fontSize: '11px', letterSpacing: '1px' }}>FRANCHISES</small>
           </div>
           <div>
-            <strong style={{ display: 'block', fontSize: '28px', color: '#fff', fontWeight: 900 }}>100+</strong>
+            <strong style={{ display: 'block', fontSize: 'clamp(20px, 7vw, 28px)', color: '#fff', fontWeight: 900 }}>100+</strong>
             <small style={{ color: 'var(--muted)', fontSize: '11px', letterSpacing: '1px' }}>PLAYERS</small>
           </div>
           <div>
-            <strong style={{ display: 'block', fontSize: '28px', color: 'var(--lime)', fontWeight: 900 }}>₹40K+</strong>
+            <strong style={{ display: 'block', fontSize: 'clamp(20px, 7vw, 28px)', color: 'var(--lime)', fontWeight: 900 }}>₹40K+</strong>
             <small style={{ color: 'var(--muted)', fontSize: '11px', letterSpacing: '1px' }}>PRIZE POOL</small>
           </div>
         </div>

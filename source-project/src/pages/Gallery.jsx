@@ -115,7 +115,7 @@ export default function GalleryPage() {
 
   return (
     <Layout>
-      <main className="page" style={{ paddingTop: '110px', paddingBottom: '90px', maxWidth: '1200px', margin: '0 auto', paddingLeft: '20px', paddingRight: '20px' }}>
+      <main className="page content-page">
         
         {/* HEADER */}
         <div style={{ textAlign: 'center', marginBottom: '45px' }}>
@@ -182,9 +182,9 @@ export default function GalleryPage() {
                 overflow: 'hidden',
                 cursor: 'pointer',
                 background: 'rgba(11, 32, 51, 0.7)',
-                border: '1px solid var(--border)',
-                height: '270px'
+                border: '1px solid var(--border)'
               }}
+              className="gallery-page-card"
               whileHover={{ scale: 1.02, borderColor: 'var(--lime)' }}
             >
               <img

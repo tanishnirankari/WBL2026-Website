@@ -142,7 +142,7 @@ export default function Auction() {
 
   return (
     <Layout>
-      <main className="page" style={{ paddingTop: '110px', paddingBottom: '90px', maxWidth: '1200px', margin: '0 auto', paddingLeft: '20px', paddingRight: '20px' }}>
+      <main className="page content-page">
         
         {/* HEADER SECTION */}
         <div style={{ textAlign: 'center', marginBottom: '45px' }}>

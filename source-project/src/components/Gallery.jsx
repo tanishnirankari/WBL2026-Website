@@ -12,7 +12,7 @@ export default function Gallery() {
     { src: `${assetBase}gallery6.jpg`, alt: 'Winter Bash League match' },
     { src: `${assetBase}gallery7.jpg`, alt: 'Winter Bash League players' },
     { src: `${assetBase}gallery8.jpg`, alt: 'Winter Bash League cricket ground' },
-    { src: `${assetBase}gallery9.jpg`, alt: 'Winter Bash League celebration', fallback: true },
+    { src: `${assetBase}memorable.jpg`, alt: 'Winter Bash League celebration' },
   ];
 
   return (
@@ -32,13 +32,7 @@ export default function Gallery() {
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5, delay: idx * 0.05 }}
           >
-            <img
-              src={img.src}
-              alt={img.alt}
-              onError={(e) => {
-                if (img.fallback) e.target.style.display = 'none';
-              }}
-            />
+            <img src={img.src} alt={img.alt} />
             {img.overlay && (
               <div className="gallery-overlay">{img.overlay}</div>
             )}
