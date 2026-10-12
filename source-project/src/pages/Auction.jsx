@@ -427,7 +427,7 @@ export default function Auction() {
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 1000,
-              padding: '20px'
+              padding: '12px'
             }}>
               <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -439,9 +439,9 @@ export default function Auction() {
                   borderRadius: '18px',
                   width: '100%',
                   maxWidth: '600px',
-                  maxHeight: '90vh',
+                  maxHeight: '92vh',
                   overflowY: 'auto',
-                  padding: '30px',
+                  padding: 'clamp(18px, 4vw, 30px)',
                   position: 'relative'
                 }}
               >

@@ -68,22 +68,46 @@ export default function Navbar() {
         Register Team &rarr;
       </Link>
 
-      <button className="menu-button" onClick={toggleMenu} aria-label="Toggle Menu" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        {isOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <Link
+          to="/auction"
+          className="mobile-auction-btn"
+          style={{
+            padding: '7px 14px',
+            background: 'rgba(156, 255, 0, 0.15)',
+            border: '1px solid var(--lime)',
+            color: 'var(--lime)',
+            borderRadius: '20px',
+            fontSize: '11px',
+            fontWeight: 800,
+            letterSpacing: '1px',
+            textDecoration: 'none'
+          }}
+        >
+          AUCTION
+        </Link>
+        <button className="menu-button" onClick={toggleMenu} aria-label="Toggle Menu" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -15, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -15, scale: 0.98 }}
             transition={{ duration: 0.2 }}
             className="mobile-menu show"
           >
             {navLinks.map((link) => (
-              <Link key={link.name} to={link.path} onClick={closeMenu}>
-                {link.name}
+              <Link
+                key={link.name}
+                to={link.path}
+                onClick={closeMenu}
+                style={link.path === '/auction' ? { color: 'var(--lime)', fontWeight: 'bold' } : {}}
+              >
+                {link.name === 'Auction' ? '🏏 Player Auction' : link.name}
               </Link>
             ))}
             {hashLinks.map((link) => (
@@ -91,7 +115,7 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
-            <Link to="/register" style={{ color: 'var(--lime)', fontWeight: 'bold' }} onClick={closeMenu}>
+            <Link to="/register" style={{ color: 'var(--lime)', fontWeight: 'bold', borderBottom: 'none' }} onClick={closeMenu}>
               Register Your Team &rarr;
             </Link>
           </motion.div>
