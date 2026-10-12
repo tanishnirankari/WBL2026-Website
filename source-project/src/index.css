@@ -1195,6 +1195,10 @@ footer p {
 
 @media (max-width: 650px) {
 
+    .home-auction-preview {
+        display: none;
+    }
+
     .navbar {
         height: 72px;
         padding: 0 12px;

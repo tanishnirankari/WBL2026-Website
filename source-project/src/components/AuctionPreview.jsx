@@ -33,7 +33,7 @@ export default function AuctionPreview() {
   ];
 
   return (
-    <section id="auction" className="section match-section">
+    <section id="auction" className="section match-section home-auction-preview">
       <div className="section-heading">
         <div>
           <h2>WBL Mega Player Auction 2026</h2>
