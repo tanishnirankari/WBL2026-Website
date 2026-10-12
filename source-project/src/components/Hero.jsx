@@ -7,6 +7,7 @@ export default function Hero() {
       className="hero"
       style={{
         '--hero-image': `url("${import.meta.env.BASE_URL}hero.png")`,
+        '--hero-mobile-image': `url("${import.meta.env.BASE_URL}hero.png")`,
       }}
     >
       <motion.div
@@ -52,9 +53,9 @@ export default function Hero() {
           <Link to="/register" className="primary-button">
             REGISTER YOUR TEAM &rarr;
           </Link>
-          <a href="#points-table" className="outline-button">
-            WBL POINTS TABLE
-          </a>
+          <Link to="/auction" className="outline-button">
+            PLAYER AUCTION &rarr;
+          </Link>
         </div>
       </motion.div>
     </section>

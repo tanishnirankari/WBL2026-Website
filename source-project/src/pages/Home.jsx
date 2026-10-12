@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Layout from '../components/Layout';
 import Hero from '../components/Hero';
-import PointsTable from '../components/PointsTable';
+import AuctionPreview from '../components/AuctionPreview';
 import Teams from '../components/Teams';
 import FeatureCards from '../components/FeatureCards';
 import Gallery from '../components/Gallery';
@@ -28,7 +28,7 @@ export default function Home() {
   return (
     <Layout>
       <Hero />
-      <PointsTable />
+      <AuctionPreview />
       <Teams />
       <FeatureCards />
       <Gallery />

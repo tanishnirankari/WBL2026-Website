@@ -1152,7 +1152,7 @@ footer p {
             linear-gradient(180deg,
                 rgba(3, 12, 21, 0.72),
                 rgba(3, 12, 21, 0.97)),
-            var(--hero-image);
+            var(--hero-mobile-image, var(--hero-image));
 
         background-size: cover;
         background-repeat: no-repeat;

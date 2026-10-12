@@ -18,13 +18,13 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Home', path: '/' },
+    { name: 'Auction', path: '/auction' },
+    { name: 'Gallery', path: '/gallery' },
     { name: 'Exclusive', path: '/exclusive' },
   ];
 
   const hashLinks = [
     { name: 'Teams', hash: '#teams' },
-    { name: 'Points Table', hash: '#points-table' },
-    { name: 'Gallery', hash: '#gallery' },
     { name: 'Contact us', hash: '#contact' },
   ];
 

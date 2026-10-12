@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 export default function Gallery() {
@@ -18,7 +19,7 @@ export default function Gallery() {
     <section id="gallery" className="section gallery-section">
       <div className="section-heading">
         <h2>Gallery</h2>
-        <a href="#gallery" className="view-all">View All &rarr;</a>
+        <Link to="/gallery" className="view-all">View Full Gallery &rarr;</Link>
       </div>
 
       <div className="gallery-grid">
