@@ -7,7 +7,6 @@ export default function Hero() {
       className="hero"
       style={{
         '--hero-image': `url("${import.meta.env.BASE_URL}hero.png")`,
-        '--hero-mobile-image': `url("${import.meta.env.BASE_URL}hero.png")`,
       }}
     >
       <motion.div
