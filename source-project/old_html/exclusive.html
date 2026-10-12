@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exclusive Features | Winter Bash League</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #06111d;
+    color: white;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+header {
+    margin: 12px 20px 0;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(4, 14, 24, 0.88);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 18px;
+    transition: .3s ease;
+}
+
+header:hover {
+    background: rgba(10, 30, 47, .98);
+    border-color: rgba(156,255,0,.55);
+    box-shadow: 0 10px 28px rgba(0,0,0,.35),
+                0 0 22px rgba(156,255,0,.08);
+    transform: translateY(-2px);
+}
+
+.logo-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    line-height: 1.1;
+}
+
+.logo-link img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+}
+
+.logo-link b {
+    color: #9cff00;
+}
+
+.logo-link:hover img {
+    transform: scale(1.08);
+}
+
+.logo-link img {
+    transition: transform .25s ease;
+}
+
+.back-link {
+    color: #9cff00;
+    font-weight: bold;
+}
+
+main {
+    padding: 25px 20px 55px;
+}
+
+.heading {
+    max-width: 700px;
+    margin-bottom: 45px;
+}
+
+.heading small {
+    color: #9cff00;
+    letter-spacing: 4px;
+    font-weight: bold;
+}
+
+.heading h1 {
+    font-size: clamp(42px, 7vw, 82px);
+    line-height: .95;
+    margin: 18px 0;
+    text-transform: uppercase;
+}
+
+.heading p {
+    color: #a3afba;
+    line-height: 1.7;
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.feature {
+    overflow: hidden;
+    min-height: 350px;
+    padding: 0 0 30px;
+    text-align: center;
+    background: #0b2033;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 18px;
+    transition: .25s;
+}
+
+.feature:hover {
+    transform: translateY(-5px);
+    border-color: #9cff00;
+}
+
+.feature-icon {
+    font-size: 34px;
+    margin-bottom: 25px;
+}
+
+.feature h2 {
+    color: #9cff00;
+    font-size: 21px;
+    margin: 0 20px 12px;
+}
+
+.feature p {
+    max-width: 300px;
+    margin: 0 auto;
+    color: #a3afba;
+    line-height: 1.6;
+}
+
+.feature-image {
+    display: block;
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    border-radius: 18px 18px 0 0;
+    margin-bottom: 24px;
+    transition: transform .3s ease;
+}
+
+.feature:hover .feature-image {
+    transform: scale(1.05);
+}
+
+@media (max-width: 700px) {
+    header {
+        margin: 10px 12px 0;
+        padding: 10px 16px;
+        border-radius: 14px;
+    }
+
+    main {
+        padding: 25px 20px 55px;
+    }
+
+    .features {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <a href="index.html" class="logo-link">
+        <img src="logo.png" alt="Winter Bash League logo">
+        <span>WINTER BASH<br><b>LEAGUE</b></span>
+    </a>
+
+    <a href="index.html" class="back-link">← Home</a>
+</header>
+
+<main>
+    <section class="heading">
+        <small>WHAT TO EXPECT</small>
+    
+        <p>
+            Each player who paticipates to this wonderful tournament will get a chance to experience the following exclusive features and benefits:
+        </p>
+    </section>
+
+    <section class="features">
+        <article class="feature">
+            <img class="feature-image" src="refreshments.jpg" alt="Refreshments">
+            <h2>Refreshments</h2>
+            <p>Stay energized throughout the tournament.</p>
+        </article>
+
+        <article class="feature">
+            <img class="feature-image" src="jersey.jpg" alt="Official jerseys">
+            <h2>Official Jerseys</h2>
+            <p>Recieve a tournament jersey.</p>
+        </article>
+
+        <article class="feature">
+            <img class="feature-image" src="streaming.jpg" alt="Live streaming">
+            <h2>Live Streaming</h2>
+            <p>Capture each and every moment and share it with your friends.</p>
+        </article>
+
+        <article class="feature">
+            <img class="feature-image" src="umpire.jpg" alt="Professional umpires">
+            <h2>Professional Umpires</h2>
+            <p>Superior Umpiring standards will be excecuted.</p>
+        </article>
+
+        <article class="feature">
+            <img class="feature-image" src="awards.jpg" alt="Award ceremony">
+            <h2>Award Ceremony</h2>
+            <p>Per match awards will be given to the top performers.</p>
+        </article>
+
+        <article class="feature">
+            <img class="feature-image" src="memorable.jpg" alt="Winter Bash League tournament">
+            <h2>Memorable Experience</h2>
+            <p>Be part of Ghaziabad's biggest swinger ball cricket tournament.</p>
+        </article>
+    </section>
+</main>
+
+</body>
+</html>

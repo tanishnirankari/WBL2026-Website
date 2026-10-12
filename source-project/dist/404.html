@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <script>
+        const basePath = '/WBL2026';
+        const requestedPath = window.location.pathname.startsWith(basePath)
+            ? window.location.pathname.slice(basePath.length) || '/'
+            : '/';
+        const requestedUrl = `${requestedPath}${window.location.search}${window.location.hash}`;
+        window.location.replace(`${basePath}/?redirect=${encodeURIComponent(requestedUrl)}`);
+    </script>
+</head>
+
+<body></body>
+
+</html>

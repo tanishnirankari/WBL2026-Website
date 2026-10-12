@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WBL Points Table</title>
+  <style>
+    :root {
+      --bg: #f3f6fb;
+      --card: #ffffff;
+      --header: #0d1b2a;
+      --accent: #9cff00;
+      --accent-strong: #7acb00;
+      --text: #1d2a39;
+      --muted: #6f7d8c;
+      --line: #dfe7f1;
+      --shadow: 0 12px 30px rgba(13, 27, 42, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 30px 20px;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--card);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .topbar {
+      background: var(--header);
+      color: #fff;
+      padding: 22px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .league-name {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .league-name span {
+      color: var(--accent);
+    }
+
+    .print-btn {
+      border: none;
+      background: var(--accent);
+      color: #07111a;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .print-btn:hover {
+      background: var(--accent-strong);
+    }
+
+    .content {
+      padding: 28px;
+    }
+
+    .title-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .title-wrap h1 {
+      margin: 0;
+      font-size: clamp(26px, 3vw, 38px);
+      color: var(--header);
+    }
+
+    .season {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    thead th {
+      background: #0b2136;
+      color: #fff;
+      padding: 14px 12px;
+      text-align: left;
+      font-size: 12px;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+    }
+
+    tbody td {
+      padding: 14px 12px;
+      border-top: 1px solid var(--line);
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    tbody tr:hover {
+      background: #eef8d8;
+    }
+
+    .team {
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: #07111a;
+      background: var(--accent);
+    }
+
+    .points {
+      font-weight: 800;
+      color: var(--header);
+    }
+
+    .footnote {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: right;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .page {
+        max-width: none;
+        margin: 0;
+        box-shadow: none;
+        border-radius: 0;
+      }
+
+      .print-btn {
+        display: none;
+      }
+
+      .topbar {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      thead th {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div class="league-name">Winter Bash <span>League</span></div>
+      <button class="print-btn" onclick="window.print()">Print Table</button>
+    </div>
+
+    <div class="content">
+      <div class="title-wrap">
+        <h1>Points Table</h1>
+        <div class="season">2026 Season</div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Team</th>
+            <th>P</th>
+            <th>W</th>
+            <th>D</th>
+            <th>L</th>
+            <th>GF</th>
+            <th>GA</th>
+            <th>GD</th>
+            <th>Pts</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><div class="team"><span class="badge">N</span>Northside FC</div></td>
+            <td>12</td>
+            <td>9</td>
+            <td>2</td>
+            <td>1</td>
+            <td>27</td>
+            <td>10</td>
+            <td>+17</td>
+            <td class="points">29</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><div class="team"><span class="badge">R</span>Riverside</div></td>
+            <td>12</td>
+            <td>8</td>
+            <td>2</td>
+            <td>2</td>
+            <td>24</td>
+            <td>12</td>
+            <td>+12</td>
+            <td class="points">26</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><div class="team"><span class="badge">C</span>City United</div></td>
+            <td>12</td>
+            <td>7</td>
+            <td>3</td>
+            <td>2</td>
+            <td>22</td>
+            <td>13</td>
+            <td>+9</td>
+            <td class="points">24</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><div class="team"><span class="badge">F</span>Forest Athletic</div></td>
+            <td>12</td>
+            <td>6</td>
+            <td>4</td>
+            <td>2</td>
+            <td>19</td>
+            <td>14</td>
+            <td>+5</td>
+            <td class="points">22</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><div class="team"><span class="badge">S</span>Sunrise SC</div></td>
+            <td>12</td>
+            <td>5</td>
+            <td>3</td>
+            <td>4</td>
+            <td>18</td>
+            <td>17</td>
+            <td>+1</td>
+            <td class="points">18</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td><div class="team"><span class="badge">L</span>Lakeview</div></td>
+            <td>12</td>
+            <td>4</td>
+            <td>5</td>
+            <td>3</td>
+            <td>16</td>
+            <td>18</td>
+            <td>-2</td>
+            <td class="points">17</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td><div class="team"><span class="badge">H</span>Harbor FC</div></td>
+            <td>12</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>15</td>
+            <td>19</td>
+            <td>-4</td>
+            <td class="points">13</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td><div class="team"><span class="badge">G</span>Granite Town</div></td>
+            <td>12</td>
+            <td>2</td>
+            <td>4</td>
+            <td>6</td>
+            <td>14</td>
+            <td>21</td>
+            <td>-7</td>
+            <td class="points">10</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="footnote">Updated for print-ready standings</div>
+    </div>
+  </div>
+</body>
+</html>
