@@ -17,8 +17,9 @@ To create a production build:
 npm run build
 ```
 
-The generated site is written to `dist/`. The GitHub Pages workflow in
-`.github/workflows/deploy.yml` deploys this output.
+The generated site is written to `dist/`. The repository-root workflow at
+`../.github/workflows/deploy.yml` builds this app and deploys that output to
+GitHub Pages when changes are pushed to `main`.
 
 ## Find things
 

@@ -16,7 +16,8 @@ source-project/
     images/      Website images copied into the built site
   backend/       Express API and database setup
   old_html/      Previous standalone HTML pages; kept for reference
-  .github/       Website deployment workflow
+../.github/
+  workflows/     GitHub Pages deployment workflow
   dist/          Generated website output (created by the build)
 ```
 
