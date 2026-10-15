@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 
 export default function PointsTable() {
-  const assetBase = import.meta.env.BASE_URL;
+  const assetBase = `${import.meta.env.BASE_URL}images/`;
   const groupA = [
     { name: 'Nightmare', img: `${assetBase}nightmare.png`, m: 0, w: 0, l: 0, pts: 0, nrr: '0.00' },
     { name: 'Phoenix', img: `${assetBase}phoenix.png`, m: 0, w: 0, l: 0, pts: 0, nrr: '0.00' },

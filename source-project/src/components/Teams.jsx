@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 
 export default function Teams() {
-  const assetBase = import.meta.env.BASE_URL;
+  const assetBase = `${import.meta.env.BASE_URL}images/`;
   const teams = [
     { name: 'Nightmare', img: `${assetBase}nightmare.png` },
     { name: 'Phoenix', img: `${assetBase}phoenix.png` },

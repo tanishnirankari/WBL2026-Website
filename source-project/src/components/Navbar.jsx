@@ -6,7 +6,7 @@ import { Gavel, Menu, X } from 'lucide-react';
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const assetBase = import.meta.env.BASE_URL;
+  const assetBase = `${import.meta.env.BASE_URL}images/`;
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);

@@ -1,2 +1,42 @@
-# WBL26
-Winter bash league 
+# Winter Bash League 2026
+
+The React website lives here. Start the frontend from this directory.
+
+## Quick start
+
+```powershell
+npm ci
+npm run dev
+```
+
+Vite prints the local address to open in your browser.
+
+To create a production build:
+
+```powershell
+npm run build
+```
+
+The generated site is written to `dist/`. The GitHub Pages workflow in
+`.github/workflows/deploy.yml` deploys this output.
+
+## Find things
+
+| Path | What it contains |
+| --- | --- |
+| `src/pages/` | Full website pages |
+| `src/components/` | Reusable page sections and UI |
+| `src/App.jsx` | Page routes |
+| `src/index.css` | Global styles |
+| `public/images/` | All website images |
+| `backend/` | Separate Express API and PostgreSQL setup |
+| `old_html/` | Previous standalone HTML pages, kept for reference |
+| `dist/` | Generated production output; do not edit directly |
+| `node_modules/` | Installed dependencies; do not edit directly |
+
+## Backend
+
+The API is a separate Node.js app under `backend/`. Its environment variables
+are documented in `backend/.env.example`; the frontend uses `.env.example`.
+Create local `.env` files from those examples and configure the API URL and
+database connection for your environment. Do not commit `.env` files.

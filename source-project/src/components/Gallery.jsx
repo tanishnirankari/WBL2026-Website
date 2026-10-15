@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 export default function Gallery() {
-  const assetBase = import.meta.env.BASE_URL;
+  const assetBase = `${import.meta.env.BASE_URL}images/`;
   const images = [
     { src: `${assetBase}winner.png`, alt: 'Winner', overlay: 'Respected Sir IPS officer Mr. Keshav Chaudhry awarding winner team of summer tournament' },
     { src: `${assetBase}gallery2.jpg`, alt: 'Gallery 2' },

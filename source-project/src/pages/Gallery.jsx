@@ -3,7 +3,7 @@ import Layout from '../components/Layout';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function GalleryPage() {
-  const assetBase = import.meta.env.BASE_URL;
+  const assetBase = `${import.meta.env.BASE_URL}images/`;
 
   const galleryItems = [
     {

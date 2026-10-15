@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
 export default function Footer() {
-  const assetBase = import.meta.env.BASE_URL;
+  const assetBase = `${import.meta.env.BASE_URL}images/`;
 
   return (
     <footer id="contact">
