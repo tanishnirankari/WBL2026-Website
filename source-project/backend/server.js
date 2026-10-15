@@ -6,274 +6,42 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-
 const app = express();
 const port = process.env.PORT || 5001;
-
-app.use(cors());
-app.use(express.json());
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-if (!fs.existsSync(path.join(__dirname, 'uploads'))) {
-  fs.mkdirSync(path.join(__dirname, 'uploads'), { recursive: true });
-}
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
-});
-
-const cloudinaryConfigured = Boolean(
-  process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_UPLOAD_PRESET
-);
-
-let auctionTableReady;
-const ensureAuctionTable = () => {
-  if (!auctionTableReady) {
-    auctionTableReady = pool.query(`
-      CREATE TABLE IF NOT EXISTS wbl_auction_registrations (
-        id SERIAL PRIMARY KEY,
-        full_name VARCHAR(120) NOT NULL,
-        phone VARCHAR(30) NOT NULL,
-        age SMALLINT NOT NULL CHECK (age BETWEEN 14 AND 50),
-        playing_role VARCHAR(60) NOT NULL,
-        batting_style VARCHAR(40),
-        bowling_style VARCHAR(40),
-        club_name VARCHAR(120),
-        base_price VARCHAR(20) NOT NULL,
-        status VARCHAR(40) NOT NULL DEFAULT 'PENDING VERIFICATION',
-        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-      );
-    `).catch((error) => {
-      auctionTableReady = null;
-      throw error;
-    });
-  }
-  return auctionTableReady;
-};
-
-const hasValidAdminPassword = (providedPassword) => {
-  const configuredPassword = process.env.ADMIN_PASSWORD;
-  if (!configuredPassword || !providedPassword) return false;
-
-  const configured = Buffer.from(configuredPassword);
-  const provided = Buffer.from(providedPassword);
-  return configured.length === provided.length && crypto.timingSafeEqual(configured, provided);
-};
-
-const requireAdmin = (req, res, next) => {
-  if (!hasValidAdminPassword(req.get('x-admin-password'))) {
-    return res.status(401).json({ error: 'Enter the correct admin password.' });
-  }
-  next();
-};
-
-const asPlayerList = (players) => {
-  if (Array.isArray(players)) return players;
-  if (typeof players !== 'string') return [];
-  try {
-    const parsed = JSON.parse(players);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-};
-
-const imageUrl = (req, storedPath) => {
-  if (!storedPath) return null;
-  if (/^https?:\/\//i.test(storedPath)) return storedPath;
-  return `${req.protocol}://${req.get('host')}/uploads/${encodeURIComponent(path.basename(storedPath))}`;
-};
-
-pool.connect()
-  .then(() => console.log('Successfully connected to PostgreSQL.'))
-  .catch(err => {
-    console.error('Failed to connect to PostgreSQL. Is the DATABASE_URL correct and running?', err.message);
-  });
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype && file.mimetype.startsWith('image/')) return cb(null, true);
-    cb(new Error('Only image files are allowed.'));
-  }
-});
-
-const storeUploadedImage = async (file) => {
+app.use(cors()); app.use(express.json());
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (req,file,cb) => file.mimetype?.startsWith('image/') ? cb(null,true) : cb(new Error('Only image files are allowed.')) });
+const asyncHandler = fn => (req,res,next) => Promise.resolve(fn(req,res,next)).catch(next);
+const cloudReady = () => process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_UPLOAD_PRESET;
+async function saveImage(file, folder='wbl-2026') {
   if (!file) return null;
-
-  if (cloudinaryConfigured) {
-    const form = new FormData();
-    form.append('file', new Blob([file.buffer], { type: file.mimetype }), file.originalname);
-    form.append('upload_preset', process.env.CLOUDINARY_UPLOAD_PRESET);
-    form.append('folder', 'wbl-2026');
-
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`,
-      { method: 'POST', body: form }
-    );
-    const data = await response.json();
-    if (!response.ok || !data.secure_url) {
-      throw new Error(data.error?.message || 'Could not save the image.');
-    }
-    return data.secure_url;
-  }
-
-  const filename = `wbl-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
-  await fs.promises.writeFile(path.join(__dirname, 'uploads', filename), file.buffer);
-  return filename;
-};
-
-const uploadFields = [{ name: 'teamLogo', maxCount: 1 }];
-for (let i = 1; i <= 15; i++) {
-  uploadFields.push({ name: `player${i}Photo`, maxCount: 1 });
+  if (!cloudReady()) throw new Error('Image storage is not configured yet.');
+  const form = new FormData(); form.append('file',new Blob([file.buffer],{type:file.mimetype}),file.originalname); form.append('upload_preset',process.env.CLOUDINARY_UPLOAD_PRESET); form.append('folder',folder);
+  const r=await fetch('https://api.cloudinary.com/v1_1/'+process.env.CLOUDINARY_CLOUD_NAME+'/image/upload',{method:'POST',body:form}); const d=await r.json(); if(!r.ok||!d.secure_url) throw new Error(d.error?.message||'Image upload failed.'); return d;
 }
-
-const asyncHandler = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
-
-app.post('/api/registrations', upload.fields(uploadFields), asyncHandler(async (req, res) => {
-  const { teamName, captainName, captainPhone, paymentMode } = req.body;
-
-  if (!teamName || !captainName || !captainPhone || !paymentMode) {
-    return res.status(400).json({ error: 'Missing required team fields (teamName, captainName, captainPhone, paymentMode).' });
-  }
-
-  const existingTeam = await pool.query('SELECT id FROM wbl_registrations WHERE team_name = $1', [teamName.trim()]);
-  if (existingTeam.rows.length > 0) {
-    return res.status(409).json({ error: 'A team with this exact name strongly matches an existing registration.' });
-  }
-
-  const teamLogoPath = await storeUploadedImage(req.files?.teamLogo?.[0]);
-
-  const players = [];
-  for (let i = 1; i <= 15; i++) {
-    const name = req.body[`player${i}Name`] || null;
-    const phone = req.body[`player${i}Phone`] || null;
-    const photoPath = await storeUploadedImage(req.files?.[`player${i}Photo`]?.[0]);
-    players.push({ playerIndex: i, name, phone, photoPath });
-  }
-
-  const query = `
-    INSERT INTO wbl_registrations (team_name, captain_name, captain_phone, payment_mode, team_logo_path, players)
-    VALUES ($1, $2, $3, $4, $5, $6)
-    RETURNING id, created_at;
-  `;
-  const values = [teamName.trim(), captainName.trim(), captainPhone.trim(), paymentMode, teamLogoPath, JSON.stringify(players)];
-
-  const result = await pool.query(query, values);
-  const newRegistration = result.rows[0];
-
-  res.status(201).json({
-    message: 'Team successfully registered!',
-    registrationId: newRegistration.id
-  });
+const ensure = async () => {
+  await pool.query("ALTER TABLE wbl_registrations ADD COLUMN IF NOT EXISTS organiser_approval VARCHAR(20) NOT NULL DEFAULT 'PENDING'");
+  await pool.query("ALTER TABLE wbl_registrations ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) NOT NULL DEFAULT 'PENDING'");
+  await pool.query('CREATE TABLE IF NOT EXISTS wbl_gallery_images (id SERIAL PRIMARY KEY, image_url TEXT NOT NULL, cloudinary_public_id TEXT, caption VARCHAR(240), created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)');
+  await pool.query("CREATE TABLE IF NOT EXISTS wbl_auction_registrations (id SERIAL PRIMARY KEY, full_name VARCHAR(120) NOT NULL, phone VARCHAR(30) NOT NULL, age SMALLINT NOT NULL CHECK (age BETWEEN 14 AND 50), playing_role VARCHAR(60) NOT NULL, batting_style VARCHAR(40), bowling_style VARCHAR(40), club_name VARCHAR(120), base_price VARCHAR(20) NOT NULL, status VARCHAR(40) NOT NULL DEFAULT 'PENDING VERIFICATION', created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+};
+let ready; const init=()=>ready||(ready=ensure().catch(e=>{ready=null;throw e}));
+function admin(req,res,next){const a=Buffer.from(process.env.ADMIN_PASSWORD||'');const b=Buffer.from(req.get('x-admin-password')||'');if(!a.length||a.length!==b.length||!crypto.timingSafeEqual(a,b))return res.status(401).json({error:'Enter the correct admin password.'});next()}
+function players(value,req){let list=value;if(typeof list==='string'){try{list=JSON.parse(list)}catch{list=[]}}return (Array.isArray(list)?list:[]).map(p=>({...p,photoUrl:/^https?:/i.test(p.photoPath||'')?p.photoPath:null}))}
+app.post('/api/registrations',upload.fields([{name:'teamLogo',maxCount:1},...Array.from({length:15},(_,i)=>({name:'player'+(i+1)+'Photo',maxCount:1}))]),asyncHandler(async(req,res)=>{
+  const {teamName,captainName,captainPhone,paymentMode}=req.body;if(!teamName||!captainName||!captainPhone||!paymentMode)return res.status(400).json({error:'Complete all required team details.'}); await init();
+  if((await pool.query('SELECT id FROM wbl_registrations WHERE LOWER(team_name)=LOWER($1)',[teamName.trim()])).rows.length)return res.status(409).json({error:'A team with this name is already registered.'});
+  const logo=await saveImage(req.files?.teamLogo?.[0]); const roster=[];
+  for(let i=1;i<=15;i++){const f=req.files?.['player'+i+'Photo']?.[0];const photo=f?(await saveImage(f)).secure_url:null;roster.push({playerIndex:i,name:req.body['player'+i+'Name']||null,phone:req.body['player'+i+'Phone']||null,photoPath:photo})}
+  const result=await pool.query('INSERT INTO wbl_registrations (team_name,captain_name,captain_phone,payment_mode,team_logo_path,players) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id',[teamName.trim(),captainName.trim(),captainPhone.trim(),paymentMode,logo?.secure_url||null,JSON.stringify(roster)]);res.status(201).json({message:'Team successfully registered!',registrationId:result.rows[0].id});
 }));
-
-app.get('/api/admin/dashboard', requireAdmin, asyncHandler(async (req, res) => {
-  await ensureAuctionTable();
-
-  const [teamsResult, auctionResult] = await Promise.all([
-    pool.query(`
-      SELECT id, team_name, captain_name, captain_phone, payment_mode,
-             team_logo_path, players, created_at
-      FROM wbl_registrations
-      ORDER BY created_at DESC, id DESC
-    `),
-    pool.query(`
-      SELECT id, full_name, phone, age, playing_role, batting_style,
-             bowling_style, club_name, base_price, created_at
-      FROM wbl_auction_registrations
-      ORDER BY created_at DESC, id DESC
-    `)
-  ]);
-
-  const teams = teamsResult.rows.map((team) => ({
-    id: team.id,
-    teamName: team.team_name,
-    captainName: team.captain_name,
-    captainPhone: team.captain_phone,
-    paymentMode: team.payment_mode,
-    createdAt: team.created_at,
-    teamLogoUrl: imageUrl(req, team.team_logo_path),
-    players: asPlayerList(team.players).map((player) => ({
-      ...player,
-      photoUrl: imageUrl(req, player.photoPath)
-    }))
-  }));
-
-  const auctionPlayers = auctionResult.rows.map((player) => ({
-    id: player.id,
-    fullName: player.full_name,
-    phone: player.phone,
-    age: player.age,
-    role: player.playing_role,
-    battingStyle: player.batting_style,
-    bowlingStyle: player.bowling_style,
-    clubName: player.club_name,
-    basePrice: player.base_price,
-    createdAt: player.created_at
-  }));
-
-  res.json({ teams, auctionPlayers });
-}));
-
-app.get('/api/auction/registrations', asyncHandler(async (req, res) => {
-  await ensureAuctionTable();
-  const result = await pool.query(`
-    SELECT id, playing_role, base_price, status, created_at
-    FROM wbl_auction_registrations
-    ORDER BY created_at DESC, id DESC
-  `);
-  res.json(result.rows.map((row) => ({
-    id: row.id,
-    role: row.playing_role,
-    basePrice: row.base_price,
-    status: row.status,
-    createdAt: row.created_at
-  })));
-}));
-
-app.post('/api/auction/registrations', asyncHandler(async (req, res) => {
-  const { name, phone, age, role, battingStyle, bowlingStyle, club, basePrice } = req.body;
-  const parsedAge = Number(age);
-  const allowedPrices = ['₹1,000', '₹2,000', '₹3,000', '₹4,000', 'â‚¹1,000', 'â‚¹2,000', 'â‚¹3,000', 'â‚¹4,000'];
-
-  if (!name?.trim() || !phone?.trim() || !Number.isInteger(parsedAge) || parsedAge < 14 || parsedAge > 50 || !role?.trim()) {
-    return res.status(400).json({ error: 'Please provide a valid name, phone, age, and playing role.' });
-  }
-  if (!allowedPrices.includes(basePrice)) {
-    return res.status(400).json({ error: 'Please choose a valid expected base price.' });
-  }
-
-  await ensureAuctionTable();
-  const result = await pool.query(`
-    INSERT INTO wbl_auction_registrations
-      (full_name, phone, age, playing_role, batting_style, bowling_style, club_name, base_price)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-    RETURNING id, status
-  `, [name.trim(), phone.trim(), parsedAge, role.trim(), battingStyle || null,
-    bowlingStyle || null, club?.trim() || null, basePrice]);
-
-  res.status(201).json({
-    message: 'Player nomination received.',
-    registrationId: result.rows[0].id,
-    status: result.rows[0].status
-  });
-}));
-
-app.use((req, res, next) => {
-  res.status(404).json({ error: 'API route not found' });
-});
-
-app.use((err, req, res, next) => {
-  console.error('SERVER ERROR:', err.stack);
-  if (err.code && err.code === '23505') {
-    return res.status(409).json({ error: 'Duplicate team name detected by database constraint.' });
-  }
-  res.status(500).json({ error: 'An unexpected internal server error occurred.' });
-});
-
-app.listen(port, () => {
-  console.log(`WBL Backend listening on http://localhost:${port}`);
-});
+app.get('/api/admin/dashboard',admin,asyncHandler(async(req,res)=>{await init();const [t,a,g]=await Promise.all([pool.query('SELECT * FROM wbl_registrations ORDER BY created_at DESC,id DESC'),pool.query('SELECT * FROM wbl_auction_registrations ORDER BY created_at DESC,id DESC'),pool.query('SELECT id,image_url,caption,created_at FROM wbl_gallery_images ORDER BY created_at DESC,id DESC')]);res.json({teams:t.rows.map(x=>({id:x.id,teamName:x.team_name,captainName:x.captain_name,captainPhone:x.captain_phone,paymentMode:x.payment_mode,organiserApproval:x.organiser_approval,paymentStatus:x.payment_status,createdAt:x.created_at,teamLogoUrl:x.team_logo_path,players:players(x.players,req)})),auctionPlayers:a.rows.map(x=>({id:x.id,fullName:x.full_name,phone:x.phone,age:x.age,role:x.playing_role,clubName:x.club_name,basePrice:x.base_price})),gallery:g.rows.map(x=>({id:x.id,url:x.image_url,caption:x.caption||'',createdAt:x.created_at}))})}));
+app.patch('/api/admin/teams/:id/review',admin,asyncHandler(async(req,res)=>{await init();const approval=String(req.body.organiserApproval||'').toUpperCase(),payment=String(req.body.paymentStatus||'').toUpperCase();if(!['PENDING','APPROVED','REJECTED'].includes(approval)||!['PENDING','PAID','PARTIALLY PAID','NOT REQUIRED'].includes(payment))return res.status(400).json({error:'Invalid status.'});const r=await pool.query('UPDATE wbl_registrations SET organiser_approval=$1,payment_status=$2 WHERE id=$3 RETURNING id,organiser_approval,payment_status',[approval,payment,req.params.id]);if(!r.rows[0])return res.status(404).json({error:'Registration not found.'});res.json({id:r.rows[0].id,organiserApproval:r.rows[0].organiser_approval,paymentStatus:r.rows[0].payment_status})}));
+app.get('/api/gallery',asyncHandler(async(req,res)=>{await init();const r=await pool.query('SELECT id,image_url,caption FROM wbl_gallery_images ORDER BY created_at DESC,id DESC');res.json(r.rows.map(x=>({id:x.id,url:x.image_url,caption:x.caption||''})))}));
+app.post('/api/admin/gallery',admin,upload.single('image'),asyncHandler(async(req,res)=>{await init();const image=await saveImage(req.file,'wbl-2026/gallery');const r=await pool.query('INSERT INTO wbl_gallery_images(image_url,cloudinary_public_id,caption) VALUES($1,$2,$3) RETURNING id,image_url,caption,created_at',[image.secure_url,image.public_id,String(req.body.caption||'').trim().slice(0,240)]);const x=r.rows[0];res.status(201).json({id:x.id,url:x.image_url,caption:x.caption||'',createdAt:x.created_at})}));
+app.delete('/api/admin/gallery/:id',admin,asyncHandler(async(req,res)=>{await init();const r=await pool.query('DELETE FROM wbl_gallery_images WHERE id=$1 RETURNING id',[req.params.id]);if(!r.rows[0])return res.status(404).json({error:'Image not found.'});res.json({removed:true})}));
+app.get('/api/auction/registrations',asyncHandler(async(req,res)=>{await init();const r=await pool.query('SELECT id,playing_role,base_price,status,created_at FROM wbl_auction_registrations ORDER BY created_at DESC,id DESC');res.json(r.rows.map(x=>({id:x.id,role:x.playing_role,basePrice:x.base_price,status:x.status,createdAt:x.created_at})))}));
+app.post('/api/auction/registrations',asyncHandler(async(req,res)=>{const {name,phone,age,role,battingStyle,bowlingStyle,club,basePrice}=req.body;const n=Number(age);if(!name?.trim()||!phone?.trim()||!Number.isInteger(n)||n<14||n>50||!role?.trim()||!basePrice)return res.status(400).json({error:'Please provide valid player details.'});await init();const r=await pool.query('INSERT INTO wbl_auction_registrations(full_name,phone,age,playing_role,batting_style,bowling_style,club_name,base_price) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id,status',[name.trim(),phone.trim(),n,role.trim(),battingStyle||null,bowlingStyle||null,club?.trim()||null,basePrice]);res.status(201).json({message:'Player nomination received.',registrationId:r.rows[0].id,status:r.rows[0].status})}));
+app.use((req,res)=>res.status(404).json({error:'API route not found'}));
+app.use((err,req,res,next)=>{console.error('SERVER ERROR:',err.stack);res.status(err.code==='23505'?409:500).json({error:err.message||'Unexpected server error.'})});
+app.listen(port,()=>console.log('WBL Backend listening on port '+port));
