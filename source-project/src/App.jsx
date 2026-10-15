@@ -4,6 +4,7 @@ import Register from './pages/Register';
 import Exclusive from './pages/Exclusive';
 import Auction from './pages/Auction';
 import GalleryPage from './pages/Gallery';
+import Admin from './pages/Admin';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/gallery" element={<GalleryPage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/exclusive" element={<Exclusive />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </Router>
   );
