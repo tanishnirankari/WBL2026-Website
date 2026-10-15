@@ -24,6 +24,32 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL
 });
 
+// Create the nominations table on demand in the existing Neon database.
+let auctionTableReady;
+const ensureAuctionTable = () => {
+  if (!auctionTableReady) {
+    auctionTableReady = pool.query(`
+      CREATE TABLE IF NOT EXISTS wbl_auction_registrations (
+        id SERIAL PRIMARY KEY,
+        full_name VARCHAR(120) NOT NULL,
+        phone VARCHAR(30) NOT NULL,
+        age SMALLINT NOT NULL CHECK (age BETWEEN 14 AND 50),
+        playing_role VARCHAR(60) NOT NULL,
+        batting_style VARCHAR(40),
+        bowling_style VARCHAR(40),
+        club_name VARCHAR(120),
+        base_price VARCHAR(20) NOT NULL,
+        status VARCHAR(40) NOT NULL DEFAULT 'PENDING VERIFICATION',
+        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `).catch((error) => {
+      auctionTableReady = null;
+      throw error;
+    });
+  }
+  return auctionTableReady;
+};
+
 // Test connection
 pool.connect()
   .then(() => console.log('Successfully connected to PostgreSQL.'))
@@ -98,13 +124,58 @@ app.post('/api/registrations', upload.fields(uploadFields), asyncHandler(async (
   });
 }));
 
-// Route not found & default error handing
+// Public auction data is masked: names and phone numbers are never returned.
+app.get('/api/auction/registrations', asyncHandler(async (req, res) => {
+  await ensureAuctionTable();
+  const result = await pool.query(`
+    SELECT id, playing_role, base_price, status, created_at
+    FROM wbl_auction_registrations
+    ORDER BY created_at DESC, id DESC
+  `);
+  res.json(result.rows.map((row) => ({
+    id: row.id,
+    role: row.playing_role,
+    basePrice: row.base_price,
+    status: row.status,
+    createdAt: row.created_at
+  })));
+}));
+
+app.post('/api/auction/registrations', asyncHandler(async (req, res) => {
+  const { name, phone, age, role, battingStyle, bowlingStyle, club, basePrice } = req.body;
+  const parsedAge = Number(age);
+  const allowedPrices = ['₹1,000', '₹2,000', '₹3,000', '₹4,000', 'â‚¹1,000', 'â‚¹2,000', 'â‚¹3,000', 'â‚¹4,000'];
+
+  if (!name?.trim() || !phone?.trim() || !Number.isInteger(parsedAge) || parsedAge < 14 || parsedAge > 50 || !role?.trim()) {
+    return res.status(400).json({ error: 'Please provide a valid name, phone, age, and playing role.' });
+  }
+  if (!allowedPrices.includes(basePrice)) {
+    return res.status(400).json({ error: 'Please choose a valid expected base price.' });
+  }
+
+  await ensureAuctionTable();
+  const result = await pool.query(`
+    INSERT INTO wbl_auction_registrations
+      (full_name, phone, age, playing_role, batting_style, bowling_style, club_name, base_price)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    RETURNING id, status
+  `, [name.trim(), phone.trim(), parsedAge, role.trim(), battingStyle || null,
+    bowlingStyle || null, club?.trim() || null, basePrice]);
+
+  res.status(201).json({
+    message: 'Player nomination received.',
+    registrationId: result.rows[0].id,
+    status: result.rows[0].status
+  });
+}));
+
+// Route not found & default error handling
 app.use((req, res, next) => {
   res.status(404).json({ error: 'API route not found' });
 });
 
 app.use((err, req, res, next) => {
-  console.error('SERVER ERROR:', err.stack);
+  console.error('SERVEr ERROR:', err.stack);
   if (err.code && err.code === '23505') { // Postgres Unique Violation
     return res.status(409).json({ error: 'Duplicate team name detected by database constraint.' });
   }
