@@ -20,10 +20,10 @@ source-project/
   dist/          Generated website output (created by the build)
 ```
 
-The root `index.html` and `assets/` directory are a separate prebuilt site
-copy. Its images are served from `source-project/public/images/`, the same
-folder used by the editable app. Make image changes in that one folder; edit
-the React app in `source-project/` rather than generated files in `assets/`.
+The root `index.html` and `assets/` directory are a prebuilt snapshot, not the
+editable source. The GitHub Pages workflow builds `source-project/` and deploys
+its `dist/` output. Make changes in `source-project/src/` and
+`source-project/public/images/`; do not edit the generated site files by hand.
 
-Generated dependencies (`node_modules/`) and build output (`dist/`) are not
-where application source code should be edited.
+`node_modules/` and `source-project/dist/` are generated locally. They are
+ignored by Git and can be recreated with `npm ci` and `npm run build`.
