@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -61,13 +61,11 @@ export default function Auction() {
     },
   ];
 
-  const [registeredList, setRegisteredList] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('wbl_auction_registrations') || '[]');
-    } catch {
-      return [];
-    }
-  });
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+  const [registeredList, setRegisteredList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiError, setApiError] = useState('');
 
   const [filter, setFilter] = useState('All');
   const [showModal, setShowModal] = useState(false);
@@ -84,27 +82,60 @@ export default function Auction() {
     basePrice: '₹2,000',
   });
 
-  const handleRegisterSubmit = (e) => {
-    e.preventDefault();
-    const newReg = {
-      id: 'REG-' + Math.floor(1000 + Math.random() * 9000),
-      code: `Player #${Math.floor(107 + registeredList.length)} (You)`,
-      category: 'New Registration',
-      role: formData.role,
-      status: 'PENDING VERIFICATION',
-      basePrice: formData.basePrice,
-      badgeColor: 'var(--lime)',
-    };
-
-    const updated = [newReg, ...registeredList];
-    setRegisteredList(updated);
+  const loadRegistrations = async () => {
     try {
-      localStorage.setItem('wbl_auction_registrations', JSON.stringify(updated));
-    } catch (err) {
-      console.error(err);
+      const response = await fetch(`${apiUrl}/auction/registrations`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not load auction nominations.');
+      setRegisteredList(data.map((row) => ({
+        id: `REG-${row.id}`,
+        code: `Player #${106 + row.id}`,
+        category: 'New Registration',
+        role: row.role,
+        status: row.status,
+        basePrice: row.basePrice,
+        badgeColor: 'var(--lime)',
+      })));
+      setApiError('');
+    } catch (error) {
+      setApiError(error.message || 'Could not connect to the auction service.');
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    setSuccessCode(newReg.id);
+  useEffect(() => {
+    loadRegistrations();
+  }, []);
+
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setApiError('');
+    try {
+      const response = await fetch(`${apiUrl}/auction/registrations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not submit your nomination.');
+      setSuccessCode(data.registrationId);
+      setShowModal(false);
+      setFormData({
+        name: '', phone: '', age: '', role: 'All-Rounder',
+        battingStyle: 'Right-Hand Bat', bowlingStyle: 'Right-Arm Fast',
+        club: '', basePrice: '₹2,000',
+      });
+      await loadRegistrations();
+    } catch (error) {
+      setApiError(error.message || 'Could not connect to the auction service.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const resetRegistrationForm = () => {
     setShowModal(false);
     setFormData({
       name: '',
@@ -277,9 +308,15 @@ export default function Auction() {
           </div>
 
           <div style={{ color: 'var(--muted)', fontSize: '13px' }}>
-            Showing <strong>{filteredPlayers.length}</strong> Auction Slots
+            {isLoading ? 'Loading auction pool…' : <>Showing <strong>{filteredPlayers.length}</strong> Auction Slots</>}
           </div>
         </div>
+
+        {apiError && (
+          <div role="alert" style={{ color: '#ff7777', textAlign: 'center', marginBottom: '20px' }}>
+            {apiError}
+          </div>
+        )}
 
         {/* MASKED PLAYER SLOTS GRID */}
         <div style={{
@@ -467,11 +504,12 @@ export default function Auction() {
                 </div>
 
                 <form onSubmit={handleRegisterSubmit}>
+                  {apiError && <p role="alert" style={{ color: '#ff7777', marginBottom: '16px' }}>{apiError}</p>}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '16px' }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '13px', marginBottom: '6px', fontWeight: 700 }}>
                         Full Name *
-                      </label>
+                </label>
                       <input
                         type="text"
                         required
@@ -590,10 +628,9 @@ export default function Auction() {
                         <option value="₹4,000">₹4,000 (Icon Player)</option>
                       </select>
                     </div>
-                  </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
-                    <button
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
+                      <button
                       type="button"
                       onClick={() => setShowModal(false)}
                       style={{
@@ -610,9 +647,10 @@ export default function Auction() {
                     <button
                       type="submit"
                       className="primary-button"
+                      disabled={isSubmitting}
                       style={{ border: 'none', cursor: 'pointer', padding: '12px 28px' }}
                     >
-                      Submit Player Registration &rarr;
+                      {isSubmitting ? 'Submitting…' : 'Submit Player Registration →'}
                     </button>
                   </div>
                 </form>
