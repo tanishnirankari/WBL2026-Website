@@ -2870,34 +2870,7 @@ footer p {
         }
 
         .admin-stat-grid {
-            gap: 8px;
-            margin-bottom: 13px;
-        }
-
-        .admin-stat-card {
-            min-height: 70px;
-            padding: 10px;
-            gap: 9px;
-            border-radius: 9px;
-        }
-
-        .admin-stat-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 8px;
-        }
-
-        .admin-stat-icon svg {
-            width: 16px;
-            height: 16px;
-        }
-
-        .admin-stat-copy small {
-            font-size: 10px;
-        }
-
-        .admin-stat-copy strong {
-            font-size: 17px;
+            display: none;
         }
 
         .admin-panel {
@@ -2914,22 +2887,29 @@ footer p {
 
         .admin-registration-tools {
             width: 100%;
-            justify-content: flex-start;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 9px;
         }
 
         .admin-search {
             width: 100%;
-            flex: 1 1 100%;
+            grid-column: 1 / -1;
         }
 
         .admin-filter {
-            flex: 1 1 0;
-            justify-content: space-between;
+            min-width: 0;
+            display: grid;
+            gap: 5px;
+            color: #69798b;
+            font-size: 9px;
         }
 
         .admin-filter select {
-            max-width: 135px;
-            flex: 1;
+            width: 100%;
+            max-width: none;
+            min-height: 38px;
+            font-size: 10px;
         }
 
         .admin-team-details span:last-child {
@@ -2977,25 +2957,40 @@ footer p {
         }
 
         .admin-team-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             align-items: stretch;
+            gap: 8px;
         }
 
         .admin-team-actions label {
-            flex: 1 1 130px;
-            justify-content: space-between;
+            min-width: 0;
+            display: grid;
+            gap: 5px;
+            font-size: 9px;
         }
 
         .admin-team-actions select {
-            max-width: 140px;
+            width: 100%;
+            max-width: none;
             min-width: 0;
-            flex: 1;
+            min-height: 40px;
             font-size: 9px;
         }
 
         .admin-action-button {
-            min-height: 35px;
-            padding-inline: 8px;
-            font-size: 9px;
+            min-height: 40px;
+            padding-inline: 6px;
+            font-size: 10px;
+        }
+
+        .admin-team-actions .admin-action-button {
+            width: 100%;
+        }
+
+        .admin-team-actions label,
+        .admin-team-actions button {
+            grid-column: span 1;
         }
 
         .admin-upload-form {
