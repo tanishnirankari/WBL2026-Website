@@ -14,6 +14,22 @@ const tabs = [
   { id: 'gallery', label: 'Gallery', icon: Image },
 ];
 
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+}[character]));
+
+const formatDate = (value) => {
+  if (!value) return 'Not recorded';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? 'Not recorded'
+    : new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+};
+
 function AdminPanel({ children, className = '' }) {
   return <section className={`admin-panel ${className}`}>{children}</section>;
 }
@@ -25,6 +41,8 @@ export default function Admin() {
   const [tab, setTab] = useState('teams');
   const [note, setNote] = useState('');
   const [search, setSearch] = useState('');
+  const [approvalFilter, setApprovalFilter] = useState('ALL');
+  const [paymentFilter, setPaymentFilter] = useState('ALL');
   const [file, setFile] = useState(null);
   const [caption, setCaption] = useState('');
   const [loading, setLoading] = useState(false);
@@ -70,19 +88,86 @@ export default function Admin() {
     }));
   };
 
-  const print = (team) => {
+  const print = async (team) => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
       setNote('Allow pop-ups to print the registration.');
       return;
     }
-    const rows = (team.players || [])
-      .filter((player) => player.name || player.phone || player.photoUrl)
-      .map((player) => `<tr><td>${player.playerIndex}</td><td>${player.photoUrl ? `<img src="${player.photoUrl}" width="42" alt="">` : ''}</td><td>${player.name || '-'}</td><td>${player.phone || '-'}</td></tr>`)
-      .join('');
-    printWindow.document.write(`<title>WBL Team Registration</title><style>@page{size:A4;margin:15mm}body{font:12px Arial;color:#123}table{width:100%;border-collapse:collapse}td,th{border:1px solid #aaa;padding:7px}h2{border-bottom:2px solid #8c0;padding:6px}.sig{display:flex;justify-content:space-between;margin-top:50px}.sig div{border-top:1px solid;width:40%;padding-top:6px}</style><h1>Winter Bash League - Final Team Registration</h1><p>Registration WBL-${team.id}</p><h2>Team details</h2><p>Team: ${team.teamName}<br>Captain: ${team.captainName}<br>Phone: ${team.captainPhone}<br>Payment method: ${team.paymentMode}<br>Payment status: ${team.paymentStatus}<br>Organiser approval: ${team.organiserApproval}</p><h2>Players</h2><table><tr><th>#</th><th>Photo</th><th>Name</th><th>Phone</th></tr>${rows}</table><div class="sig"><div>Captain signature</div><div>Organiser signature and stamp</div></div>`);
+    const roster = (team.players || []).filter((player) => player.name || player.phone || player.photoUrl);
+    const imageMarkup = (url, alt, className) => url
+      ? `<img class="${className}" src="${escapeHtml(url)}" alt="${escapeHtml(alt)}">`
+      : `<div class="${className} image-placeholder">No photo</div>`;
+    const playerCards = roster.length
+      ? roster.map((player) => `
+          <article class="player-card">
+            ${imageMarkup(player.photoUrl, `${player.name || `Player ${player.playerIndex}`} photo`, 'player-photo')}
+            <div class="player-info">
+              <span class="player-number">PLAYER ${escapeHtml(player.playerIndex)}</span>
+              <h3>${escapeHtml(player.name || 'Name not provided')}</h3>
+              <p>${escapeHtml(player.phone || 'Phone not provided')}</p>
+            </div>
+          </article>`).join('')
+      : '<p class="empty-roster">No player details were submitted with this registration.</p>';
+    const teamLogo = imageMarkup(team.teamLogoUrl, `${team.teamName} team logo`, 'team-logo');
+    const date = escapeHtml(formatDate(team.createdAt));
+    const logoMarkup = team.teamLogoUrl
+      ? teamLogo
+      : '<div class="team-logo image-placeholder">WBL</div>';
+    const html = `<!doctype html>
+      <html lang="en"><head><meta charset="utf-8"><title>WBL-${escapeHtml(team.id)} · ${escapeHtml(team.teamName)} registration</title>
+      <style>
+        @page{size:A4;margin:13mm}
+        *{box-sizing:border-box}
+        body{margin:0;color:#15253a;font:12px/1.45 Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+        .topline{height:5px;background:#81bd34;margin-bottom:18px}
+        .brand{display:flex;align-items:center;justify-content:space-between;padding-bottom:13px;border-bottom:1px solid #dce3e9}
+        .brand-title{font-size:10px;font-weight:800;letter-spacing:2px;color:#5c752f}.brand-subtitle{margin-top:4px;font-size:9px;color:#738194}
+        .registration-id{text-align:right;color:#6d7b8c;font-size:9px}.registration-id strong{display:block;color:#17283d;font-size:13px}
+        .team-header{display:flex;align-items:center;gap:16px;padding:20px 0 16px;border-bottom:1px solid #e2e7ec}
+        .team-logo{width:88px;height:88px;flex:none;object-fit:contain;border:1px solid #e0e6eb;border-radius:10px;background:#f5f7f9;padding:5px}
+        .image-placeholder{display:grid;place-items:center;color:#8794a2;font-size:10px;font-weight:700}
+        h1{margin:0;color:#14263b;font-size:25px;line-height:1.12}.team-meta{margin:7px 0 0;color:#647387;font-size:10px}
+        .status-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.status{padding:4px 8px;border-radius:20px;background:#f1f5e9;color:#4e7525;font-size:8px;font-weight:800;text-transform:uppercase}
+        .section-title{margin:17px 0 9px;color:#263950;font-size:11px;letter-spacing:1px;text-transform:uppercase}
+        .details{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+        .detail{min-height:49px;padding:8px 10px;border:1px solid #e3e8ed;border-radius:7px;background:#fbfcfd}
+        .detail span{display:block;color:#7b8999;font-size:8px;text-transform:uppercase;letter-spacing:.5px}.detail strong{display:block;margin-top:4px;color:#24374d;font-size:10px;overflow-wrap:anywhere}
+        .player-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+        .player-card{min-height:94px;padding:7px;display:flex;align-items:center;gap:10px;break-inside:avoid;page-break-inside:avoid;border:1px solid #e2e7ec;border-radius:8px}
+        .player-photo{width:78px;height:78px;flex:none;object-fit:cover;border-radius:6px;background:#f0f3f5}
+        .player-info{min-width:0}.player-number{color:#6a8d3a;font-size:8px;font-weight:800;letter-spacing:.7px}
+        .player-info h3{margin:5px 0;color:#1d3046;font-size:11px;overflow-wrap:anywhere}.player-info p{margin:0;color:#637286;font-size:9px;overflow-wrap:anywhere}
+        .empty-roster{padding:18px;border:1px dashed #d2dbe2;color:#728194}
+        .signature{display:grid;grid-template-columns:1fr 1fr;gap:38px;margin-top:28px;break-inside:avoid}
+        .signature div{padding-top:7px;border-top:1px solid #8c98a5;color:#637286;font-size:9px}
+        .footer{margin-top:18px;padding-top:8px;border-top:1px solid #e3e8ed;color:#8491a0;font-size:8px;text-align:center}
+        @media screen{body{max-width:800px;margin:24px auto;padding:0 22px}.print-hint{margin:12px 0;padding:10px;border-radius:7px;background:#f3f7ec;color:#55752e;font-size:11px}}
+        @media print{.print-hint{display:none}}
+      </style></head><body>
+      <div class="print-hint">Choose “Save as PDF” in the print dialog. For clear player photos, use A4 paper and default or high print quality.</div>
+      <div class="topline"></div>
+      <header class="brand"><div><div class="brand-title">WINTER BASH LEAGUE</div><div class="brand-subtitle">TEAM REGISTRATION RECORD · 2026 SEASON</div></div><div class="registration-id"><strong>WBL-${escapeHtml(team.id)}</strong>Registered ${date}</div></header>
+      <section class="team-header">${logoMarkup}<div><h1>${escapeHtml(team.teamName)}</h1><p class="team-meta">Captain: ${escapeHtml(team.captainName)} · ${escapeHtml(team.captainPhone)}</p><div class="status-row"><span class="status">Approval: ${escapeHtml(team.organiserApproval || 'PENDING')}</span><span class="status">Payment: ${escapeHtml(team.paymentStatus || 'PENDING')}</span></div></div></section>
+      <h2 class="section-title">Registration details</h2>
+      <section class="details"><div class="detail"><span>Team</span><strong>${escapeHtml(team.teamName)}</strong></div><div class="detail"><span>Team captain</span><strong>${escapeHtml(team.captainName)}</strong></div><div class="detail"><span>Captain phone</span><strong>${escapeHtml(team.captainPhone)}</strong></div><div class="detail"><span>Payment method</span><strong>${escapeHtml(team.paymentMode)}</strong></div><div class="detail"><span>Payment status</span><strong>${escapeHtml(team.paymentStatus || 'PENDING')}</strong></div><div class="detail"><span>Organiser approval</span><strong>${escapeHtml(team.organiserApproval || 'PENDING')}</strong></div></section>
+      <h2 class="section-title">Player roster · ${roster.length} submitted</h2><section class="player-grid">${playerCards}</section>
+      <section class="signature"><div>Captain signature</div><div>Organiser signature and stamp</div></section>
+      <footer class="footer">Winter Bash League · Official registration record · Generated ${escapeHtml(formatDate(new Date()))}</footer>
+      </body></html>`;
+    printWindow.document.open();
+    printWindow.document.write(html);
     printWindow.document.close();
-    printWindow.print();
+    try {
+      await Promise.all(Array.from(printWindow.document.images, (image) => (
+        image.decode().catch(() => undefined)
+      )));
+      printWindow.focus();
+      printWindow.print();
+    } catch (error) {
+      printWindow.close();
+      setNote('Unable to prepare the registration PDF. Please try again.');
+    }
   };
 
   const upload = async (event) => {
@@ -189,9 +274,11 @@ export default function Admin() {
     );
   }
 
-  const teams = data.teams.filter((team) => (
-    `${team.teamName} ${team.captainName}`.toLowerCase().includes(search.toLowerCase())
-  ));
+  const teams = data.teams
+    .filter((team) => `${team.teamName} ${team.captainName}`.toLowerCase().includes(search.toLowerCase()))
+    .filter((team) => approvalFilter === 'ALL' || (team.organiserApproval || 'PENDING') === approvalFilter)
+    .filter((team) => paymentFilter === 'ALL' || (team.paymentStatus || 'PENDING') === paymentFilter)
+    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
   const players = data.teams.flatMap((team) => (
     (team.players || [])
       .filter((player) => player.name || player.phone || player.photoUrl)
@@ -247,10 +334,24 @@ export default function Admin() {
           {tab === 'teams' && (
             <AdminPanel>
               <div className="admin-panel-heading">
-                <div><h2>Team registrations</h2><p>{teams.length} teams in your league</p></div>
-                <label className="admin-search"><Search size={17} /><input placeholder="Search teams or captains" value={search} onChange={(event) => setSearch(event.target.value)} /></label>
+                <div><h2>Team registrations</h2><p>Showing {teams.length} of {data.teams.length} registrations · newest first</p></div>
+                <div className="admin-registration-tools">
+                  <label className="admin-search"><Search size={17} /><input placeholder="Search teams or captains" value={search} onChange={(event) => setSearch(event.target.value)} /></label>
+                  <label className="admin-filter">Approval
+                    <select value={approvalFilter} onChange={(event) => setApprovalFilter(event.target.value)}>
+                      <option value="ALL">All statuses</option>
+                      {['PENDING', 'APPROVED', 'REJECTED'].map((status) => <option key={status}>{status}</option>)}
+                    </select>
+                  </label>
+                  <label className="admin-filter">Payment
+                    <select value={paymentFilter} onChange={(event) => setPaymentFilter(event.target.value)}>
+                      <option value="ALL">All statuses</option>
+                      {['PENDING', 'PAID', 'PARTIALLY PAID', 'NOT REQUIRED'].map((status) => <option key={status}>{status}</option>)}
+                    </select>
+                  </label>
+                </div>
               </div>
-              {teams.length === 0 ? <p className="admin-empty">No teams match your search.</p> : (
+              {teams.length === 0 ? <p className="admin-empty">No registrations match the selected search and filters.</p> : (
                 <div className="admin-team-list">
                   {teams.map((team) => (
                     <article className="admin-team-card" key={team.id}>
@@ -263,17 +364,17 @@ export default function Admin() {
                         </div>
                         <span className={`admin-status-pill ${team.organiserApproval === 'APPROVED' ? 'approved' : team.organiserApproval === 'REJECTED' ? 'rejected' : ''}`}>{team.organiserApproval || 'PENDING'}</span>
                       </div>
-                      <div className="admin-team-details"><span>{team.captainPhone}</span><span>Payment: {team.paymentMode}</span><span>{(team.players || []).filter((player) => player.name || player.phone || player.photoUrl).length} player records</span></div>
+                      <div className="admin-team-details"><span>{team.captainPhone}</span><span>Payment method: {team.paymentMode}</span><span>{(team.players || []).filter((player) => player.name || player.phone || player.photoUrl).length} player records</span><span>Registered: {formatDate(team.createdAt)}</span></div>
                       <div className="admin-team-actions">
                         <label>Approval<select value={team.organiserApproval || 'PENDING'} onChange={(event) => patchTeam(team, 'organiserApproval', event.target.value)}>{['PENDING', 'APPROVED', 'REJECTED'].map((status) => <option key={status}>{status}</option>)}</select></label>
                         <label>Payment<select value={team.paymentStatus || 'PENDING'} onChange={(event) => patchTeam(team, 'paymentStatus', event.target.value)}>{['PENDING', 'PAID', 'PARTIALLY PAID', 'NOT REQUIRED'].map((status) => <option key={status}>{status}</option>)}</select></label>
                         <button className="admin-action-button primary" onClick={() => save(team)}><CheckCircle2 size={15} /> Save review</button>
-                        <button className="admin-action-button" onClick={() => print(team)}><Printer size={15} /> Print</button>
+                        <button className="admin-action-button" onClick={() => print(team)}><Printer size={15} /> Print / Save PDF</button>
                       </div>
                       <details className="admin-player-details"><summary>View player details and photos</summary>
                         {(team.players || []).map((player) => (
                           <div className="admin-player-row" key={player.playerIndex}>
-                            {player.photoUrl ? <img src={player.photoUrl} alt={player.name ? `${player.name} photo` : 'Player photo'} /> : <span className="admin-player-photo-placeholder"><UserRound size={16} /></span>}
+                            {player.photoUrl ? <img src={player.photoUrl} alt={player.name ? `${player.name} photo` : 'Player photo'} /> : <span className="admin-player-photo-placeholder"><UserRound size={18} /></span>}
                             <span><strong>{player.name || `Player ${player.playerIndex}`}</strong><small>{player.phone || 'No phone provided'}</small></span>
                             <small>Player {player.playerIndex}</small>
                           </div>
