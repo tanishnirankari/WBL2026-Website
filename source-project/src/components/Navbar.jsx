@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Gavel, Menu, X } from 'lucide-react';
+import { ArrowUpRight, Gavel, Menu, ShieldCheck, X } from 'lucide-react';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -107,6 +107,11 @@ export default function Navbar() {
             ))}
             <Link to="/register" style={{ color: 'var(--lime)', fontWeight: 'bold', borderBottom: 'none' }} onClick={closeMenu}>
               Register Your Team &rarr;
+            </Link>
+            <Link to="/admin" className="organiser-access-link" onClick={closeMenu}>
+              <span className="organiser-access-icon"><ShieldCheck size={18} aria-hidden="true" /></span>
+              <span className="organiser-access-copy"><strong>Organiser access</strong><small>Admin portal</small></span>
+              <ArrowUpRight className="organiser-access-arrow" size={17} aria-hidden="true" />
             </Link>
           </motion.div>
         )}
