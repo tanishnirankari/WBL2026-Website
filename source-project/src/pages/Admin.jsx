@@ -77,7 +77,7 @@ function AuctionNominations({ password }) {
       {loading ? <p className="admin-empty">Loading nominations…</p> : shown.length === 0 ? <p className="admin-empty">No {filter === 'ALL' ? '' : filter.toLowerCase() + ' '}nominations yet.</p> : (
         <div style={{ display: 'grid', gap: 12 }}>
           {shown.map((player) => (
-            <article key={player.id} style={{ display: 'grid', gridTemplateColumns: '72px minmax(0,1fr) auto', gap: 14, alignItems: 'center', padding: 14, borderRadius: 12, border: '1px solid rgba(255,255,255,.1)', background: 'rgba(255,255,255,.025)' }}>
+            <article key={player.id} className="admin-nomination-card">
               {player.photoUrl ? <img src={player.photoUrl} alt={player.fullName} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 10 }} /> : <div className="admin-player-card-placeholder"><UserRound size={22} /></div>}
               <div style={{ minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}><h3 style={{ margin: 0 }}>{player.fullName}</h3><span style={{ padding: '3px 8px', borderRadius: 20, fontSize: 10, fontWeight: 800, color: player.status === 'APPROVED' ? 'var(--lime)' : player.status === 'REJECTED' ? '#f87171' : '#fbbf24', background: player.status === 'APPROVED' ? 'rgba(156,255,0,.12)' : player.status === 'REJECTED' ? 'rgba(248,113,113,.12)' : 'rgba(251,191,36,.12)' }}>{player.status || 'PENDING'}</span></div><p style={{ margin: '5px 0', color: '#cbd5e1' }}>{player.role} · Age {player.age} · {player.clubName || 'No club listed'}</p><small style={{ color: '#94a3b8' }}>Phone: {player.phone} · Batting: {player.battingStyle || '—'} · Bowling: {player.bowlingStyle || '—'} · Base price: {player.basePrice}</small><small style={{ display: 'block', color: '#64748b', marginTop: 4 }}>Submitted {formatDate(player.createdAt)}</small></div>
               <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', justifyContent: 'flex-end' }}>{player.status !== 'APPROVED' && <button onClick={() => review(player, 'APPROVED')} disabled={busyId === player.id} className="admin-action-button primary"><Check size={14} /> Approve & publish</button>}{player.status !== 'REJECTED' && <button onClick={() => review(player, 'REJECTED')} disabled={busyId === player.id} className="admin-action-button danger"><XCircle size={14} /> Reject</button>}</div>
@@ -119,6 +119,15 @@ export default function Admin() {
       setLoading(false);
     }
   };
+
+  // Keep the bid inbox current while the organiser has the dashboard open.
+  useEffect(() => {
+    if (!data) return undefined;
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === 'visible') load();
+    }, 20000);
+    return () => window.clearInterval(timer);
+  }, [Boolean(data), password]);
 
   const save = async (team) => {
     try {
@@ -562,6 +571,7 @@ export default function Admin() {
 
               {auctionSubTab === 'nominations' ? <AuctionNominations password={password} /> : auctionSubTab === 'bids' ? (
                 <>
+                  <div className="admin-bids-heading"><div><strong>Incoming bids</strong><small>New bids sync automatically while this page is open.</small></div><button className="admin-refresh" onClick={load} disabled={loading}><RefreshCw size={15} /> Refresh now</button></div>
                   <div style={{ display: 'flex', gap: '10px', marginBottom: '18px', flexWrap: 'wrap' }}>
                     {['ALL', 'PENDING', 'APPROVED', 'REJECTED'].map((filter) => (
                       <button
@@ -586,8 +596,8 @@ export default function Admin() {
                   {bidsList.filter((b) => bidFilter === 'ALL' || b.status === bidFilter).length === 0 ? (
                     <p className="admin-empty">No bids match the selected filter.</p>
                   ) : (
-                    <div style={{ overflowX: 'auto' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
+                    <div className="admin-bids-table-wrap" style={{ overflowX: 'auto' }}>
+                      <table className="admin-bids-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
                         <thead>
                           <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8' }}>
                             <th style={{ padding: '10px 12px' }}>Player</th>
@@ -603,17 +613,17 @@ export default function Admin() {
                             .filter((b) => bidFilter === 'ALL' || b.status === bidFilter)
                             .map((bid) => (
                               <tr key={bid.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                <td style={{ padding: '12px' }}>
+                                <td data-label="Player" style={{ padding: '12px' }}>
                                   <strong>{bid.playerName || bid.playerId}</strong>
                                 </td>
-                                <td style={{ padding: '12px' }}>{bid.bidderName}</td>
-                                <td style={{ padding: '12px', color: 'var(--lime)', fontWeight: 800 }}>
+                                <td data-label="Bidder" style={{ padding: '12px' }}>{bid.bidderName}</td>
+                                <td data-label="Bid amount" style={{ padding: '12px', color: 'var(--lime)', fontWeight: 800 }}>
                                   T {Number(bid.bidAmount).toLocaleString('en-IN')}
                                 </td>
-                                <td style={{ padding: '12px', color: '#94a3b8', fontSize: '12px' }}>
+                                <td data-label="Private contact" style={{ padding: '12px', color: '#94a3b8', fontSize: '12px' }}>
                                   {bid.phone} {bid.email && `• ${bid.email}`}
                                 </td>
-                                <td style={{ padding: '12px' }}>
+                                <td data-label="Status" style={{ padding: '12px' }}>
                                   <span
                                     style={{
                                       fontSize: '11px',
@@ -643,7 +653,7 @@ export default function Admin() {
                                     {bid.status}
                                   </span>
                                 </td>
-                                <td style={{ padding: '12px', textAlign: 'right' }}>
+                                <td data-label="Review" style={{ padding: '12px', textAlign: 'right' }}>
                                   <div style={{ display: 'inline-flex', gap: '6px' }}>
                                     {bid.status !== 'APPROVED' && (
                                       <button
