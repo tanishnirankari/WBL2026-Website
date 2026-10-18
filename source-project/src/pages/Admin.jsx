@@ -111,6 +111,7 @@ export default function Admin() {
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Unable to open the admin portal.');
       setData(result);
+      setBidsList(result.bids || []);
       setNote('');
     } catch (error) {
       setNote(error.message);
@@ -157,53 +158,27 @@ export default function Admin() {
     }
   });
 
-  const [bidsList, setBidsList] = useState(() => {
+  const [bidsList, setBidsList] = useState([]);
+
+  const reviewBid = async (bidId, status) => {
+    const targetBid = bidsList.find((bid) => bid.id === bidId);
+    if (!targetBid) return;
     try {
-      const approved = JSON.parse(localStorage.getItem('wbl_approved_bids') || '[]');
-      const pending = JSON.parse(localStorage.getItem('wbl_pending_bids') || '[]');
-      const rejected = JSON.parse(localStorage.getItem('wbl_rejected_bids') || '[]');
-      return [...approved, ...pending, ...rejected];
-    } catch {
-      return [];
+      const response = await fetch(`${api}/admin/auction/bids/${bidId}/review`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ status }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Unable to save bid status.');
+      setBidsList((current) => current.map((bid) => bid.id === bidId ? { ...bid, status: result.status } : bid));
+      setNote(`Bid from ${targetBid.bidderName} for ₹${Number(targetBid.bidAmount).toLocaleString('en-IN')} ${status.toLowerCase()}.`);
+    } catch (error) {
+      setNote(error.message || 'Unable to save bid status.');
     }
-  });
-
-  // Approve a Bid
-  const handleApproveBid = (bidId) => {
-    const targetBid = bidsList.find((b) => b.id === bidId);
-    if (!targetBid) return;
-
-    const updated = bidsList.map((b) => b.id === bidId ? { ...b, status: 'APPROVED' } : b);
-    setBidsList(updated);
-
-    // Save to approved bids storage
-    const approved = updated.filter((b) => b.status === 'APPROVED');
-    const pending = updated.filter((b) => b.status === 'PENDING');
-    const rejected = updated.filter((b) => b.status === 'REJECTED');
-
-    localStorage.setItem('wbl_approved_bids', JSON.stringify(approved));
-    localStorage.setItem('wbl_pending_bids', JSON.stringify(pending));
-    localStorage.setItem('wbl_rejected_bids', JSON.stringify(rejected));
-    setNote(`Bid from ${targetBid.bidderName} for T ${targetBid.bidAmount} APPROVED.`);
   };
-
-  // Reject a Bid
-  const handleRejectBid = (bidId) => {
-    const targetBid = bidsList.find((b) => b.id === bidId);
-    if (!targetBid) return;
-
-    const updated = bidsList.map((b) => b.id === bidId ? { ...b, status: 'REJECTED' } : b);
-    setBidsList(updated);
-
-    const approved = updated.filter((b) => b.status === 'APPROVED');
-    const pending = updated.filter((b) => b.status === 'PENDING');
-    const rejected = updated.filter((b) => b.status === 'REJECTED');
-
-    localStorage.setItem('wbl_approved_bids', JSON.stringify(approved));
-    localStorage.setItem('wbl_pending_bids', JSON.stringify(pending));
-    localStorage.setItem('wbl_rejected_bids', JSON.stringify(rejected));
-    setNote(`Bid from ${targetBid.bidderName} REJECTED.`);
-  };
+  const handleApproveBid = (bidId) => reviewBid(bidId, 'APPROVED');
+  const handleRejectBid = (bidId) => reviewBid(bidId, 'REJECTED');
 
   // Toggle Published status
   const togglePlayerPublished = (playerId) => {
