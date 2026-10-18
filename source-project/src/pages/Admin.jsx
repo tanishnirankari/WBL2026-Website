@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ArrowLeft, CheckCircle2, Eye, EyeOff, Gavel, Image, LockKeyhole,
   LogOut, Printer, RefreshCw, Search, ShieldCheck, Upload, UserRound, Users,
@@ -34,6 +34,61 @@ const formatDate = (value) => {
 function AdminPanel({ children, className = '' }) {
   return <section className={`admin-panel ${className}`}>{children}</section>;
 }
+
+function AuctionNominations({ password }) {
+  const [players, setPlayers] = useState([]);
+  const [filter, setFilter] = useState('PENDING');
+  const [busyId, setBusyId] = useState(null);
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(true);
+  const headers = { 'x-admin-password': password, 'Content-Type': 'application/json' };
+  const load = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(api + '/admin/dashboard', { headers });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Could not load player nominations.');
+      setPlayers(result.auctionPlayers || []);
+      setMessage('');
+    } catch (error) { setMessage(error.message); }
+    finally { setLoading(false); }
+  };
+  useEffect(() => { load(); }, [password]);
+  const review = async (player, status) => {
+    setBusyId(player.id);
+    try {
+      const response = await fetch(api + '/admin/auction/registrations/' + player.id + '/review', { method: 'PATCH', headers, body: JSON.stringify({ status }) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Could not update player status.');
+      setPlayers((current) => current.map((item) => item.id === player.id ? { ...item, status: result.status } : item));
+      setMessage(player.fullName + ' is now ' + result.status.toLowerCase() + '.');
+    } catch (error) { setMessage(error.message); }
+    finally { setBusyId(null); }
+  };
+  const shown = players.filter((player) => filter === 'ALL' || player.status === filter);
+  const buttonStyle = (active) => ({ padding: '7px 12px', borderRadius: 18, border: active ? '1px solid var(--lime)' : '1px solid rgba(255,255,255,.14)', background: active ? 'rgba(156,255,0,.14)' : 'transparent', color: active ? 'var(--lime)' : '#cbd5e1', cursor: 'pointer', fontWeight: 700, fontSize: 12 });
+  return (
+    <section>
+      <div className="admin-panel-heading"><div><h2>Player nominations</h2><p>Review each player before publishing them to the public auction page.</p></div><button className="admin-refresh" onClick={load} disabled={loading}><RefreshCw size={15} /> Refresh</button></div>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 18 }}>
+        {['PENDING', 'APPROVED', 'REJECTED', 'ALL'].map((status) => <button key={status} onClick={() => setFilter(status)} style={buttonStyle(filter === status)}>{status} ({players.filter((player) => status === 'ALL' || player.status === status).length})</button>)}
+      </div>
+      {message && <p role="status" className="admin-notice">{message}</p>}
+      {loading ? <p className="admin-empty">Loading nominations…</p> : shown.length === 0 ? <p className="admin-empty">No {filter === 'ALL' ? '' : filter.toLowerCase() + ' '}nominations yet.</p> : (
+        <div style={{ display: 'grid', gap: 12 }}>
+          {shown.map((player) => (
+            <article key={player.id} style={{ display: 'grid', gridTemplateColumns: '72px minmax(0,1fr) auto', gap: 14, alignItems: 'center', padding: 14, borderRadius: 12, border: '1px solid rgba(255,255,255,.1)', background: 'rgba(255,255,255,.025)' }}>
+              {player.photoUrl ? <img src={player.photoUrl} alt={player.fullName} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 10 }} /> : <div className="admin-player-card-placeholder"><UserRound size={22} /></div>}
+              <div style={{ minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}><h3 style={{ margin: 0 }}>{player.fullName}</h3><span style={{ padding: '3px 8px', borderRadius: 20, fontSize: 10, fontWeight: 800, color: player.status === 'APPROVED' ? 'var(--lime)' : player.status === 'REJECTED' ? '#f87171' : '#fbbf24', background: player.status === 'APPROVED' ? 'rgba(156,255,0,.12)' : player.status === 'REJECTED' ? 'rgba(248,113,113,.12)' : 'rgba(251,191,36,.12)' }}>{player.status || 'PENDING'}</span></div><p style={{ margin: '5px 0', color: '#cbd5e1' }}>{player.role} · Age {player.age} · {player.clubName || 'No club listed'}</p><small style={{ color: '#94a3b8' }}>Phone: {player.phone} · Batting: {player.battingStyle || '—'} · Bowling: {player.bowlingStyle || '—'} · Base price: {player.basePrice}</small><small style={{ display: 'block', color: '#64748b', marginTop: 4 }}>Submitted {formatDate(player.createdAt)}</small></div>
+              <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', justifyContent: 'flex-end' }}>{player.status !== 'APPROVED' && <button onClick={() => review(player, 'APPROVED')} disabled={busyId === player.id} className="admin-action-button primary"><Check size={14} /> Approve & publish</button>}{player.status !== 'REJECTED' && <button onClick={() => review(player, 'REJECTED')} disabled={busyId === player.id} className="admin-action-button danger"><XCircle size={14} /> Reject</button>}</div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 
 export default function Admin() {
   const [password, setPassword] = useState('');
@@ -91,7 +146,7 @@ export default function Admin() {
 
   // Auction Bids & Player Management State
   const [bidFilter, setBidFilter] = useState('ALL'); // ALL, PENDING, APPROVED, REJECTED
-  const [auctionSubTab, setAuctionSubTab] = useState('bids'); // bids, catalogue
+  const [auctionSubTab, setAuctionSubTab] = useState('nominations'); // nominations, bids, catalogue
 
   const [auctionPlayers, setAuctionPlayers] = useState(() => {
     try {
@@ -494,6 +549,10 @@ export default function Admin() {
                 </div>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   <button
+                    onClick={() => setAuctionSubTab('nominations')}
+                    style={{ padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', border: auctionSubTab === 'nominations' ? '1px solid var(--lime)' : '1px solid rgba(255,255,255,0.15)', background: auctionSubTab === 'nominations' ? 'var(--lime)' : 'transparent', color: auctionSubTab === 'nominations' ? '#070a0f' : '#cbd5e1' }}
+                  >Player Nominations ({data?.auctionPlayers?.length || 0})</button>
+                  <button
                     onClick={() => setAuctionSubTab('bids')}
                     style={{
                       padding: '8px 16px',
@@ -526,7 +585,7 @@ export default function Admin() {
                 </div>
               </div>
 
-              {auctionSubTab === 'bids' ? (
+              {auctionSubTab === 'nominations' ? <AuctionNominations password={password} /> : auctionSubTab === 'bids' ? (
                 <>
                   <div style={{ display: 'flex', gap: '10px', marginBottom: '18px', flexWrap: 'wrap' }}>
                     {['ALL', 'PENDING', 'APPROVED', 'REJECTED'].map((filter) => (
