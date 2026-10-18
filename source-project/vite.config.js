@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/WBL2026-Website/',
+  base: '/',
   server: {
     host: true
   }
