@@ -124,13 +124,14 @@ export default function Auction() {
 
   const roleFilters = ['All Players', 'Batsman', 'Bowler', 'All-Rounder', 'Wicket-Keeper'];
   const [activeRole, setActiveRole] = useState('All Players');
+  const [registeredPlayers, setRegisteredPlayers] = useState([]);
 
   const [players, setPlayers] = useState(() => {
     try {
       const saved = localStorage.getItem('wbl_auction_players_custom');
-      return saved ? JSON.parse(saved) : defaultAuctionPlayers;
+      return saved ? JSON.parse(saved) : [];
     } catch {
-      return defaultAuctionPlayers;
+      return [];
     }
   });
 
@@ -184,6 +185,20 @@ export default function Auction() {
       }
     };
     fetchLiveBids();
+    const fetchApprovedPlayers = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/auction/registrations`);
+        if (!res.ok) return;
+        const data = await res.json();
+        setRegisteredPlayers(Array.isArray(data) ? data.map((p) => ({
+          ...p, id: `approved-${p.id}`, category: 'APPROVED PLAYER', status: 'AVAILABLE', published: true,
+          basePrice: Number(String(p.basePrice || '0').replace(/[^0-9]/g, '')) || 0,
+          stats: { matches: '—', primaryStat: p.clubName || 'Open auction', strikeRate: p.battingStyle || '—', economy: p.bowlingStyle || '—' },
+          badgeColor: 'var(--lime)'
+        })) : []);
+      } catch { setRegisteredPlayers([]); }
+    };
+    fetchApprovedPlayers();
   }, [apiUrl]);
 
   const getHighestBidInfo = (playerId) => {
@@ -196,13 +211,13 @@ export default function Auction() {
     );
   };
 
-  const visiblePlayers = players.filter((p) => {
+  const visiblePlayers = [...players, ...registeredPlayers].filter((p) => {
     if (p.published === false) return false;
     if (activeRole === 'All Players') return true;
-    if (activeRole === 'Batsman') return p.role.toLowerCase().includes('bat');
-    if (activeRole === 'Bowler') return p.role.toLowerCase().includes('bowl');
-    if (activeRole === 'All-Rounder') return p.role.toLowerCase().includes('round');
-    if (activeRole === 'Wicket-Keeper') return p.role.toLowerCase().includes('keeper');
+    if (activeRole === 'Batsman') return (p.role || '').toLowerCase().includes('bat');
+    if (activeRole === 'Bowler') return (p.role || '').toLowerCase().includes('bowl');
+    if (activeRole === 'All-Rounder') return (p.role || '').toLowerCase().includes('round');
+    if (activeRole === 'Wicket-Keeper') return (p.role || '').toLowerCase().includes('keeper');
     return true;
   });
 
@@ -293,14 +308,11 @@ export default function Auction() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Submission failed');
-      setRegSuccess(data.registrationId || Math.floor(100 + Math.random() * 900));
+      setRegSuccess(data.registrationId);
       setShowRegisterModal(false);
       setPhotoPreview(null);
-    } catch {
-      const regId = Math.floor(1000 + Math.random() * 9000);
-      setRegSuccess(regId);
-      setShowRegisterModal(false);
-      setPhotoPreview(null);
+    } catch (error) {
+      setRegError(error.message || 'Unable to submit nomination. Please try again.');
     } finally {
       setIsSubmittingReg(false);
     }
@@ -468,6 +480,14 @@ export default function Auction() {
             </motion.div>
           )}
 
+          {visiblePlayers.length === 0 && (
+            <div style={{ margin: '40px auto', maxWidth: 680, padding: '32px', textAlign: 'center', border: '1px solid rgba(156,255,0,.22)', borderRadius: 16, background: 'rgba(156,255,0,.04)' }}>
+              <h2 style={{ color: 'var(--lime)' }}>Player nominations are open</h2>
+              <p style={{ color: '#cbd5e1' }}>Approved players will appear here after organiser review. Submit your nomination to be considered for the auction.</p>
+              <button onClick={() => setShowRegisterModal(true)} style={{ background: 'var(--lime)', color: '#06111d', border: 0, borderRadius: 8, padding: '12px 20px', fontWeight: 800, cursor: 'pointer' }}>Register as a player</button>
+            </div>
+          )}
+
           {/* 3. PRO SPORTS PLAYER CARDS GRID */}
           <div
             style={{
@@ -517,7 +537,7 @@ export default function Auction() {
                   >
                     {/* Portrait Photograph */}
                     <img
-                      src={player.photoUrl}
+                      src={player.photoUrl || '/images/jersey.jpg'}
                       alt={player.name}
                       style={{
                         width: '100%',
