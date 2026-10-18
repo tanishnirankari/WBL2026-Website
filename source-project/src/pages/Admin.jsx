@@ -2,6 +2,7 @@ import { useState } from 'react';
 import {
   ArrowLeft, CheckCircle2, Eye, EyeOff, Gavel, Image, LockKeyhole,
   LogOut, Printer, RefreshCw, Search, ShieldCheck, Upload, UserRound, Users,
+  Check, XCircle, ToggleLeft, ToggleRight, DollarSign, Tag, CheckSquare
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AdminPortalLogo from '../components/AdminPortalLogo';
@@ -86,6 +87,87 @@ export default function Admin() {
       ...current,
       teams: current.teams.map((item) => item.id === team.id ? { ...item, [key]: value } : item),
     }));
+  };
+
+  // Auction Bids & Player Management State
+  const [bidFilter, setBidFilter] = useState('ALL'); // ALL, PENDING, APPROVED, REJECTED
+  const [auctionSubTab, setAuctionSubTab] = useState('bids'); // bids, catalogue
+
+  const [auctionPlayers, setAuctionPlayers] = useState(() => {
+    try {
+      const saved = localStorage.getItem('wbl_auction_players_custom');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [bidsList, setBidsList] = useState(() => {
+    try {
+      const approved = JSON.parse(localStorage.getItem('wbl_approved_bids') || '[]');
+      const pending = JSON.parse(localStorage.getItem('wbl_pending_bids') || '[]');
+      const rejected = JSON.parse(localStorage.getItem('wbl_rejected_bids') || '[]');
+      return [...approved, ...pending, ...rejected];
+    } catch {
+      return [];
+    }
+  });
+
+  // Approve a Bid
+  const handleApproveBid = (bidId) => {
+    const targetBid = bidsList.find((b) => b.id === bidId);
+    if (!targetBid) return;
+
+    const updated = bidsList.map((b) => b.id === bidId ? { ...b, status: 'APPROVED' } : b);
+    setBidsList(updated);
+
+    // Save to approved bids storage
+    const approved = updated.filter((b) => b.status === 'APPROVED');
+    const pending = updated.filter((b) => b.status === 'PENDING');
+    const rejected = updated.filter((b) => b.status === 'REJECTED');
+
+    localStorage.setItem('wbl_approved_bids', JSON.stringify(approved));
+    localStorage.setItem('wbl_pending_bids', JSON.stringify(pending));
+    localStorage.setItem('wbl_rejected_bids', JSON.stringify(rejected));
+    setNote(`Bid from ${targetBid.bidderName} for T ${targetBid.bidAmount} APPROVED.`);
+  };
+
+  // Reject a Bid
+  const handleRejectBid = (bidId) => {
+    const targetBid = bidsList.find((b) => b.id === bidId);
+    if (!targetBid) return;
+
+    const updated = bidsList.map((b) => b.id === bidId ? { ...b, status: 'REJECTED' } : b);
+    setBidsList(updated);
+
+    const approved = updated.filter((b) => b.status === 'APPROVED');
+    const pending = updated.filter((b) => b.status === 'PENDING');
+    const rejected = updated.filter((b) => b.status === 'REJECTED');
+
+    localStorage.setItem('wbl_approved_bids', JSON.stringify(approved));
+    localStorage.setItem('wbl_pending_bids', JSON.stringify(pending));
+    localStorage.setItem('wbl_rejected_bids', JSON.stringify(rejected));
+    setNote(`Bid from ${targetBid.bidderName} REJECTED.`);
+  };
+
+  // Toggle Published status
+  const togglePlayerPublished = (playerId) => {
+    const updated = auctionPlayers.map((p) =>
+      p.id === playerId ? { ...p, published: p.published === false ? true : false } : p
+    );
+    setAuctionPlayers(updated);
+    localStorage.setItem('wbl_auction_players_custom', JSON.stringify(updated));
+    setNote('Player catalogue visibility updated.');
+  };
+
+  // Update Player Status (AVAILABLE / SOLD / UNSOLD)
+  const setPlayerAuctionStatus = (playerId, status) => {
+    const updated = auctionPlayers.map((p) =>
+      p.id === playerId ? { ...p, status } : p
+    );
+    setAuctionPlayers(updated);
+    localStorage.setItem('wbl_auction_players_custom', JSON.stringify(updated));
+    setNote(`Player marked as ${status}.`);
   };
 
   const print = async (team) => {
@@ -405,11 +487,251 @@ export default function Admin() {
 
           {tab === 'auction' && (
             <AdminPanel>
-              <div className="admin-panel-heading"><div><h2>Auction registrations</h2><p>Players registered for the league auction</p></div></div>
-              {data.auctionPlayers.length === 0 ? <p className="admin-empty">No auction registrations yet.</p> : (
-                <div className="admin-auction-list">{data.auctionPlayers.map((player) => (
-                  <article className="admin-auction-row" key={player.id}><span className="admin-auction-icon"><Gavel size={18} /></span><div><h3>{player.fullName}</h3><p>{player.role} · {player.clubName || 'No club listed'}</p></div><strong>{player.basePrice}</strong></article>
-                ))}</div>
+              <div className="admin-panel-heading">
+                <div>
+                  <h2>Player Auction & Bidding Portal</h2>
+                  <p>Review incoming franchise bids and manage published player catalogue</p>
+                </div>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => setAuctionSubTab('bids')}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '20px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: auctionSubTab === 'bids' ? '1px solid var(--lime)' : '1px solid rgba(255,255,255,0.15)',
+                      background: auctionSubTab === 'bids' ? 'var(--lime)' : 'transparent',
+                      color: auctionSubTab === 'bids' ? '#070a0f' : '#cbd5e1'
+                    }}
+                  >
+                    Bids Management ({bidsList.length})
+                  </button>
+                  <button
+                    onClick={() => setAuctionSubTab('catalogue')}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '20px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: auctionSubTab === 'catalogue' ? '1px solid var(--lime)' : '1px solid rgba(255,255,255,0.15)',
+                      background: auctionSubTab === 'catalogue' ? 'var(--lime)' : 'transparent',
+                      color: auctionSubTab === 'catalogue' ? '#070a0f' : '#cbd5e1'
+                    }}
+                  >
+                    Player Catalogue
+                  </button>
+                </div>
+              </div>
+
+              {auctionSubTab === 'bids' ? (
+                <>
+                  <div style={{ display: 'flex', gap: '10px', marginBottom: '18px', flexWrap: 'wrap' }}>
+                    {['ALL', 'PENDING', 'APPROVED', 'REJECTED'].map((filter) => (
+                      <button
+                        key={filter}
+                        onClick={() => setBidFilter(filter)}
+                        style={{
+                          padding: '6px 14px',
+                          borderRadius: '16px',
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          background: bidFilter === filter ? 'rgba(156,255,0,0.15)' : 'rgba(255,255,255,0.04)',
+                          border: bidFilter === filter ? '1px solid var(--lime)' : '1px solid rgba(255,255,255,0.1)',
+                          color: bidFilter === filter ? 'var(--lime)' : '#94a3b8'
+                        }}
+                      >
+                        {filter} ({bidsList.filter((b) => filter === 'ALL' || b.status === filter).length})
+                      </button>
+                    ))}
+                  </div>
+
+                  {bidsList.filter((b) => bidFilter === 'ALL' || b.status === bidFilter).length === 0 ? (
+                    <p className="admin-empty">No bids match the selected filter.</p>
+                  ) : (
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
+                        <thead>
+                          <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8' }}>
+                            <th style={{ padding: '10px 12px' }}>Player</th>
+                            <th style={{ padding: '10px 12px' }}>Bidder</th>
+                            <th style={{ padding: '10px 12px' }}>Bid Amount</th>
+                            <th style={{ padding: '10px 12px' }}>Contact (Private)</th>
+                            <th style={{ padding: '10px 12px' }}>Status</th>
+                            <th style={{ padding: '10px 12px', textAlign: 'right' }}>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {bidsList
+                            .filter((b) => bidFilter === 'ALL' || b.status === bidFilter)
+                            .map((bid) => (
+                              <tr key={bid.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                <td style={{ padding: '12px' }}>
+                                  <strong>{bid.playerName || bid.playerId}</strong>
+                                </td>
+                                <td style={{ padding: '12px' }}>{bid.bidderName}</td>
+                                <td style={{ padding: '12px', color: 'var(--lime)', fontWeight: 800 }}>
+                                  T {Number(bid.bidAmount).toLocaleString('en-IN')}
+                                </td>
+                                <td style={{ padding: '12px', color: '#94a3b8', fontSize: '12px' }}>
+                                  {bid.phone} {bid.email && `• ${bid.email}`}
+                                </td>
+                                <td style={{ padding: '12px' }}>
+                                  <span
+                                    style={{
+                                      fontSize: '11px',
+                                      fontWeight: 800,
+                                      padding: '3px 8px',
+                                      borderRadius: '4px',
+                                      background:
+                                        bid.status === 'APPROVED'
+                                          ? 'rgba(156,255,0,0.15)'
+                                          : bid.status === 'REJECTED'
+                                          ? 'rgba(239,68,68,0.15)'
+                                          : 'rgba(255,255,255,0.08)',
+                                      color:
+                                        bid.status === 'APPROVED'
+                                          ? 'var(--lime)'
+                                          : bid.status === 'REJECTED'
+                                          ? '#ef4444'
+                                          : '#f8fafc',
+                                      border:
+                                        bid.status === 'APPROVED'
+                                          ? '1px solid var(--lime)'
+                                          : bid.status === 'REJECTED'
+                                          ? '1px solid rgba(239,68,68,0.4)'
+                                          : '1px solid rgba(255,255,255,0.15)'
+                                    }}
+                                  >
+                                    {bid.status}
+                                  </span>
+                                </td>
+                                <td style={{ padding: '12px', textAlign: 'right' }}>
+                                  <div style={{ display: 'inline-flex', gap: '6px' }}>
+                                    {bid.status !== 'APPROVED' && (
+                                      <button
+                                        onClick={() => handleApproveBid(bid.id)}
+                                        style={{
+                                          padding: '5px 10px',
+                                          borderRadius: '6px',
+                                          background: 'rgba(156,255,0,0.15)',
+                                          border: '1px solid var(--lime)',
+                                          color: 'var(--lime)',
+                                          fontSize: '11px',
+                                          fontWeight: 800,
+                                          cursor: 'pointer'
+                                        }}
+                                      >
+                                        Approve
+                                      </button>
+                                    )}
+                                    {bid.status !== 'REJECTED' && (
+                                      <button
+                                        onClick={() => handleRejectBid(bid.id)}
+                                        style={{
+                                          padding: '5px 10px',
+                                          borderRadius: '6px',
+                                          background: 'rgba(239,68,68,0.15)',
+                                          border: '1px solid rgba(239,68,68,0.4)',
+                                          color: '#ef4444',
+                                          fontSize: '11px',
+                                          fontWeight: 800,
+                                          cursor: 'pointer'
+                                        }}
+                                      >
+                                        Reject
+                                      </button>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+                  {auctionPlayers.map((player) => (
+                    <article
+                      key={player.id}
+                      style={{
+                        background: '#0a1017',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '12px',
+                        padding: '16px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '12px'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                          <h3 style={{ fontSize: '15px', color: '#ffffff', margin: '0 0 2px' }}>{player.name}</h3>
+                          <span style={{ fontSize: '12px', color: 'var(--lime)' }}>{player.role}</span>
+                        </div>
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            fontWeight: 800,
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            background: player.published !== false ? 'rgba(156,255,0,0.15)' : 'rgba(255,255,255,0.05)',
+                            color: player.published !== false ? 'var(--lime)' : '#64748b',
+                            border: `1px solid ${player.published !== false ? 'rgba(156,255,0,0.3)' : 'rgba(255,255,255,0.1)'}`
+                          }}
+                        >
+                          {player.published !== false ? 'PUBLISHED' : 'HIDDEN'}
+                        </span>
+                      </div>
+
+                      <div style={{ fontSize: '12px', color: '#94a3b8' }}>
+                        <div>Base Price: <strong style={{ color: '#ffffff' }}>T {Number(player.basePrice).toLocaleString('en-IN')}</strong></div>
+                        <div>Status: <strong style={{ color: player.status === 'SOLD' ? '#ef4444' : 'var(--lime)' }}>{player.status || 'AVAILABLE'}</strong></div>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
+                        <button
+                          onClick={() => togglePlayerPublished(player.id)}
+                          style={{
+                            flex: 1,
+                            padding: '6px 10px',
+                            borderRadius: '6px',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            background: 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(255,255,255,0.15)',
+                            color: '#cbd5e1',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {player.published !== false ? 'Unpublish' : 'Publish'}
+                        </button>
+
+                        <button
+                          onClick={() => setPlayerAuctionStatus(player.id, player.status === 'SOLD' ? 'AVAILABLE' : 'SOLD')}
+                          style={{
+                            flex: 1,
+                            padding: '6px 10px',
+                            borderRadius: '6px',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            background: player.status === 'SOLD' ? 'rgba(156,255,0,0.15)' : 'rgba(239,68,68,0.15)',
+                            border: player.status === 'SOLD' ? '1px solid var(--lime)' : '1px solid rgba(239,68,68,0.3)',
+                            color: player.status === 'SOLD' ? 'var(--lime)' : '#ef4444',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {player.status === 'SOLD' ? 'Mark Available' : 'Mark Sold'}
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
               )}
             </AdminPanel>
           )}
