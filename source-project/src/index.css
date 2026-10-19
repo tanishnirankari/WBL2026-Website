@@ -3345,3 +3345,177 @@ footer p {
     .auction-register-fab { transition: none !important; }
     .auction-register-icon-motion { animation: none !important; }
 }
+
+/* Admin portal visual polish */
+.admin-app {
+    background:
+        radial-gradient(ellipse at 92% 0%, rgba(156, 255, 0, .055), transparent 28rem),
+        #f3f6f8;
+}
+
+.admin-sidebar {
+    background:
+        radial-gradient(ellipse at 12% 0%, rgba(156, 255, 0, .1), transparent 19rem),
+        linear-gradient(180deg, #102339 0%, #0a1725 100%);
+    box-shadow: 8px 0 28px rgba(10, 23, 37, .08);
+}
+
+.admin-side-nav button {
+    min-height: 48px;
+    border-radius: 10px;
+}
+
+.admin-side-nav button.active {
+    color: #c5ff83;
+    border-color: rgba(156, 255, 0, .2);
+    background: linear-gradient(105deg, rgba(156, 255, 0, .16), rgba(156, 255, 0, .045));
+    box-shadow: inset 3px 0 0 var(--lime);
+}
+
+.admin-return-link {
+    border-radius: 8px;
+    transition: color .18s ease, background .18s ease;
+}
+
+.admin-return-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, .06);
+}
+
+.admin-topbar {
+    border-bottom-color: #e5ebef;
+    box-shadow: 0 3px 14px rgba(26, 45, 64, .025);
+}
+
+.admin-content {
+    padding-top: 42px;
+}
+
+.admin-page-heading {
+    margin-bottom: 28px;
+}
+
+.admin-page-heading h1 {
+    font-size: clamp(28px, 3vw, 36px);
+    letter-spacing: -1.3px;
+}
+
+.admin-kicker {
+    color: #709f3c;
+}
+
+.admin-season-pill {
+    color: #527d25;
+    border-color: #dcebc9;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #f7fced, #edf7df);
+}
+
+.admin-stat-card {
+    min-height: 96px;
+    border-color: #e3e9ed;
+    border-radius: 13px;
+    box-shadow: 0 3px 12px rgba(28, 48, 66, .025);
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.admin-stat-card:hover,
+.admin-stat-card.selected {
+    transform: translateY(-2px);
+    border-color: #b7dc8d;
+    box-shadow: 0 9px 22px rgba(42, 73, 22, .08);
+}
+
+.admin-stat-icon {
+    color: #5d902b;
+    border: 1px solid #e3efcf;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #f5fbe9, #ebf6dc);
+}
+
+.admin-stat-copy strong {
+    font-size: 22px;
+    letter-spacing: -.5px;
+}
+
+.admin-panel {
+    border-color: #e3e9ed;
+    border-radius: 14px;
+    box-shadow: 0 8px 28px rgba(27, 44, 64, .045);
+}
+
+.admin-panel-heading h2 {
+    font-size: 16px;
+}
+
+.admin-team-card,
+.admin-nomination-card,
+.admin-gallery-card {
+    border-color: #e7edf0;
+    border-radius: 12px;
+    transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.admin-team-card:hover,
+.admin-nomination-card:hover,
+.admin-gallery-card:hover {
+    transform: translateY(-1px);
+    border-color: #cfe2b8;
+    box-shadow: 0 8px 20px rgba(27, 44, 64, .06);
+}
+
+.admin-search:focus-within,
+.admin-filter select:focus-visible,
+.admin-team-actions select:focus-visible,
+.admin-caption-input:focus-visible,
+.admin-action-button:focus-visible,
+.admin-refresh:focus-visible,
+.admin-side-nav button:focus-visible,
+.admin-stat-card:focus-visible,
+.admin-return-link:focus-visible {
+    outline: 3px solid rgba(111, 165, 57, .32);
+    outline-offset: 2px;
+    border-color: #9ac76b;
+}
+
+.admin-action-button,
+.admin-refresh {
+    transition: color .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+.admin-action-button:hover,
+.admin-refresh:hover:not(:disabled) {
+    border-color: #c7d4dc;
+    box-shadow: 0 3px 9px rgba(27, 44, 64, .07);
+}
+
+.admin-action-button.primary:hover {
+    border-color: #91c94d;
+    box-shadow: 0 4px 12px rgba(113, 170, 52, .2);
+}
+
+.admin-notice {
+    border-radius: 10px;
+}
+
+@media (max-width: 650px) {
+    .admin-content {
+        padding-top: 24px;
+    }
+
+    .admin-side-nav button {
+        min-height: 44px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-stat-card,
+    .admin-team-card,
+    .admin-nomination-card,
+    .admin-gallery-card,
+    .admin-return-link,
+    .admin-action-button,
+    .admin-refresh {
+        transition: none;
+    }
+}
