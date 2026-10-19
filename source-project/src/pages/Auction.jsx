@@ -122,21 +122,6 @@ export default function Auction() {
   };
 
   const visiblePlayers = [...players, ...registeredPlayers].filter((player) => player.published !== false);
-  const demoPlayer = {
-    id: 'demo-player-preview',
-    name: 'Demo Player',
-    role: 'All-Rounder',
-    category: 'DEMO PROFILE',
-    battingStyle: 'Right-Hand Bat',
-    bowlingStyle: 'Right-Arm Medium',
-    photoUrl: '/images/jersey.jpg',
-    basePrice: 200,
-    status: 'DEMO',
-    isDemo: true,
-    stats: { average: '38.5', strikeRate: '142.0', economy: '6.8', best: '72* / 3' },
-    badgeColor: 'var(--lime)',
-  };
-  const displayedPlayers = visiblePlayers.length ? visiblePlayers : [demoPlayer];
 
   const openBidModal = (player) => {
     const highestBid = getHighestBidInfo(player.id);
@@ -250,11 +235,10 @@ export default function Auction() {
               gap: '24px'
             }}
           >
-            {displayedPlayers.map((player, index) => {
+            {visiblePlayers.map((player, index) => {
               const highestBid = getHighestBidInfo(player.id);
               const isSold = player.status === 'SOLD';
               const isUnsold = player.status === 'UNSOLD';
-              const isDemo = player.isDemo === true;
               const ringPathId = `auction-player-ring-${String(player.id).replace(/[^a-zA-Z0-9_-]/g, '-')}-${index}`;
 
               return (
@@ -437,7 +421,7 @@ export default function Auction() {
                     <div style={{ marginTop: 'auto' }}>
                       <button
                         onClick={() => openBidModal(player)}
-                        disabled={isSold || isDemo}
+                        disabled={isSold}
                         style={{
                           width: '100%',
                           height: '44px',
@@ -448,26 +432,26 @@ export default function Auction() {
                           alignItems: 'center',
                           justifyContent: 'center',
                           gap: '8px',
-                          cursor: isSold || isDemo ? 'not-allowed' : 'pointer',
-                          background: isSold || isDemo
+                          cursor: isSold ? 'not-allowed' : 'pointer',
+                          background: isSold
                             ? 'rgba(255, 255, 255, 0.04)'
                             : 'rgba(0, 217, 255, 0.08)',
-                          border: isSold || isDemo
+                          border: isSold
                             ? '1px solid rgba(255, 255, 255, 0.08)'
                             : '1px solid rgba(0, 217, 255, 0.42)',
-                          color: isSold || isDemo ? '#64748b' : '#00d9ff',
+                          color: isSold ? '#64748b' : '#00d9ff',
                           transition: 'all 0.2s ease',
                           fontFamily: "'Outfit', sans-serif"
                         }}
                         onMouseOver={(e) => {
-                          if (!isSold && !isDemo) {
+                          if (!isSold) {
                             e.currentTarget.style.background = '#00d9ff';
                             e.currentTarget.style.color = '#041018';
                             e.currentTarget.style.boxShadow = '0 4px 18px rgba(0, 217, 255, 0.38)';
                           }
                         }}
                         onMouseOut={(e) => {
-                          if (!isSold && !isDemo) {
+                          if (!isSold) {
                             e.currentTarget.style.background = 'rgba(0, 217, 255, 0.08)';
                             e.currentTarget.style.color = '#00d9ff';
                             e.currentTarget.style.boxShadow = 'none';
@@ -475,7 +459,7 @@ export default function Auction() {
                         }}
                       >
                         <Gavel size={15} />
-                        {isDemo ? 'DEMO PREVIEW' : isSold ? 'PLAYER SOLD' : 'PLACE A BID'}
+                        {isSold ? 'PLAYER SOLD' : 'PLACE A BID'}
                       </button>
                     </div>
                   </div>
