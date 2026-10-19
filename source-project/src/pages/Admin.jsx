@@ -620,10 +620,10 @@ export default function Admin() {
                                 <td data-label="Bid amount" style={{ padding: '12px', color: 'var(--lime)', fontWeight: 800 }}>
                                   T {Number(bid.bidAmount).toLocaleString('en-IN')}
                                 </td>
-                                <td data-label="Private contact" style={{ padding: '12px', color: '#94a3b8', fontSize: '12px' }}>
+                                <td style={{ padding: '12px', color: '#94a3b8', fontSize: '12px' }}>
                                   {bid.phone} {bid.email && `• ${bid.email}`}
                                 </td>
-                                <td data-label="Status" style={{ padding: '12px' }}>
+                                <td style={{ padding: '12px' }}>
                                   <span
                                     style={{
                                       fontSize: '11px',
@@ -653,7 +653,7 @@ export default function Admin() {
                                     {bid.status}
                                   </span>
                                 </td>
-                                <td data-label="Review" style={{ padding: '12px', textAlign: 'right' }}>
+                                <td style={{ padding: '12px', textAlign: 'right' }}>
                                   <div style={{ display: 'inline-flex', gap: '6px' }}>
                                     {bid.status !== 'APPROVED' && (
                                       <button
