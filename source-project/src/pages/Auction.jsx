@@ -451,25 +451,25 @@ export default function Auction() {
                           cursor: isSold || isDemo ? 'not-allowed' : 'pointer',
                           background: isSold || isDemo
                             ? 'rgba(255, 255, 255, 0.04)'
-                            : 'rgba(156, 255, 0, 0.08)',
+                            : 'rgba(0, 217, 255, 0.08)',
                           border: isSold || isDemo
                             ? '1px solid rgba(255, 255, 255, 0.08)'
-                            : '1px solid rgba(156, 255, 0, 0.35)',
-                          color: isSold || isDemo ? '#64748b' : 'var(--lime)',
+                            : '1px solid rgba(0, 217, 255, 0.42)',
+                          color: isSold || isDemo ? '#64748b' : '#00d9ff',
                           transition: 'all 0.2s ease',
                           fontFamily: "'Outfit', sans-serif"
                         }}
                         onMouseOver={(e) => {
                           if (!isSold && !isDemo) {
-                            e.currentTarget.style.background = 'var(--lime)';
-                            e.currentTarget.style.color = '#04070c';
-                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(156,255,0,0.3)';
+                            e.currentTarget.style.background = '#00d9ff';
+                            e.currentTarget.style.color = '#041018';
+                            e.currentTarget.style.boxShadow = '0 4px 18px rgba(0, 217, 255, 0.38)';
                           }
                         }}
                         onMouseOut={(e) => {
                           if (!isSold && !isDemo) {
-                            e.currentTarget.style.background = 'rgba(156, 255, 0, 0.08)';
-                            e.currentTarget.style.color = 'var(--lime)';
+                            e.currentTarget.style.background = 'rgba(0, 217, 255, 0.08)';
+                            e.currentTarget.style.color = '#00d9ff';
                             e.currentTarget.style.boxShadow = 'none';
                           }
                         }}
