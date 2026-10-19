@@ -113,12 +113,6 @@ const defaultAuctionPlayers = [
   }
 ];
 
-const initialApprovedBids = [
-  { id: 'b-101', playerId: 'WBL-P101', bidderName: 'Titan Strikers', bidAmount: 4500, status: 'APPROVED' },
-  { id: 'b-102', playerId: 'WBL-P102', bidderName: 'Royal Challengers WBL', bidAmount: 5200, status: 'APPROVED' },
-  { id: 'b-103', playerId: 'WBL-P103', bidderName: 'Blaze Warriors', bidAmount: 6000, status: 'APPROVED' }
-];
-
 export default function Auction() {
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
@@ -135,14 +129,9 @@ export default function Auction() {
     }
   });
 
-  const [approvedBids, setApprovedBids] = useState(() => {
-    try {
-      const saved = localStorage.getItem('wbl_approved_bids');
-      return saved ? JSON.parse(saved) : initialApprovedBids;
-    } catch {
-      return initialApprovedBids;
-    }
-  });
+  const [approvedBids, setApprovedBids] = useState([]);
+  const [bidFeedUpdatedAt, setBidFeedUpdatedAt] = useState(null);
+  const [bidFeedError, setBidFeedError] = useState(false);
 
   // Modal states
   const [biddingPlayer, setBiddingPlayer] = useState(null);
@@ -168,37 +157,42 @@ export default function Auction() {
   const [isSubmittingReg, setIsSubmittingReg] = useState(false);
   const [regError, setRegError] = useState('');
 
-  // Fetch live bids or nominations
+  // Load only organiser-approved bids from the shared database.
   useEffect(() => {
+    let active = true;
     const fetchLiveBids = async () => {
       try {
         const res = await fetch(`${apiUrl}/auction/bids/public`);
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length) {
-            setApprovedBids(data);
-            localStorage.setItem('wbl_approved_bids', JSON.stringify(data));
-          }
+        if (!res.ok) throw new Error('Could not load approved bids.');
+        const data = await res.json();
+        if (active) {
+          setApprovedBids(Array.isArray(data) ? data : []);
+          setBidFeedUpdatedAt(new Date());
+          setBidFeedError(false);
         }
       } catch {
-        // storage fallback
+        if (active) setBidFeedError(true);
       }
     };
-    fetchLiveBids();
     const fetchApprovedPlayers = async () => {
       try {
         const res = await fetch(`${apiUrl}/auction/registrations`);
         if (!res.ok) return;
         const data = await res.json();
-        setRegisteredPlayers(Array.isArray(data) ? data.map((p) => ({
+        if (active) setRegisteredPlayers(Array.isArray(data) ? data.map((p) => ({
           ...p, id: `approved-${p.id}`, category: 'APPROVED PLAYER', status: 'AVAILABLE', published: true,
           basePrice: Number(String(p.basePrice || '0').replace(/[^0-9]/g, '')) || 0,
           stats: { matches: '—', primaryStat: p.clubName || 'Open auction', strikeRate: p.battingStyle || '—', economy: p.bowlingStyle || '—' },
           badgeColor: 'var(--lime)'
         })) : []);
-      } catch { setRegisteredPlayers([]); }
+      } catch { if (active) setRegisteredPlayers([]); }
     };
+    fetchLiveBids();
     fetchApprovedPlayers();
+    const refreshTimer = window.setInterval(() => {
+      if (document.visibilityState === 'visible') fetchLiveBids();
+    }, 20000);
+    return () => { active = false; window.clearInterval(refreshTimer); };
   }, [apiUrl]);
 
   const getHighestBidInfo = (playerId) => {
@@ -223,7 +217,7 @@ export default function Auction() {
 
   const openBidModal = (player) => {
     const highestBid = getHighestBidInfo(player.id);
-    const minBid = highestBid ? Number(highestBid.bidAmount) + 500 : Number(player.basePrice);
+    const minBid = highestBid ? Number(highestBid.bidAmount) + 100 : Number(player.basePrice);
     setBiddingPlayer(player);
     setBidForm({ name: '', phone: '', email: '', amount: String(minBid) });
     setBidError('');
@@ -244,45 +238,33 @@ export default function Auction() {
     const highestBid = getHighestBidInfo(biddingPlayer.id);
     const minRequired = highestBid ? Number(highestBid.bidAmount) + 100 : Number(biddingPlayer.basePrice);
     const bidAmountNumber = Number(bidForm.amount);
-
-    if (isNaN(bidAmountNumber) || bidAmountNumber < minRequired) {
+    if (!Number.isFinite(bidAmountNumber) || bidAmountNumber < minRequired) {
       setBidError(`Bid must be at least ₹${minRequired.toLocaleString('en-IN')}`);
       return;
     }
 
     setIsSubmittingBid(true);
     setBidError('');
-
-    const newBid = {
-      id: 'bid-' + Date.now(),
-      playerId: biddingPlayer.id,
-      playerName: biddingPlayer.name,
-      bidderName: bidForm.name.trim(),
-      phone: bidForm.phone.trim(),
-      email: bidForm.email.trim() || null,
-      bidAmount: bidAmountNumber,
-      status: 'PENDING',
-      createdAt: new Date().toISOString()
-    };
-
     try {
       const res = await fetch(`${apiUrl}/auction/bids`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newBid)
+        body: JSON.stringify({
+          playerId: biddingPlayer.id,
+          playerName: biddingPlayer.name,
+          bidderName: bidForm.name.trim(),
+          phone: bidForm.phone.trim(),
+          email: bidForm.email.trim() || null,
+          bidAmount: bidAmountNumber
+        })
       });
-      if (!res.ok) throw new Error('API offline');
-    } catch {
-      try {
-        const pendingBids = JSON.parse(localStorage.getItem('wbl_pending_bids') || '[]');
-        pendingBids.push(newBid);
-        localStorage.setItem('wbl_pending_bids', JSON.stringify(pendingBids));
-      } catch {
-        // storage ignored
-      }
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Could not submit your bid. Please try again.');
+      setBidSuccess(true);
+    } catch (error) {
+      setBidError(error.message || 'Could not connect to the auction service. Your bid was not sent.');
     } finally {
       setIsSubmittingBid(false);
-      setBidSuccess(true);
     }
   };
 
@@ -439,6 +421,13 @@ export default function Auction() {
               </button>
             </div>
           </header>
+
+          <div className={`auction-bid-feed ${bidFeedError ? 'is-stale' : ''}`} role="status">
+            <span className="auction-bid-feed-dot" />
+            {bidFeedError
+              ? 'Live bid updates are temporarily unavailable. Showing the last received bids.'
+              : `Approved bids refresh automatically${bidFeedUpdatedAt ? ` · Updated ${bidFeedUpdatedAt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}` : ' · Connecting…'}`}
+          </div>
 
           {/* Registration Success Notification */}
           {regSuccess && (

@@ -3,7 +3,8 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/WBL2026-Website/',
+  // GitHub Pages uses a repository prefix; Vercel serves from the domain root.
+  base: process.env.GITHUB_ACTIONS ? '/WBL2026-Website/' : '/',
   server: {
     host: true
   }
