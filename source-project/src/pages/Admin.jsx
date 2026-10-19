@@ -267,6 +267,21 @@ export default function Admin() {
     setNote(`Player marked as ${status}.`);
   };
 
+  // Update a single stat field for a player
+  const updatePlayerStat = (playerId, field, value) => {
+    const updated = auctionPlayers.map((p) =>
+      p.id === playerId
+        ? { ...p, stats: { ...(p.stats || {}), [field]: value } }
+        : p
+    );
+    setAuctionPlayers(updated);
+    localStorage.setItem('wbl_auction_players_custom', JSON.stringify(updated));
+  };
+
+  const savePlayerStats = (playerId) => {
+    setNote('Player stats saved.');
+  };
+
   const print = async (team) => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
@@ -794,6 +809,38 @@ export default function Admin() {
                       <div style={{ fontSize: '12px', color: '#94a3b8' }}>
                         <div>Base Price: <strong style={{ color: '#ffffff' }}>T {Number(player.basePrice).toLocaleString('en-IN')}</strong></div>
                         <div>Status: <strong style={{ color: player.status === 'SOLD' ? '#ef4444' : 'var(--lime)' }}>{player.status || 'AVAILABLE'}</strong></div>
+                      </div>
+
+                      {/* Stat Editor */}
+                      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '10px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 800, color: '#64748b', letterSpacing: '0.5px', display: 'block', marginBottom: '8px' }}>PERFORMANCE STATS</span>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                          {[{ label: 'AVG', field: 'average' }, { label: 'S/RATE', field: 'strikeRate' }, { label: 'ECONOMY', field: 'economy' }, { label: 'BEST', field: 'best' }].map(({ label, field }) => (
+                            <div key={field}>
+                              <label style={{ fontSize: '9px', color: '#64748b', fontWeight: 800, letterSpacing: '0.5px', display: 'block', marginBottom: '3px' }}>{label}</label>
+                              <input
+                                type="text"
+                                placeholder="—"
+                                value={player.stats?.[field] === '—' ? '' : (player.stats?.[field] || '')}
+                                onChange={(e) => updatePlayerStat(player.id, field, e.target.value || '—')}
+                                onBlur={() => savePlayerStats(player.id)}
+                                style={{
+                                  width: '100%',
+                                  height: '32px',
+                                  padding: '0 8px',
+                                  borderRadius: '6px',
+                                  background: '#04070c',
+                                  border: '1px solid rgba(255,255,255,0.12)',
+                                  color: '#ffffff',
+                                  fontSize: '12px',
+                                  fontWeight: 700,
+                                  outline: 'none',
+                                  boxSizing: 'border-box'
+                                }}
+                              />
+                            </div>
+                          ))}
+                        </div>
                       </div>
 
                       <div style={{ display: 'flex', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>

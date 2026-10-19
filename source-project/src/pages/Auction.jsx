@@ -34,7 +34,7 @@ const defaultAuctionPlayers = [
     category: 'CATEGORY A',
     battingStyle: 'Right-Hand Bat',
     bowlingStyle: 'Right-Arm Medium',
-    stats: { matches: 28, primaryStat: '1,140 Runs', strikeRate: '148.6', average: '42.2' },
+    stats: { matches: 28, average: '42.2', strikeRate: '148.6', economy: '—', best: '—' },
     basePrice: 3000,
     status: 'AVAILABLE',
     published: true,
@@ -48,7 +48,7 @@ const defaultAuctionPlayers = [
     category: 'ICON PLAYER',
     battingStyle: 'Right-Hand Bat',
     bowlingStyle: 'Right-Arm Fast (140+ km/h)',
-    stats: { matches: 32, primaryStat: '46 Wickets', economy: '6.40', best: '5/18' },
+    stats: { matches: 32, average: '—', strikeRate: '—', economy: '6.40', best: '5/18' },
     basePrice: 3500,
     status: 'AVAILABLE',
     published: true,
@@ -62,7 +62,7 @@ const defaultAuctionPlayers = [
     category: 'CATEGORY A',
     battingStyle: 'Left-Hand Bat',
     bowlingStyle: 'Right-Arm Fast Medium',
-    stats: { matches: 25, primaryStat: '720 R / 29 W', strikeRate: '155.0', economy: '7.10' },
+    stats: { matches: 25, average: '28.5', strikeRate: '155.0', economy: '7.10', best: '3/20' },
     basePrice: 4000,
     status: 'AVAILABLE',
     published: true,
@@ -76,7 +76,7 @@ const defaultAuctionPlayers = [
     category: 'CATEGORY B',
     battingStyle: 'Right-Hand Bat',
     bowlingStyle: 'Wicket Keeper',
-    stats: { matches: 22, primaryStat: '590 Runs', strikeRate: '168.2', dismissals: '19 Catches' },
+    stats: { matches: 22, average: '32.1', strikeRate: '168.2', economy: '—', best: '—' },
     basePrice: 2500,
     status: 'AVAILABLE',
     published: true,
@@ -90,7 +90,7 @@ const defaultAuctionPlayers = [
     category: 'CATEGORY A',
     battingStyle: 'Right-Hand Bat',
     bowlingStyle: 'Right-Arm Leg Spin / Googly',
-    stats: { matches: 30, primaryStat: '41 Wickets', economy: '5.80', best: '4/12' },
+    stats: { matches: 30, average: '—', strikeRate: '—', economy: '5.80', best: '4/12' },
     basePrice: 3000,
     status: 'AVAILABLE',
     published: true,
@@ -104,7 +104,7 @@ const defaultAuctionPlayers = [
     category: 'CATEGORY B',
     battingStyle: 'Left-Hand Bat',
     bowlingStyle: 'Right-Arm Off Spin',
-    stats: { matches: 19, primaryStat: '480 R / 18 W', strikeRate: '162.5', best: '3/15' },
+    stats: { matches: 19, average: '31.4', strikeRate: '162.5', economy: '8.20', best: '3/15' },
     basePrice: 2500,
     status: 'AVAILABLE',
     published: true,
@@ -182,7 +182,7 @@ export default function Auction() {
         if (active) setRegisteredPlayers(Array.isArray(data) ? data.map((p) => ({
           ...p, id: `approved-${p.id}`, category: p.category || 'APPROVED PLAYER', status: 'AVAILABLE', published: true,
           basePrice: Number(String(p.basePrice || '0').replace(/[^0-9]/g, '')) || 0,
-          stats: { matches: p.matches || '—', primaryStat: p.primaryStat || '—', strikeRate: p.strikeRate || '', economy: p.economy || '', average: p.average || '', best: p.best || '' },
+          stats: { matches: p.matches || '—', average: p.average || '—', strikeRate: p.strikeRate || '—', economy: p.economy || '—', best: p.best || '—' },
           badgeColor: 'var(--lime)'
         })) : []);
       } catch { if (active) setRegisteredPlayers([]); }
@@ -660,7 +660,7 @@ export default function Auction() {
                     </div>
                   </div>
 
-                  {/* Clean Performance Matrix */}
+                  {/* Clean Performance Matrix — 4 fixed stats */}
                   <div
                     style={{
                       padding: '12px 16px',
@@ -675,34 +675,34 @@ export default function Auction() {
                   >
                     <div>
                       <span style={{ fontSize: '9px', color: '#64748b', display: 'block', fontWeight: 800, letterSpacing: '0.5px' }}>
-                        MATCHES
+                        AVG
                       </span>
                       <strong style={{ fontSize: '13px', color: '#f1f5f9', fontWeight: 800 }}>
-                        {player.stats?.matches || '—'}
+                        {player.stats?.average || '—'}
                       </strong>
                     </div>
                     <div>
                       <span style={{ fontSize: '9px', color: '#64748b', display: 'block', fontWeight: 800, letterSpacing: '0.5px' }}>
-                        IMPACT
+                        S/RATE
                       </span>
-                      <strong style={{ fontSize: '12px', color: 'var(--lime)', fontWeight: 800 }}>
-                        {player.stats?.primaryStat || '—'}
+                      <strong style={{ fontSize: '13px', color: 'var(--lime)', fontWeight: 800 }}>
+                        {player.stats?.strikeRate || '—'}
                       </strong>
                     </div>
                     <div>
                       <span style={{ fontSize: '9px', color: '#64748b', display: 'block', fontWeight: 800, letterSpacing: '0.5px' }}>
-                        {player.stats?.strikeRate ? 'S/RATE' : 'ECONOMY'}
+                        ECONOMY
                       </span>
                       <strong style={{ fontSize: '13px', color: '#f1f5f9', fontWeight: 800 }}>
-                        {player.stats?.strikeRate || player.stats?.economy || '—'}
+                        {player.stats?.economy || '—'}
                       </strong>
                     </div>
                     <div>
                       <span style={{ fontSize: '9px', color: '#64748b', display: 'block', fontWeight: 800, letterSpacing: '0.5px' }}>
-                        {player.stats?.average ? 'AVG' : 'BEST'}
+                        BEST
                       </span>
-                      <strong style={{ fontSize: '13px', color: '#f1f5f9', fontWeight: 800 }}>
-                        {player.stats?.average || player.stats?.best || '—'}
+                      <strong style={{ fontSize: '13px', color: 'var(--lime)', fontWeight: 800 }}>
+                        {player.stats?.best || '—'}
                       </strong>
                     </div>
                   </div>
