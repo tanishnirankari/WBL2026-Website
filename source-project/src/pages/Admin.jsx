@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   ArrowLeft, CheckCircle2, Eye, EyeOff, Gavel, Image, LockKeyhole,
   LogOut, Printer, RefreshCw, Search, ShieldCheck, Upload, UserRound, Users,
-  Check, XCircle, ToggleLeft, ToggleRight, DollarSign, Tag, CheckSquare
+  Check, XCircle, ToggleLeft, ToggleRight, DollarSign, Tag, CheckSquare, Trash2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AdminPortalLogo from '../components/AdminPortalLogo';
@@ -68,6 +68,19 @@ function AuctionNominations({ password }) {
     } catch (error) { setMessage(error.message); }
     finally { setBusyId(null); }
   };
+  const removeNomination = async (player) => {
+    if (!window.confirm(`Delete ${player.fullName}'s player nomination? This cannot be undone.`)) return;
+    setBusyId(player.id);
+    try {
+      const response = await fetch(`${api}/admin/auction/registrations/${player.id}`, { method: 'DELETE', headers });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Could not delete player nomination.');
+      setPlayers((current) => current.filter((item) => item.id !== player.id));
+      if (editingId === player.id) { setEditingId(null); setDraft(null); setPhotoData(''); }
+      setMessage(`${player.fullName}'s nomination was deleted.`);
+    } catch (error) { setMessage(error.message || 'Could not delete player nomination.'); }
+    finally { setBusyId(null); }
+  };
   const beginEdit = (player) => {
     setEditingId(player.id);
     setPhotoData('');
@@ -129,12 +142,12 @@ function AuctionNominations({ password }) {
                   </div>
                   <label className="admin-auction-photo-field">Player photo<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; if (file.size > 5 * 1024 * 1024) { setMessage('Player photos must be 5 MB or smaller.'); event.target.value = ''; return; } const reader = new FileReader(); reader.onload = () => setPhotoData(String(reader.result || '')); reader.readAsDataURL(file); }} /></label>
                   {player.phone && <small>Private contact: {player.phone}</small>}
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}><button className="admin-action-button primary" type="submit" disabled={busyId === player.id}><Check size={14} /> Save player details</button><button className="admin-action-button" type="button" onClick={() => { setEditingId(null); setDraft(null); setPhotoData(''); }}>Cancel</button></div>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}><button className="admin-action-button primary" type="submit" disabled={busyId === player.id}><Check size={14} /> Save player details</button><button className="admin-action-button" type="button" onClick={() => { setEditingId(null); setDraft(null); setPhotoData(''); }}>Cancel</button><button className="admin-action-button danger" type="button" onClick={() => removeNomination(player)} disabled={busyId === player.id}><Trash2 size={14} /> Delete nomination</button></div>
                 </form>
               ) : <>
                 {player.photoUrl ? <img src={player.photoUrl} alt={player.fullName} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 10 }} /> : <div className="admin-player-card-placeholder"><UserRound size={22} /></div>}
                 <div style={{ minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}><h3 style={{ margin: 0 }}>{player.fullName}</h3><span style={{ padding: '3px 8px', borderRadius: 20, fontSize: 10, fontWeight: 800, color: player.status === 'APPROVED' ? 'var(--lime)' : player.status === 'REJECTED' ? '#f87171' : '#fbbf24', background: player.status === 'APPROVED' ? 'rgba(156,255,0,.12)' : player.status === 'REJECTED' ? 'rgba(248,113,113,.12)' : 'rgba(251,191,36,.12)' }}>{player.status || 'PENDING'}</span></div><p style={{ margin: '5px 0', color: '#cbd5e1' }}>{player.role} · Age {player.age} · {player.clubName || 'No club listed'}</p><small style={{ color: '#94a3b8' }}>Phone: {player.phone} · Batting: {player.battingStyle || '—'} · Bowling: {player.bowlingStyle || '—'} · Base price: {player.basePrice}</small><small style={{ display: 'block', color: '#64748b', marginTop: 4 }}>Submitted {formatDate(player.createdAt)}</small></div>
-                <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', justifyContent: 'flex-end' }}><button onClick={() => beginEdit(player)} disabled={busyId === player.id} className="admin-action-button">Edit player</button>{player.status !== 'APPROVED' && <button onClick={() => review(player, 'APPROVED')} disabled={busyId === player.id} className="admin-action-button primary"><Check size={14} /> Approve & publish</button>}{player.status !== 'REJECTED' && <button onClick={() => review(player, 'REJECTED')} disabled={busyId === player.id} className="admin-action-button danger"><XCircle size={14} /> Reject</button>}</div>
+                <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', justifyContent: 'flex-end' }}><button onClick={() => beginEdit(player)} disabled={busyId === player.id} className="admin-action-button">Edit player</button>{player.status !== 'APPROVED' && <button onClick={() => review(player, 'APPROVED')} disabled={busyId === player.id} className="admin-action-button primary"><Check size={14} /> Approve & publish</button>}{player.status !== 'REJECTED' && <button onClick={() => review(player, 'REJECTED')} disabled={busyId === player.id} className="admin-action-button danger"><XCircle size={14} /> Reject</button>}<button onClick={() => removeNomination(player)} disabled={busyId === player.id} className="admin-action-button danger"><Trash2 size={14} /> Delete</button></div>
               </>}
               {player.photoUrl ? <img src={player.photoUrl} alt={player.fullName} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 10 }} /> : <div className="admin-player-card-placeholder"><UserRound size={22} /></div>}
               <div style={{ minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}><h3 style={{ margin: 0 }}>{player.fullName}</h3><span style={{ padding: '3px 8px', borderRadius: 20, fontSize: 10, fontWeight: 800, color: player.status === 'APPROVED' ? 'var(--lime)' : player.status === 'REJECTED' ? '#f87171' : '#fbbf24', background: player.status === 'APPROVED' ? 'rgba(156,255,0,.12)' : player.status === 'REJECTED' ? 'rgba(248,113,113,.12)' : 'rgba(251,191,36,.12)' }}>{player.status || 'PENDING'}</span></div><p style={{ margin: '5px 0', color: '#cbd5e1' }}>{player.role} · Age {player.age} · {player.clubName || 'No club listed'}</p><small style={{ color: '#94a3b8' }}>Phone: {player.phone} · Batting: {player.battingStyle || '—'} · Bowling: {player.bowlingStyle || '—'} · Base price: {player.basePrice}</small><small style={{ display: 'block', color: '#64748b', marginTop: 4 }}>Submitted {formatDate(player.createdAt)}</small></div>
@@ -220,6 +233,52 @@ export default function Admin() {
   const [auctionPlayers, setAuctionPlayers] = useState([]);
 
   const [bidsList, setBidsList] = useState([]);
+
+  const deleteAdminRecord = async (path, confirmMessage, successMessage, onDelete) => {
+    if (!window.confirm(confirmMessage)) return;
+    try {
+      const response = await fetch(`${api}${path}`, { method: 'DELETE', headers });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Unable to delete this record.');
+      onDelete();
+      setNote(successMessage);
+    } catch (error) {
+      setNote(error.message || 'Unable to delete this record.');
+    }
+  };
+
+  const deleteTeam = (team) => deleteAdminRecord(
+    `/admin/teams/${team.id}`,
+    `Delete the ${team.teamName} team registration and all its player records? This cannot be undone.`,
+    `${team.teamName} registration deleted.`,
+    () => setData((current) => ({ ...current, teams: current.teams.filter((item) => item.id !== team.id) }))
+  );
+
+  const deleteRegisteredPlayer = (player) => deleteAdminRecord(
+    `/admin/teams/${player.teamId}/players/${player.playerIndex}`,
+    `Delete ${player.name || `Player ${player.playerIndex}`} from ${player.teamName}? This cannot be undone.`,
+    `${player.name || `Player ${player.playerIndex}`} deleted from ${player.teamName}.`,
+    () => setData((current) => ({
+      ...current,
+      teams: current.teams.map((team) => team.id === player.teamId
+        ? { ...team, players: team.players.filter((item) => item.playerIndex !== player.playerIndex) }
+        : team),
+    }))
+  );
+
+  const deleteBid = (bid) => deleteAdminRecord(
+    `/admin/auction/bids/${bid.id}`,
+    `Delete the bid from ${bid.bidderName}? This cannot be undone.`,
+    'Bid deleted.',
+    () => setBidsList((current) => current.filter((item) => item.id !== bid.id))
+  );
+
+  const deleteCataloguePlayer = (player) => deleteAdminRecord(
+    `/admin/auction/catalogue/${encodeURIComponent(player.id)}`,
+    `Delete ${player.name} from the auction catalogue? This cannot be undone.`,
+    `${player.name} deleted from the auction catalogue.`,
+    () => setAuctionPlayers((current) => current.filter((item) => item.id !== player.id))
+  );
 
   const reviewBid = async (bidId, status) => {
     const targetBid = bidsList.find((bid) => bid.id === bidId);
@@ -390,6 +449,8 @@ export default function Admin() {
   };
 
   const removeImage = async (id) => {
+    const image = (data.gallery || []).find((item) => item.id === id);
+    if (!window.confirm(`Delete ${image?.caption || 'this gallery image'}? This cannot be undone.`)) return;
     try {
       const response = await fetch(`${api}/admin/gallery/${id}`, { method: 'DELETE', headers });
       const result = await response.json();
@@ -474,7 +535,7 @@ export default function Admin() {
   const players = data.teams.flatMap((team) => (
     (team.players || [])
       .filter((player) => player.name || player.phone || player.photoUrl)
-      .map((player) => ({ ...player, teamName: team.teamName }))
+      .map((player) => ({ ...player, teamId: team.id, teamName: team.teamName }))
   ));
   const counts = {
     teams: data.teams.length,
@@ -562,6 +623,7 @@ export default function Admin() {
                         <label>Payment<select value={team.paymentStatus || 'PENDING'} onChange={(event) => patchTeam(team, 'paymentStatus', event.target.value)}>{['PENDING', 'PAID', 'PARTIALLY PAID', 'NOT REQUIRED'].map((status) => <option key={status}>{status}</option>)}</select></label>
                         <button className="admin-action-button primary" onClick={() => save(team)}><CheckCircle2 size={15} /> Save review</button>
                         <button className="admin-action-button" onClick={() => print(team)}><Printer size={15} /> Print / Save PDF</button>
+                        <button className="admin-action-button danger" onClick={() => deleteTeam(team)}><Trash2 size={15} /> Delete team</button>
                       </div>
                       <details className="admin-player-details"><summary>View player details and photos</summary>
                         {(team.players || []).map((player) => (
@@ -569,6 +631,7 @@ export default function Admin() {
                             {player.photoUrl ? <img src={player.photoUrl} alt={player.name ? `${player.name} photo` : 'Player photo'} /> : <span className="admin-player-photo-placeholder"><UserRound size={18} /></span>}
                             <span><strong>{player.name || `Player ${player.playerIndex}`}</strong><small>{player.phone || 'No phone provided'}</small></span>
                             <small>Player {player.playerIndex}</small>
+                            <button className="admin-action-button danger" onClick={() => deleteRegisteredPlayer({ ...player, teamId: team.id, teamName: team.teamName })} aria-label={`Delete ${player.name || `player ${player.playerIndex}`}`}><Trash2 size={14} /> Delete</button>
                           </div>
                         ))}
                       </details>
@@ -587,7 +650,7 @@ export default function Admin() {
                   {players.map((player, index) => (
                     <article className="admin-player-card" key={`${player.playerIndex}-${player.teamName}-${index}`}>
                       {player.photoUrl ? <img src={player.photoUrl} alt={player.name || 'Player'} /> : <span className="admin-player-card-placeholder"><UserRound size={24} /></span>}
-                      <div><h3>{player.name || 'Unnamed player'}</h3><p>{player.teamName}</p><small>Player {player.playerIndex} · {player.phone || 'No phone'}</small></div>
+                      <div><h3>{player.name || 'Unnamed player'}</h3><p>{player.teamName}</p><small>Player {player.playerIndex} · {player.phone || 'No phone'}</small><button className="admin-action-button danger" style={{ marginTop: 8 }} onClick={() => deleteRegisteredPlayer(player)}><Trash2 size={14} /> Delete player</button></div>
                     </article>
                   ))}
                 </div>
@@ -726,6 +789,13 @@ export default function Admin() {
                                 </td>
                                 <td data-label="Review" style={{ padding: '12px', textAlign: 'right' }}>
                                   <div style={{ display: 'inline-flex', gap: '6px' }}>
+                                    <button
+                                      onClick={() => deleteBid(bid)}
+                                      className="admin-action-button danger"
+                                      aria-label={`Delete bid from ${bid.bidderName}`}
+                                    >
+                                      <Trash2 size={14} /> Delete
+                                    </button>
                                     {bid.status !== 'APPROVED' && (
                                       <button
                                         onClick={() => handleApproveBid(bid.id)}
@@ -880,6 +950,12 @@ export default function Admin() {
                           }}
                         >
                           {player.status === 'SOLD' ? 'Mark Available' : 'Mark Sold'}
+                        </button>
+                        <button
+                          onClick={() => deleteCataloguePlayer(player)}
+                          className="admin-action-button danger"
+                        >
+                          <Trash2 size={14} /> Delete
                         </button>
                       </div>
                     </article>
