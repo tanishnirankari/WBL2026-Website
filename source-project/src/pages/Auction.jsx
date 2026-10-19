@@ -56,7 +56,6 @@ export default function Auction() {
     battingStyle: 'Right-Hand Bat',
     bowlingStyle: 'Right-Arm Fast',
     club: '',
-    basePrice: 'T 3,000'
   });
   const [regSuccess, setRegSuccess] = useState(null);
   const [isSubmittingReg, setIsSubmittingReg] = useState(false);
@@ -158,7 +157,7 @@ export default function Auction() {
     const minRequired = highestBid ? Number(highestBid.bidAmount) + 100 : Number(biddingPlayer.basePrice);
     const bidAmountNumber = Number(bidForm.amount);
     if (!Number.isFinite(bidAmountNumber) || bidAmountNumber < minRequired) {
-      setBidError(`Bid must be at least T ${minRequired.toLocaleString('en-IN')} Bash Tokens`);
+      setBidError(`Bid must be at least ${minRequired.toLocaleString('en-IN')} T`);
       return;
     }
 
@@ -643,7 +642,7 @@ export default function Auction() {
                           BASE PRICE
                         </span>
                         <span style={{ fontSize: '16px', fontWeight: 800, color: '#f8fafc', fontFamily: "'Outfit', sans-serif" }}>
-                          T {Number(player.basePrice).toLocaleString('en-IN')} <span style={{ fontSize: '10px', color: '#94a3b8' }}>Bash Tokens</span>
+                          {Number(player.basePrice).toLocaleString('en-IN')} T
                         </span>
                       </div>
 
@@ -663,7 +662,7 @@ export default function Auction() {
                                 fontFamily: "'Outfit', sans-serif"
                               }}
                             >
-                              T {Number(highestBid.bidAmount).toLocaleString('en-IN')}
+                              {Number(highestBid.bidAmount).toLocaleString('en-IN')} T
                             </span>
                             <span
                               style={{
@@ -848,7 +847,7 @@ export default function Auction() {
                     </p>
                     <p style={{ color: '#94a3b8', fontSize: '13px', lineHeight: 1.5, margin: '0 0 24px' }}>
                       Your bid for <strong>{biddingPlayer.name}</strong> of{' '}
-                      <strong style={{ color: '#ffffff' }}>T {Number(bidForm.amount).toLocaleString('en-IN')} Bash Tokens</strong> will be reviewed by the league panel and displayed publicly once approved.
+                      <strong style={{ color: '#ffffff' }}>{Number(bidForm.amount).toLocaleString('en-IN')} T</strong> will be reviewed by the league panel and displayed publicly once approved.
                     </p>
                     <button
                       onClick={() => setBiddingPlayer(null)}
@@ -888,7 +887,7 @@ export default function Auction() {
                           BASE PRICE
                         </span>
                         <strong style={{ fontSize: '14px', color: '#e2e8f0', fontFamily: "'Outfit', sans-serif" }}>
-                          T {Number(biddingPlayer.basePrice).toLocaleString('en-IN')} Bash Tokens
+                          {Number(biddingPlayer.basePrice).toLocaleString('en-IN')} T
                         </strong>
                       </div>
                       <div style={{ textAlign: 'right' }}>
@@ -897,7 +896,7 @@ export default function Auction() {
                         </span>
                         <strong style={{ fontSize: '14px', color: 'var(--lime)', fontFamily: "'Outfit', sans-serif" }}>
                           {getHighestBidInfo(biddingPlayer.id)
-                            ? `T ${Number(getHighestBidInfo(biddingPlayer.id).bidAmount).toLocaleString('en-IN')}`
+                            ? `${Number(getHighestBidInfo(biddingPlayer.id).bidAmount).toLocaleString('en-IN')} T`
                             : 'None'}
                         </strong>
                       </div>
@@ -999,7 +998,7 @@ export default function Auction() {
                     <div style={{ marginBottom: '18px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                         <label style={{ fontSize: '12px', fontWeight: 700, color: '#cbd5e1' }}>
-                          Bid Amount (in Bash Tokens T) *
+                          Bid Amount (Bash Tokens) *
                         </label>
                         <div style={{ display: 'flex', gap: '6px' }}>
                           <button
@@ -1016,7 +1015,7 @@ export default function Auction() {
                               cursor: 'pointer'
                             }}
                           >
-                            +T 500
+                            +500 T
                           </button>
                           <button
                             type="button"
@@ -1032,24 +1031,11 @@ export default function Auction() {
                               cursor: 'pointer'
                             }}
                           >
-                            +T 1,000
+                            +1,000 T
                           </button>
                         </div>
                       </div>
                       <div style={{ position: 'relative' }}>
-                        <span
-                          style={{
-                            position: 'absolute',
-                            left: '12px',
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            color: 'var(--lime)',
-                            fontWeight: 800,
-                            fontSize: '15px'
-                          }}
-                        >
-                          T
-                        </span>
                         <input
                           type="number"
                           required
@@ -1060,7 +1046,7 @@ export default function Auction() {
                           style={{
                             width: '100%',
                             height: '44px',
-                            padding: '0 12px 0 28px',
+                            padding: '0 34px 0 12px',
                             borderRadius: '8px',
                             background: '#04070c',
                             border: '1px solid rgba(156, 255, 0, 0.4)',
@@ -1071,6 +1057,7 @@ export default function Auction() {
                             fontFamily: "'Outfit', sans-serif"
                           }}
                         />
+                        <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--lime)', fontWeight: 800, fontSize: '15px', pointerEvents: 'none' }}>T</span>
                       </div>
                     </div>
 
@@ -1383,30 +1370,6 @@ export default function Auction() {
                       />
                     </div>
 
-                    <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
-                        Expected Base Price
-                      </label>
-                      <select
-                        value={regForm.basePrice}
-                        onChange={(e) => setRegForm({ ...regForm, basePrice: e.target.value })}
-                        style={{
-                          width: '100%',
-                          height: '42px',
-                          padding: '0 12px',
-                          borderRadius: '8px',
-                          background: '#04070c',
-                          border: '1px solid rgba(255, 255, 255, 0.12)',
-                          color: '#ffffff',
-                          fontSize: '13px'
-                        }}
-                      >
-                        <option value="T 2,000">T 2,000 (Emerging)</option>
-                        <option value="T 2,500">T 2,500 (Category B)</option>
-                        <option value="T 3,000">T 3,000 (Category A)</option>
-                        <option value="T 4,000">T 4,000 (Icon Player)</option>
-                      </select>
-                    </div>
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>

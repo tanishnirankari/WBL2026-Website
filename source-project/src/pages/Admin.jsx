@@ -87,7 +87,7 @@ function AuctionNominations({ password }) {
     setDraft({
       fullName: player.fullName || '', age: String(player.age || ''), role: player.role || '',
       battingStyle: player.battingStyle || '', bowlingStyle: player.bowlingStyle || '',
-      clubName: player.clubName || '', basePrice: String(player.basePrice || ''),
+      clubName: player.clubName || '', basePrice: String(player.basePrice || '').replace(/[^\d.]/g, ''),
       category: player.category || 'APPROVED PLAYER', matches: player.matches || '',
       primaryStat: player.primaryStat || '', strikeRate: player.strikeRate || '',
       economy: player.economy || '', average: player.average || '', best: player.best || '',
@@ -130,7 +130,7 @@ function AuctionNominations({ password }) {
                     <label>Role<input required maxLength="60" value={draft.role} onChange={(event) => setField('role', event.target.value)} /></label>
                     <label>Category<input maxLength="40" value={draft.category} onChange={(event) => setField('category', event.target.value)} /></label>
                     <label>Club / team<input maxLength="120" value={draft.clubName} onChange={(event) => setField('clubName', event.target.value)} /></label>
-                    <label>Base price (T – Bash Tokens)<input required maxLength="20" value={draft.basePrice} onChange={(event) => setField('basePrice', event.target.value)} /></label>
+                    <label>Base price (Bash Tokens)<input required type="number" min="1" step="1" value={draft.basePrice} onChange={(event) => setField('basePrice', event.target.value)} /></label>
                     <label>Batting style<input maxLength="40" value={draft.battingStyle} onChange={(event) => setField('battingStyle', event.target.value)} /></label>
                     <label>Bowling style<input maxLength="40" value={draft.bowlingStyle} onChange={(event) => setField('bowlingStyle', event.target.value)} /></label>
                     <label>Matches<input maxLength="30" value={draft.matches} onChange={(event) => setField('matches', event.target.value)} /></label>
@@ -146,11 +146,11 @@ function AuctionNominations({ password }) {
                 </form>
               ) : <>
                 {player.photoUrl ? <img src={player.photoUrl} alt={player.fullName} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 10 }} /> : <div className="admin-player-card-placeholder"><UserRound size={22} /></div>}
-                <div style={{ minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}><h3 style={{ margin: 0 }}>{player.fullName}</h3><span style={{ padding: '3px 8px', borderRadius: 20, fontSize: 10, fontWeight: 800, color: player.status === 'APPROVED' ? 'var(--lime)' : player.status === 'REJECTED' ? '#f87171' : '#fbbf24', background: player.status === 'APPROVED' ? 'rgba(156,255,0,.12)' : player.status === 'REJECTED' ? 'rgba(248,113,113,.12)' : 'rgba(251,191,36,.12)' }}>{player.status || 'PENDING'}</span></div><p style={{ margin: '5px 0', color: '#cbd5e1' }}>{player.role} · Age {player.age} · {player.clubName || 'No club listed'}</p><small style={{ color: '#94a3b8' }}>Phone: {player.phone} · Batting: {player.battingStyle || '—'} · Bowling: {player.bowlingStyle || '—'} · Base price: {player.basePrice}</small><small style={{ display: 'block', color: '#64748b', marginTop: 4 }}>Submitted {formatDate(player.createdAt)}</small></div>
+                <div style={{ minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}><h3 style={{ margin: 0 }}>{player.fullName}</h3><span style={{ padding: '3px 8px', borderRadius: 20, fontSize: 10, fontWeight: 800, color: player.status === 'APPROVED' ? 'var(--lime)' : player.status === 'REJECTED' ? '#f87171' : '#fbbf24', background: player.status === 'APPROVED' ? 'rgba(156,255,0,.12)' : player.status === 'REJECTED' ? 'rgba(248,113,113,.12)' : 'rgba(251,191,36,.12)' }}>{player.status || 'PENDING'}</span></div><p style={{ margin: '5px 0', color: '#cbd5e1' }}>{player.role} · Age {player.age} · {player.clubName || 'No club listed'}</p><small style={{ color: '#94a3b8' }}>Phone: {player.phone} · Batting: {player.battingStyle || '—'} · Bowling: {player.bowlingStyle || '—'} · Base price: {Number(String(player.basePrice || '').replace(/[^\d.]/g, '')).toLocaleString('en-IN')} T</small><small style={{ display: 'block', color: '#64748b', marginTop: 4 }}>Submitted {formatDate(player.createdAt)}</small></div>
                 <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', justifyContent: 'flex-end' }}><button onClick={() => beginEdit(player)} disabled={busyId === player.id} className="admin-action-button">Edit player</button>{player.status !== 'APPROVED' && <button onClick={() => review(player, 'APPROVED')} disabled={busyId === player.id} className="admin-action-button primary"><Check size={14} /> Approve & publish</button>}{player.status !== 'REJECTED' && <button onClick={() => review(player, 'REJECTED')} disabled={busyId === player.id} className="admin-action-button danger"><XCircle size={14} /> Reject</button>}<button onClick={() => removeNomination(player)} disabled={busyId === player.id} className="admin-action-button danger"><Trash2 size={14} /> Delete</button></div>
               </>}
               {player.photoUrl ? <img src={player.photoUrl} alt={player.fullName} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 10 }} /> : <div className="admin-player-card-placeholder"><UserRound size={22} /></div>}
-              <div style={{ minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}><h3 style={{ margin: 0 }}>{player.fullName}</h3><span style={{ padding: '3px 8px', borderRadius: 20, fontSize: 10, fontWeight: 800, color: player.status === 'APPROVED' ? 'var(--lime)' : player.status === 'REJECTED' ? '#f87171' : '#fbbf24', background: player.status === 'APPROVED' ? 'rgba(156,255,0,.12)' : player.status === 'REJECTED' ? 'rgba(248,113,113,.12)' : 'rgba(251,191,36,.12)' }}>{player.status || 'PENDING'}</span></div><p style={{ margin: '5px 0', color: '#cbd5e1' }}>{player.role} · Age {player.age} · {player.clubName || 'No club listed'}</p><small style={{ color: '#94a3b8' }}>Phone: {player.phone} · Batting: {player.battingStyle || '—'} · Bowling: {player.bowlingStyle || '—'} · Base price: {player.basePrice}</small><small style={{ display: 'block', color: '#64748b', marginTop: 4 }}>Submitted {formatDate(player.createdAt)}</small></div>
+              <div style={{ minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}><h3 style={{ margin: 0 }}>{player.fullName}</h3><span style={{ padding: '3px 8px', borderRadius: 20, fontSize: 10, fontWeight: 800, color: player.status === 'APPROVED' ? 'var(--lime)' : player.status === 'REJECTED' ? '#f87171' : '#fbbf24', background: player.status === 'APPROVED' ? 'rgba(156,255,0,.12)' : player.status === 'REJECTED' ? 'rgba(248,113,113,.12)' : 'rgba(251,191,36,.12)' }}>{player.status || 'PENDING'}</span></div><p style={{ margin: '5px 0', color: '#cbd5e1' }}>{player.role} · Age {player.age} · {player.clubName || 'No club listed'}</p><small style={{ color: '#94a3b8' }}>Phone: {player.phone} · Batting: {player.battingStyle || '—'} · Bowling: {player.bowlingStyle || '—'} · Base price: {Number(String(player.basePrice || '').replace(/[^\d.]/g, '')).toLocaleString('en-IN')} T</small><small style={{ display: 'block', color: '#64748b', marginTop: 4 }}>Submitted {formatDate(player.createdAt)}</small></div>
               <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', justifyContent: 'flex-end' }}>{player.status !== 'APPROVED' && <button onClick={() => review(player, 'APPROVED')} disabled={busyId === player.id} className="admin-action-button primary"><Check size={14} /> Approve & publish</button>}{player.status !== 'REJECTED' && <button onClick={() => review(player, 'REJECTED')} disabled={busyId === player.id} className="admin-action-button danger"><XCircle size={14} /> Reject</button>}</div>
             </article>
           ))}
@@ -292,7 +292,7 @@ export default function Admin() {
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Unable to save bid status.');
       setBidsList((current) => current.map((bid) => bid.id === bidId ? { ...bid, status: result.status } : bid));
-      setNote(`Bid from ${targetBid.bidderName} for T ${Number(targetBid.bidAmount).toLocaleString('en-IN')} Bash Tokens ${status.toLowerCase()}.`);
+      setNote(`Bid from ${targetBid.bidderName} for ${Number(targetBid.bidAmount).toLocaleString('en-IN')} T ${status.toLowerCase()}.`);
     } catch (error) {
       setNote(error.message || 'Unable to save bid status.');
     }
@@ -752,7 +752,7 @@ export default function Admin() {
                                 </td>
                                 <td data-label="Bidder" style={{ padding: '12px' }}>{bid.bidderName}</td>
                                 <td data-label="Bid amount" style={{ padding: '12px', color: 'var(--lime)', fontWeight: 800 }}>
-                                  T {Number(bid.bidAmount).toLocaleString('en-IN')}
+                                  {Number(bid.bidAmount).toLocaleString('en-IN')} T
                                 </td>
                                 <td data-label="Private contact" style={{ padding: '12px', color: '#94a3b8', fontSize: '12px' }}>
                                   {bid.phone} {bid.email && `• ${bid.email}`}
@@ -875,7 +875,7 @@ export default function Admin() {
                       </div>
 
                       <div style={{ fontSize: '12px', color: '#94a3b8' }}>
-                        <div>Base Price: <strong style={{ color: '#ffffff' }}>T {Number(player.basePrice).toLocaleString('en-IN')} Bash Tokens</strong></div>
+                        <div>Base Price: <strong style={{ color: '#ffffff' }}>{Number(player.basePrice).toLocaleString('en-IN')} T</strong></div>
                         <div>Status: <strong style={{ color: player.status === 'SOLD' ? '#ef4444' : 'var(--lime)' }}>{player.status || 'AVAILABLE'}</strong></div>
                       </div>
 

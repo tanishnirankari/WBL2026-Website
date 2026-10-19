@@ -8,7 +8,7 @@ export default function AuctionPreview() {
       name: 'Marquee Icon #01',
       role: 'Top-Order All-Rounder',
       specialty: 'Profile & Identity Locked • Revealing Soon',
-      basePrice: 'T ?,???',
+      basePrice: '?,??? T',
       status: 'MYSTERY PICK',
       stats: { matches: '??', runs: '???', sr: '???.?', wickets: '??' }
     },
@@ -17,7 +17,7 @@ export default function AuctionPreview() {
       name: 'Marquee Icon #02',
       role: 'Express Fast Bowler',
       specialty: 'Profile & Identity Locked • Revealing Soon',
-      basePrice: 'T ?,???',
+      basePrice: '?,??? T',
       status: 'MYSTERY PICK',
       stats: { matches: '??', runs: '???', sr: '???.?', wickets: '??' }
     },
@@ -26,7 +26,7 @@ export default function AuctionPreview() {
       name: 'Marquee Icon #03',
       role: 'Wicket-Keeper Finisher',
       specialty: 'Profile & Identity Locked • Revealing Soon',
-      basePrice: 'T ?,???',
+      basePrice: '?,??? T',
       status: 'MYSTERY PICK',
       stats: { matches: '??', runs: '???', sr: '???.?', wickets: '??' }
     }
@@ -107,7 +107,7 @@ export default function AuctionPreview() {
             <small style={{ color: 'var(--muted)', fontSize: '11px', letterSpacing: '1px' }}>PLAYERS</small>
           </div>
           <div>
-            <strong style={{ display: 'block', fontSize: 'clamp(20px, 7vw, 28px)', color: 'var(--lime)', fontWeight: 900 }}>T 40K+</strong>
+            <strong style={{ display: 'block', fontSize: 'clamp(20px, 7vw, 28px)', color: 'var(--lime)', fontWeight: 900 }}>40K+ T</strong>
             <small style={{ color: 'var(--muted)', fontSize: '11px', letterSpacing: '1px' }}>PRIZE POOL</small>
           </div>
         </div>
