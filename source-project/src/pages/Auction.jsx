@@ -1,41 +1,36 @@
 import { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Gavel,
   ShieldCheck,
-  UserCheck,
   CheckCircle2,
   X,
   Phone,
   Mail,
-  Sparkles,
   TrendingUp,
   AlertCircle,
   Clock,
   ArrowRight,
-  Upload,
   Coins,
-  ChevronRight,
   Award,
   Zap,
   Flame,
   Shield,
-  Activity
+  UserPlus,
+  ImagePlus,
 } from 'lucide-react';
 
 export default function Auction() {
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+  const prefersReducedMotion = useReducedMotion();
 
-  const roleFilters = ['All Players', 'Batsman', 'Bowler', 'All-Rounder', 'Wicket-Keeper'];
-  const [activeRole, setActiveRole] = useState('All Players');
   const [registeredPlayers, setRegisteredPlayers] = useState([]);
 
   const [players, setPlayers] = useState([]);
   const [catalogueError, setCatalogueError] = useState('');
 
   const [approvedBids, setApprovedBids] = useState([]);
-  const [bidFeedUpdatedAt, setBidFeedUpdatedAt] = useState(null);
   const [bidFeedError, setBidFeedError] = useState(false);
 
   // Modal states
@@ -56,6 +51,10 @@ export default function Auction() {
     battingStyle: 'Right-Hand Bat',
     bowlingStyle: 'Right-Arm Fast',
     club: '',
+    average: '',
+    strikeRate: '',
+    economy: '',
+    best: '',
   });
   const [regSuccess, setRegSuccess] = useState(null);
   const [isSubmittingReg, setIsSubmittingReg] = useState(false);
@@ -71,7 +70,6 @@ export default function Auction() {
         const data = await res.json();
         if (active) {
           setApprovedBids(Array.isArray(data) ? data : []);
-          setBidFeedUpdatedAt(new Date());
           setBidFeedError(false);
         }
       } catch {
@@ -123,15 +121,22 @@ export default function Auction() {
     );
   };
 
-  const visiblePlayers = [...players, ...registeredPlayers].filter((p) => {
-    if (p.published === false) return false;
-    if (activeRole === 'All Players') return true;
-    if (activeRole === 'Batsman') return (p.role || '').toLowerCase().includes('bat');
-    if (activeRole === 'Bowler') return (p.role || '').toLowerCase().includes('bowl');
-    if (activeRole === 'All-Rounder') return (p.role || '').toLowerCase().includes('round');
-    if (activeRole === 'Wicket-Keeper') return (p.role || '').toLowerCase().includes('keeper');
-    return true;
-  });
+  const visiblePlayers = [...players, ...registeredPlayers].filter((player) => player.published !== false);
+  const demoPlayer = {
+    id: 'demo-player-preview',
+    name: 'Demo Player',
+    role: 'All-Rounder',
+    category: 'DEMO PROFILE',
+    battingStyle: 'Right-Hand Bat',
+    bowlingStyle: 'Right-Arm Medium',
+    photoUrl: '/images/jersey.jpg',
+    basePrice: 200,
+    status: 'DEMO',
+    isDemo: true,
+    stats: { average: '38.5', strikeRate: '142.0', economy: '6.8', best: '72* / 3' },
+    badgeColor: 'var(--lime)',
+  };
+  const displayedPlayers = visiblePlayers.length ? visiblePlayers : [demoPlayer];
 
   const openBidModal = (player) => {
     const highestBid = getHighestBidInfo(player.id);
@@ -218,14 +223,10 @@ export default function Auction() {
     }
   };
 
-  const scrollToCatalogue = () => {
-    const el = document.getElementById('player-catalogue');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
     <Layout>
       <main
+        className="auction-page-shell"
         style={{
           fontFamily: "'Plus Jakarta Sans', sans-serif",
           background: '#04070c',
@@ -237,183 +238,34 @@ export default function Auction() {
           overflowX: 'hidden'
         }}
       >
-        {/* Subtle mesh background grid */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage:
-              'radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px), radial-gradient(ellipse at 50% -10%, rgba(156,255,0,0.06) 0%, transparent 60%)',
-            backgroundSize: '32px 32px, 100% 100%',
-            pointerEvents: 'none',
-            zIndex: 0
-          }}
-        />
-
-        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px', position: 'relative', zIndex: 1 }}>
-          
-          {/* 1. ULTRA-COMPACT PROFESSIONAL HEADER BAR */}
-          <header
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '12px 0 24px',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-              marginBottom: '28px',
-              flexWrap: 'wrap',
-              gap: '14px'
-            }}
-          >
-            {/* Small League Brand Badge */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '6px 14px',
-                  borderRadius: '999px',
-                  background: 'rgba(156, 255, 0, 0.08)',
-                  border: '1px solid rgba(156, 255, 0, 0.28)',
-                  backdropFilter: 'blur(8px)'
-                }}
-              >
-                <span
-                  style={{
-                    width: '7px',
-                    height: '7px',
-                    borderRadius: '50%',
-                    background: 'var(--lime)',
-                    boxShadow: '0 0 10px var(--lime)'
-                  }}
-                />
-                <span
-                  style={{
-                    color: 'var(--lime)',
-                    fontSize: '11px',
-                    fontWeight: 900,
-                    letterSpacing: '1.6px',
-                    textTransform: 'uppercase',
-                    fontFamily: "'Outfit', sans-serif"
-                  }}
-                >
-                  OFFICIAL AUCTION POOL
-                </span>
-              </div>
-            </div>
-
-            {/* Compact Action Button */}
-            <div>
-              <button
-                onClick={() => setShowRegisterModal(true)}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  background: 'var(--lime)',
-                  color: '#06111d',
-                  height: '42px',
-                  padding: '0 22px',
-                  borderRadius: '8px',
-                  fontWeight: 900,
-                  fontSize: '12px',
-                  letterSpacing: '0.5px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                  boxShadow: '0 4px 18px rgba(156, 255, 0, 0.28)',
-                  fontFamily: "'Outfit', sans-serif"
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 24px rgba(156, 255, 0, 0.4)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 18px rgba(156, 255, 0, 0.28)';
-                }}
-              >
-                <UserCheck size={16} /> REGISTER AS PLAYER
-              </button>
-            </div>
+        <div className="auction-page-inner">
+          <header className="auction-page-heading">
+            <p>WINTER BASH LEAGUE AUCTION 2026</p>
           </header>
-
-          <div className={`auction-bid-feed ${bidFeedError ? 'is-stale' : ''}`} role="status">
-            <span className="auction-bid-feed-dot" />
-            {bidFeedError
-              ? 'Live bid updates are temporarily unavailable. Showing the last received bids.'
-              : `Approved bids refresh automatically${bidFeedUpdatedAt ? ` · Updated ${bidFeedUpdatedAt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}` : ' · Connecting…'}`}
-          </div>
-          {catalogueError && <p role="alert" style={{ color: '#fca5a5', margin: '10px 0 18px' }}>{catalogueError}</p>}
-
-          {/* Registration Success Notification */}
-          {regSuccess && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              style={{
-                background: 'rgba(156, 255, 0, 0.08)',
-                border: '1px solid rgba(156, 255, 0, 0.3)',
-                borderRadius: '12px',
-                padding: '14px 20px',
-                marginBottom: '26px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '12px'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <CheckCircle2 color="var(--lime)" size={20} />
-                <span style={{ fontSize: '13px', color: '#e2e8f0' }}>
-                  Player nomination submitted under Registration <strong>#{regSuccess}</strong>. Under organizer review.
-                </span>
-              </div>
-              <button
-                onClick={() => setRegSuccess(null)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#94a3b8',
-                  cursor: 'pointer',
-                  fontSize: '18px',
-                  lineHeight: 1
-                }}
-              >
-                &times;
-              </button>
-            </motion.div>
-          )}
-
-          {visiblePlayers.length === 0 && (
-            <div style={{ margin: '40px auto', maxWidth: 680, padding: '32px', textAlign: 'center', border: '1px solid rgba(156,255,0,.22)', borderRadius: 16, background: 'rgba(156,255,0,.04)' }}>
-              <h2 style={{ color: 'var(--lime)' }}>Player nominations are open</h2>
-              <p style={{ color: '#cbd5e1' }}>Approved players will appear here after organiser review. Submit your nomination to be considered for the auction.</p>
-              <button onClick={() => setShowRegisterModal(true)} style={{ background: 'var(--lime)', color: '#06111d', border: 0, borderRadius: 8, padding: '12px 20px', fontWeight: 800, cursor: 'pointer' }}>Register as a player</button>
-            </div>
-          )}
-
-          {/* 3. PRO SPORTS PLAYER CARDS GRID */}
           <div
+            className="auction-player-grid"
+            aria-label="Auction players"
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
               gap: '24px'
             }}
           >
-            {visiblePlayers.map((player) => {
+            {displayedPlayers.map((player, index) => {
               const highestBid = getHighestBidInfo(player.id);
               const isSold = player.status === 'SOLD';
               const isUnsold = player.status === 'UNSOLD';
+              const isDemo = player.isDemo === true;
+              const ringPathId = `auction-player-ring-${String(player.id).replace(/[^a-zA-Z0-9_-]/g, '-')}-${index}`;
 
               return (
                 <motion.article
                   key={player.id}
-                  whileHover={{ y: -6 }}
-                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  className="auction-player-card"
+                  initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  whileHover={prefersReducedMotion ? undefined : { y: -6 }}
+                  transition={{ duration: 0.35, ease: 'easeOut', delay: prefersReducedMotion ? 0 : Math.min(index * 0.07, 0.35) }}
                   style={{
                     background: 'linear-gradient(180deg, #0b1118 0%, #070b10 100%)',
                     border: '1px solid rgba(255, 255, 255, 0.09)',
@@ -434,153 +286,49 @@ export default function Auction() {
                     e.currentTarget.style.boxShadow = '0 14px 34px rgba(0, 0, 0, 0.55)';
                   }}
                 >
-                  {/* Portrait Hero Card Header with Real Sports Photography & Vignette Overlay */}
                   <div
-                    style={{
-                      position: 'relative',
-                      height: '280px',
-                      overflow: 'hidden',
-                      background: '#04070c'
-                    }}
+                    className="auction-player-portrait"
                   >
-                    {/* Portrait Photograph */}
-                    <img
-                      src={player.photoUrl || '/images/jersey.jpg'}
-                      alt={player.name}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        objectPosition: 'center 20%',
-                        filter: 'brightness(0.92) contrast(1.1)',
-                        transition: 'transform 0.4s ease'
-                      }}
-                      onError={(e) => {
-                        e.currentTarget.src = '/images/jersey.jpg';
-                      }}
-                    />
-
-                    {/* Rich Cinematic Vignette Gradient Overlay */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        background:
-                          'linear-gradient(180deg, rgba(4, 7, 12, 0.35) 0%, rgba(4, 7, 12, 0.08) 35%, rgba(7, 11, 16, 0.92) 80%, #0b1118 100%)'
-                      }}
-                    />
-
-                    {/* Top Row: Role Badge & Auction Status */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '14px',
-                        left: '14px',
-                        right: '14px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        zIndex: 3
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: '10px',
-                          fontWeight: 800,
-                          letterSpacing: '1px',
-                          textTransform: 'uppercase',
-                          padding: '4px 10px',
-                          borderRadius: '6px',
-                          background: 'rgba(6, 11, 18, 0.75)',
-                          backdropFilter: 'blur(8px)',
-                          color: player.badgeColor || 'var(--lime)',
-                          border: `1px solid ${player.badgeColor ? player.badgeColor + '66' : 'rgba(156,255,0,0.4)'}`,
-                          fontFamily: "'Outfit', sans-serif"
-                        }}
-                      >
-                        {player.role}
-                      </span>
-
-                      <span
-                        style={{
-                          fontSize: '10px',
-                          fontWeight: 800,
-                          letterSpacing: '0.5px',
-                          padding: '4px 10px',
-                          borderRadius: '6px',
-                          background: isSold
-                            ? 'rgba(239, 68, 68, 0.25)'
-                            : isUnsold
-                            ? 'rgba(148, 163, 184, 0.25)'
-                            : 'rgba(156, 255, 0, 0.18)',
-                          color: isSold ? '#f87171' : isUnsold ? '#cbd5e1' : 'var(--lime)',
-                          border: isSold
-                            ? '1px solid rgba(239, 68, 68, 0.5)'
-                            : isUnsold
-                            ? '1px solid rgba(148, 163, 184, 0.4)'
-                            : '1px solid rgba(156, 255, 0, 0.4)',
-                          fontFamily: "'Outfit', sans-serif"
-                        }}
-                      >
-                        {player.status || 'AVAILABLE'}
-                      </span>
+                    <div className="auction-player-photo-frame">
+                      <div className="auction-player-emblem">
+                        <svg className="auction-player-emblem-type" viewBox="0 0 100 100" aria-hidden="true">
+                          <defs>
+                            <path id={ringPathId} d="M 50,50 m -45,0 a 45,45 0 1,1 90,0 a 45,45 0 1,1 -90,0" />
+                          </defs>
+                          <text>
+                            <textPath href={`#${ringPathId}`} startOffset="0%">WINTER BASH LEAGUE AUCTION 2026 ·</textPath>
+                            <textPath href={`#${ringPathId}`} startOffset="50%">WINTER BASH LEAGUE AUCTION 2026 ·</textPath>
+                          </text>
+                        </svg>
+                        <img
+                          src={player.photoUrl || '/images/jersey.jpg'}
+                          alt={player.name}
+                          onError={(e) => {
+                            e.currentTarget.src = '/images/jersey.jpg';
+                          }}
+                        />
+                      </div>
                     </div>
-
-                    {/* Bottom: Player Name & Styles */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: '12px',
-                        left: '16px',
-                        right: '16px',
-                        zIndex: 3
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: '10px',
-                          color: 'var(--lime)',
-                          fontWeight: 800,
-                          letterSpacing: '1.2px',
-                          textTransform: 'uppercase',
-                          fontFamily: "'Outfit', sans-serif",
-                          display: 'block',
-                          marginBottom: '2px'
-                        }}
-                      >
-                        {player.category}
-                      </span>
-                      <h3
-                        style={{
-                          fontFamily: "'Outfit', sans-serif",
-                          fontSize: '20px',
-                          fontWeight: 800,
-                          color: '#ffffff',
-                          margin: '0 0 3px',
-                          letterSpacing: '-0.3px',
-                          textTransform: 'uppercase'
-                        }}
-                      >
-                        {player.name}
-                      </h3>
-                      <div
-                        style={{
-                          fontSize: '11px',
-                          color: '#cbd5e1',
-                          display: 'flex',
-                          gap: '6px',
-                          alignItems: 'center'
-                        }}
-                      >
-                        <span>{player.battingStyle}</span>
-                        <span style={{ color: 'rgba(255,255,255,0.3)' }}>•</span>
-                        <span>{player.bowlingStyle}</span>
+                    <div className="auction-player-summary">
+                      <div className="auction-player-badges">
+                        <span className="auction-player-role" style={{ color: player.badgeColor || 'var(--lime)' }}>{player.role}</span>
+                        <span className={`auction-player-status${isSold ? ' is-sold' : isUnsold ? ' is-unsold' : ''}`}>{player.status || 'AVAILABLE'}</span>
+                      </div>
+                      <div className="auction-player-name-block">
+                        <span className="auction-player-category">{player.category}</span>
+                        <h3>{player.name}</h3>
+                        <div className="auction-player-styles">
+                          <span>{player.battingStyle}</span>
+                          <span aria-hidden="true">·</span>
+                          <span>{player.bowlingStyle}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Clean Performance Matrix — 4 fixed stats */}
                   <div
+                    className="auction-player-stats"
                     style={{
                       padding: '12px 16px',
                       background: '#070b10',
@@ -690,7 +438,7 @@ export default function Auction() {
                     <div style={{ marginTop: 'auto' }}>
                       <button
                         onClick={() => openBidModal(player)}
-                        disabled={isSold}
+                        disabled={isSold || isDemo}
                         style={{
                           width: '100%',
                           height: '44px',
@@ -701,26 +449,26 @@ export default function Auction() {
                           alignItems: 'center',
                           justifyContent: 'center',
                           gap: '8px',
-                          cursor: isSold ? 'not-allowed' : 'pointer',
-                          background: isSold
+                          cursor: isSold || isDemo ? 'not-allowed' : 'pointer',
+                          background: isSold || isDemo
                             ? 'rgba(255, 255, 255, 0.04)'
                             : 'rgba(156, 255, 0, 0.08)',
-                          border: isSold
+                          border: isSold || isDemo
                             ? '1px solid rgba(255, 255, 255, 0.08)'
                             : '1px solid rgba(156, 255, 0, 0.35)',
-                          color: isSold ? '#64748b' : 'var(--lime)',
+                          color: isSold || isDemo ? '#64748b' : 'var(--lime)',
                           transition: 'all 0.2s ease',
                           fontFamily: "'Outfit', sans-serif"
                         }}
                         onMouseOver={(e) => {
-                          if (!isSold) {
+                          if (!isSold && !isDemo) {
                             e.currentTarget.style.background = 'var(--lime)';
                             e.currentTarget.style.color = '#04070c';
                             e.currentTarget.style.boxShadow = '0 4px 15px rgba(156,255,0,0.3)';
                           }
                         }}
                         onMouseOut={(e) => {
-                          if (!isSold) {
+                          if (!isSold && !isDemo) {
                             e.currentTarget.style.background = 'rgba(156, 255, 0, 0.08)';
                             e.currentTarget.style.color = 'var(--lime)';
                             e.currentTarget.style.boxShadow = 'none';
@@ -728,7 +476,7 @@ export default function Auction() {
                         }}
                       >
                         <Gavel size={15} />
-                        {isSold ? 'PLAYER SOLD' : 'PLACE A BID'}
+                        {isDemo ? 'DEMO PREVIEW' : isSold ? 'PLAYER SOLD' : 'PLACE A BID'}
                       </button>
                     </div>
                   </div>
@@ -737,12 +485,30 @@ export default function Auction() {
             })}
           </div>
 
+          <div className="sr-only" role="status" aria-live="polite">
+            {regSuccess ? `Player nomination submitted under registration ${regSuccess}. Under organiser review.` : ''}
+            {bidFeedError ? 'Live bid updates are temporarily unavailable.' : ''}
+          </div>
+          {catalogueError && <div className="sr-only" role="alert">{catalogueError}</div>}
+          <button
+            className="auction-register-fab"
+            type="button"
+            aria-label="Register yourself"
+            title="Register yourself"
+            onClick={() => setShowRegisterModal(true)}
+          >
+            <span className="auction-register-icon-motion">
+              <UserPlus size={25} strokeWidth={2.2} />
+            </span>
+            <span className="auction-register-label">Register yourself</span>
+          </button>
         </div>
 
         {/* 4. POLISHED BID SUBMISSION MODAL */}
         <AnimatePresence>
           {biddingPlayer && (
             <div
+            className="auction-dialog-backdrop"
               style={{
                 position: 'fixed',
                 inset: 0,
@@ -756,6 +522,7 @@ export default function Auction() {
               }}
             >
               <motion.div
+                className="auction-dialog auction-bid-dialog"
                 initial={{ opacity: 0, scale: 0.94, y: 15 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.94, y: 15 }}
@@ -1093,6 +860,7 @@ export default function Auction() {
         <AnimatePresence>
           {showRegisterModal && (
             <div
+              className="auction-dialog-backdrop"
               style={{
                 position: 'fixed',
                 inset: 0,
@@ -1106,6 +874,7 @@ export default function Auction() {
               }}
             >
               <motion.div
+                className="auction-dialog auction-register-dialog"
                 initial={{ opacity: 0, scale: 0.94, y: 15 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.94, y: 15 }}
@@ -1114,21 +883,18 @@ export default function Auction() {
                   border: '1px solid rgba(255, 255, 255, 0.15)',
                   borderRadius: '16px',
                   width: '100%',
-                  maxWidth: '560px',
-                  maxHeight: '90vh',
+                  maxWidth: '500px',
+                  maxHeight: 'min(88vh, 760px)',
                   overflowY: 'auto',
                   boxShadow: '0 25px 50px -12px rgba(0,0,0,0.7)',
-                  padding: '24px'
+                  padding: '20px'
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+                <div className="auction-register-heading" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                   <div>
                     <h2 style={{ fontSize: '18px', fontWeight: 800, textTransform: 'uppercase', color: '#ffffff', margin: 0, fontFamily: "'Outfit', sans-serif" }}>
-                      Register as Player
+                      Player nomination
                     </h2>
-                    <p style={{ color: 'var(--lime)', fontSize: '12px', fontWeight: 700, margin: '4px 0 0' }}>
-                      WBL 2026 Auction Player Nomination
-                    </p>
                   </div>
                   <button
                     onClick={() => setShowRegisterModal(false)}
@@ -1141,65 +907,38 @@ export default function Auction() {
                 <form onSubmit={handleRegisterSubmit}>
                   {regError && <p style={{ color: '#ef4444', fontSize: '12px', marginBottom: '12px' }}>{regError}</p>}
 
-                  {/* Photo Upload with Live Thumbnail Preview */}
                   <div
+                    className="auction-register-photo"
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '16px',
-                      padding: '12px',
-                      background: 'rgba(255,255,255,0.03)',
-                      borderRadius: '10px',
-                      border: '1px dashed rgba(255,255,255,0.15)',
-                      marginBottom: '16px'
+                      marginBottom: '14px'
                     }}
                   >
-                    <div
-                      style={{
-                        width: '56px',
-                        height: '56px',
-                        borderRadius: '50%',
-                        background: '#04070c',
-                        border: '1px solid rgba(156,255,0,0.3)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        overflow: 'hidden',
-                        flexShrink: 0
-                      }}
-                    >
+                    <span className="auction-register-photo-title">PLAYER CARD IMAGE</span>
+                    <label className="auction-player-image-upload">
                       {photoPreview ? (
-                        <img src={photoPreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={photoPreview} alt="Player card image preview" />
                       ) : (
-                        <Upload size={20} color="var(--lime)" />
+                        <span className="auction-player-image-empty">
+                          <ImagePlus size={23} aria-hidden="true" />
+                          <span>Choose a player image</span>
+                        </span>
                       )}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <label
-                        style={{
-                          display: 'inline-block',
-                          fontSize: '12px',
-                          fontWeight: 700,
-                          color: 'var(--lime)',
-                          cursor: 'pointer',
-                          marginBottom: '2px'
-                        }}
-                      >
-                        {photoPreview ? 'Change Photograph' : 'Upload Player Photograph'}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handlePhotoSelect}
-                          style={{ display: 'none' }}
-                        />
-                      </label>
-                      <span style={{ display: 'block', fontSize: '11px', color: '#64748b' }}>
-                        Square portrait recommended (JPG/PNG)
+                      <span className="auction-player-image-action">
+                        {photoPreview ? 'Change image' : 'Upload player image'}
                       </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoSelect}
+                        aria-label="Upload player card image"
+                      />
+                    </label>
+                    <div className="auction-register-photo-help">
+                      This image will appear on your auction player card.
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '16px' }}>
+                  <div className="auction-register-fields" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', marginBottom: '14px' }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
                         Full Name *
@@ -1357,6 +1096,101 @@ export default function Auction() {
                         placeholder="Club name"
                         value={regForm.club}
                         onChange={(e) => setRegForm({ ...regForm, club: e.target.value })}
+                        style={{
+                          width: '100%',
+                          height: '42px',
+                          padding: '0 12px',
+                          borderRadius: '8px',
+                          background: '#04070c',
+                          border: '1px solid rgba(255, 255, 255, 0.12)',
+                          color: '#ffffff',
+                          fontSize: '13px'
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+                        Average
+                      </label>
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        maxLength={30}
+                        placeholder="e.g. 38.5"
+                        value={regForm.average}
+                        onChange={(e) => setRegForm({ ...regForm, average: e.target.value })}
+                        style={{
+                          width: '100%',
+                          height: '42px',
+                          padding: '0 12px',
+                          borderRadius: '8px',
+                          background: '#04070c',
+                          border: '1px solid rgba(255, 255, 255, 0.12)',
+                          color: '#ffffff',
+                          fontSize: '13px'
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+                        Strike Rate
+                      </label>
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        maxLength={30}
+                        placeholder="e.g. 142.0"
+                        value={regForm.strikeRate}
+                        onChange={(e) => setRegForm({ ...regForm, strikeRate: e.target.value })}
+                        style={{
+                          width: '100%',
+                          height: '42px',
+                          padding: '0 12px',
+                          borderRadius: '8px',
+                          background: '#04070c',
+                          border: '1px solid rgba(255, 255, 255, 0.12)',
+                          color: '#ffffff',
+                          fontSize: '13px'
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+                        Economy
+                      </label>
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        maxLength={30}
+                        placeholder="e.g. 6.8"
+                        value={regForm.economy}
+                        onChange={(e) => setRegForm({ ...regForm, economy: e.target.value })}
+                        style={{
+                          width: '100%',
+                          height: '42px',
+                          padding: '0 12px',
+                          borderRadius: '8px',
+                          background: '#04070c',
+                          border: '1px solid rgba(255, 255, 255, 0.12)',
+                          color: '#ffffff',
+                          fontSize: '13px'
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+                        Best Performance
+                      </label>
+                      <input
+                        type="text"
+                        maxLength={30}
+                        placeholder="e.g. 72* or 3/18"
+                        value={regForm.best}
+                        onChange={(e) => setRegForm({ ...regForm, best: e.target.value })}
                         style={{
                           width: '100%',
                           height: '42px',
