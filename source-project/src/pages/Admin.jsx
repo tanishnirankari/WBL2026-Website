@@ -41,6 +41,9 @@ function AuctionNominations({ password }) {
   const [busyId, setBusyId] = useState(null);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState(null);
+  const [draft, setDraft] = useState(null);
+  const [photoData, setPhotoData] = useState('');
   const headers = { 'x-admin-password': password, 'Content-Type': 'application/json' };
   const load = async () => {
     setLoading(true);
@@ -65,6 +68,34 @@ function AuctionNominations({ password }) {
     } catch (error) { setMessage(error.message); }
     finally { setBusyId(null); }
   };
+  const beginEdit = (player) => {
+    setEditingId(player.id);
+    setPhotoData('');
+    setDraft({
+      fullName: player.fullName || '', age: String(player.age || ''), role: player.role || '',
+      battingStyle: player.battingStyle || '', bowlingStyle: player.bowlingStyle || '',
+      clubName: player.clubName || '', basePrice: String(player.basePrice || ''),
+      category: player.category || 'APPROVED PLAYER', matches: player.matches || '',
+      primaryStat: player.primaryStat || '', strikeRate: player.strikeRate || '',
+      economy: player.economy || '', average: player.average || '', best: player.best || '',
+    });
+  };
+  const saveProfile = async (event, player) => {
+    event.preventDefault();
+    setBusyId(player.id);
+    try {
+      const response = await fetch(api + '/admin/auction/registrations/' + player.id + '/profile', {
+        method: 'PATCH', headers, body: JSON.stringify({ ...draft, ...(photoData ? { photoUrl: photoData } : {}) }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Could not save player details.');
+      setPlayers((current) => current.map((item) => item.id === player.id ? result : item));
+      setEditingId(null); setDraft(null); setPhotoData('');
+      setMessage(`${result.fullName}'s auction profile was saved.`);
+    } catch (error) { setMessage(error.message || 'Could not save player details.'); }
+    finally { setBusyId(null); }
+  };
+  const setField = (key, value) => setDraft((current) => ({ ...current, [key]: value }));
   const shown = players.filter((player) => filter === 'ALL' || player.status === filter);
   const buttonStyle = (active) => ({ padding: '7px 12px', borderRadius: 18, border: active ? '1px solid var(--lime)' : '1px solid rgba(255,255,255,.14)', background: active ? 'rgba(156,255,0,.14)' : 'transparent', color: active ? 'var(--lime)' : '#cbd5e1', cursor: 'pointer', fontWeight: 700, fontSize: 12 });
   return (
@@ -78,6 +109,33 @@ function AuctionNominations({ password }) {
         <div style={{ display: 'grid', gap: 12 }}>
           {shown.map((player) => (
             <article key={player.id} className="admin-nomination-card">
+              {(editingId === player.id && draft) ? (
+                <form className="admin-auction-profile-edit" onSubmit={(event) => saveProfile(event, player)}>
+                  <div className="admin-auction-edit-grid">
+                    <label>Player name<input required maxLength="120" value={draft.fullName} onChange={(event) => setField('fullName', event.target.value)} /></label>
+                    <label>Age<input required type="number" min="14" max="50" value={draft.age} onChange={(event) => setField('age', event.target.value)} /></label>
+                    <label>Role<input required maxLength="60" value={draft.role} onChange={(event) => setField('role', event.target.value)} /></label>
+                    <label>Category<input maxLength="40" value={draft.category} onChange={(event) => setField('category', event.target.value)} /></label>
+                    <label>Club / team<input maxLength="120" value={draft.clubName} onChange={(event) => setField('clubName', event.target.value)} /></label>
+                    <label>Base price (₹)<input required maxLength="20" value={draft.basePrice} onChange={(event) => setField('basePrice', event.target.value)} /></label>
+                    <label>Batting style<input maxLength="40" value={draft.battingStyle} onChange={(event) => setField('battingStyle', event.target.value)} /></label>
+                    <label>Bowling style<input maxLength="40" value={draft.bowlingStyle} onChange={(event) => setField('bowlingStyle', event.target.value)} /></label>
+                    <label>Matches<input maxLength="30" value={draft.matches} onChange={(event) => setField('matches', event.target.value)} /></label>
+                    <label>Performance highlight<input maxLength="80" value={draft.primaryStat} onChange={(event) => setField('primaryStat', event.target.value)} /></label>
+                    <label>Strike rate<input maxLength="30" value={draft.strikeRate} onChange={(event) => setField('strikeRate', event.target.value)} /></label>
+                    <label>Economy<input maxLength="30" value={draft.economy} onChange={(event) => setField('economy', event.target.value)} /></label>
+                    <label>Average<input maxLength="30" value={draft.average} onChange={(event) => setField('average', event.target.value)} /></label>
+                    <label>Best figures<input maxLength="30" value={draft.best} onChange={(event) => setField('best', event.target.value)} /></label>
+                  </div>
+                  <label className="admin-auction-photo-field">Player photo<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; if (file.size > 5 * 1024 * 1024) { setMessage('Player photos must be 5 MB or smaller.'); event.target.value = ''; return; } const reader = new FileReader(); reader.onload = () => setPhotoData(String(reader.result || '')); reader.readAsDataURL(file); }} /></label>
+                  {player.phone && <small>Private contact: {player.phone}</small>}
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}><button className="admin-action-button primary" type="submit" disabled={busyId === player.id}><Check size={14} /> Save player details</button><button className="admin-action-button" type="button" onClick={() => { setEditingId(null); setDraft(null); setPhotoData(''); }}>Cancel</button></div>
+                </form>
+              ) : <>
+                {player.photoUrl ? <img src={player.photoUrl} alt={player.fullName} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 10 }} /> : <div className="admin-player-card-placeholder"><UserRound size={22} /></div>}
+                <div style={{ minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}><h3 style={{ margin: 0 }}>{player.fullName}</h3><span style={{ padding: '3px 8px', borderRadius: 20, fontSize: 10, fontWeight: 800, color: player.status === 'APPROVED' ? 'var(--lime)' : player.status === 'REJECTED' ? '#f87171' : '#fbbf24', background: player.status === 'APPROVED' ? 'rgba(156,255,0,.12)' : player.status === 'REJECTED' ? 'rgba(248,113,113,.12)' : 'rgba(251,191,36,.12)' }}>{player.status || 'PENDING'}</span></div><p style={{ margin: '5px 0', color: '#cbd5e1' }}>{player.role} · Age {player.age} · {player.clubName || 'No club listed'}</p><small style={{ color: '#94a3b8' }}>Phone: {player.phone} · Batting: {player.battingStyle || '—'} · Bowling: {player.bowlingStyle || '—'} · Base price: {player.basePrice}</small><small style={{ display: 'block', color: '#64748b', marginTop: 4 }}>Submitted {formatDate(player.createdAt)}</small></div>
+                <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', justifyContent: 'flex-end' }}><button onClick={() => beginEdit(player)} disabled={busyId === player.id} className="admin-action-button">Edit player</button>{player.status !== 'APPROVED' && <button onClick={() => review(player, 'APPROVED')} disabled={busyId === player.id} className="admin-action-button primary"><Check size={14} /> Approve & publish</button>}{player.status !== 'REJECTED' && <button onClick={() => review(player, 'REJECTED')} disabled={busyId === player.id} className="admin-action-button danger"><XCircle size={14} /> Reject</button>}</div>
+              </>}
               {player.photoUrl ? <img src={player.photoUrl} alt={player.fullName} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 10 }} /> : <div className="admin-player-card-placeholder"><UserRound size={22} /></div>}
               <div style={{ minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}><h3 style={{ margin: 0 }}>{player.fullName}</h3><span style={{ padding: '3px 8px', borderRadius: 20, fontSize: 10, fontWeight: 800, color: player.status === 'APPROVED' ? 'var(--lime)' : player.status === 'REJECTED' ? '#f87171' : '#fbbf24', background: player.status === 'APPROVED' ? 'rgba(156,255,0,.12)' : player.status === 'REJECTED' ? 'rgba(248,113,113,.12)' : 'rgba(251,191,36,.12)' }}>{player.status || 'PENDING'}</span></div><p style={{ margin: '5px 0', color: '#cbd5e1' }}>{player.role} · Age {player.age} · {player.clubName || 'No club listed'}</p><small style={{ color: '#94a3b8' }}>Phone: {player.phone} · Batting: {player.battingStyle || '—'} · Bowling: {player.bowlingStyle || '—'} · Base price: {player.basePrice}</small><small style={{ display: 'block', color: '#64748b', marginTop: 4 }}>Submitted {formatDate(player.createdAt)}</small></div>
               <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', justifyContent: 'flex-end' }}>{player.status !== 'APPROVED' && <button onClick={() => review(player, 'APPROVED')} disabled={busyId === player.id} className="admin-action-button primary"><Check size={14} /> Approve & publish</button>}{player.status !== 'REJECTED' && <button onClick={() => review(player, 'REJECTED')} disabled={busyId === player.id} className="admin-action-button danger"><XCircle size={14} /> Reject</button>}</div>
@@ -620,10 +678,10 @@ export default function Admin() {
                                 <td data-label="Bid amount" style={{ padding: '12px', color: 'var(--lime)', fontWeight: 800 }}>
                                   T {Number(bid.bidAmount).toLocaleString('en-IN')}
                                 </td>
-                                <td style={{ padding: '12px', color: '#94a3b8', fontSize: '12px' }}>
+                                <td data-label="Private contact" style={{ padding: '12px', color: '#94a3b8', fontSize: '12px' }}>
                                   {bid.phone} {bid.email && `• ${bid.email}`}
                                 </td>
-                                <td style={{ padding: '12px' }}>
+                                <td data-label="Status" style={{ padding: '12px' }}>
                                   <span
                                     style={{
                                       fontSize: '11px',
@@ -653,7 +711,7 @@ export default function Admin() {
                                     {bid.status}
                                   </span>
                                 </td>
-                                <td style={{ padding: '12px', textAlign: 'right' }}>
+                                <td data-label="Review" style={{ padding: '12px', textAlign: 'right' }}>
                                   <div style={{ display: 'inline-flex', gap: '6px' }}>
                                     {bid.status !== 'APPROVED' && (
                                       <button

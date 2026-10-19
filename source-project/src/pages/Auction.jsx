@@ -180,9 +180,9 @@ export default function Auction() {
         if (!res.ok) return;
         const data = await res.json();
         if (active) setRegisteredPlayers(Array.isArray(data) ? data.map((p) => ({
-          ...p, id: `approved-${p.id}`, category: 'APPROVED PLAYER', status: 'AVAILABLE', published: true,
+          ...p, id: `approved-${p.id}`, category: p.category || 'APPROVED PLAYER', status: 'AVAILABLE', published: true,
           basePrice: Number(String(p.basePrice || '0').replace(/[^0-9]/g, '')) || 0,
-          stats: { matches: '—', primaryStat: p.clubName || 'Open auction', strikeRate: p.battingStyle || '—', economy: p.bowlingStyle || '—' },
+          stats: { matches: p.matches || '—', primaryStat: p.primaryStat || '—', strikeRate: p.strikeRate || '', economy: p.economy || '', average: p.average || '', best: p.best || '' },
           badgeColor: 'var(--lime)'
         })) : []);
       } catch { if (active) setRegisteredPlayers([]); }
@@ -678,7 +678,7 @@ export default function Auction() {
                         MATCHES
                       </span>
                       <strong style={{ fontSize: '13px', color: '#f1f5f9', fontWeight: 800 }}>
-                        {player.stats?.matches || '15+'}
+                        {player.stats?.matches || '—'}
                       </strong>
                     </div>
                     <div>
@@ -686,7 +686,7 @@ export default function Auction() {
                         IMPACT
                       </span>
                       <strong style={{ fontSize: '12px', color: 'var(--lime)', fontWeight: 800 }}>
-                        {player.stats?.primaryStat || '20+'}
+                        {player.stats?.primaryStat || '—'}
                       </strong>
                     </div>
                     <div>
@@ -694,7 +694,7 @@ export default function Auction() {
                         {player.stats?.strikeRate ? 'S/RATE' : 'ECONOMY'}
                       </span>
                       <strong style={{ fontSize: '13px', color: '#f1f5f9', fontWeight: 800 }}>
-                        {player.stats?.strikeRate || player.stats?.economy || '7.2'}
+                        {player.stats?.strikeRate || player.stats?.economy || '—'}
                       </strong>
                     </div>
                     <div>
@@ -702,7 +702,7 @@ export default function Auction() {
                         {player.stats?.average ? 'AVG' : 'BEST'}
                       </span>
                       <strong style={{ fontSize: '13px', color: '#f1f5f9', fontWeight: 800 }}>
-                        {player.stats?.average || player.stats?.best || '3/22'}
+                        {player.stats?.average || player.stats?.best || '—'}
                       </strong>
                     </div>
                   </div>
