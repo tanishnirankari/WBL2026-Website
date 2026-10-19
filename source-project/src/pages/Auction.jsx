@@ -35,7 +35,7 @@ export default function Auction() {
 
   // Modal states
   const [biddingPlayer, setBiddingPlayer] = useState(null);
-  const [bidForm, setBidForm] = useState({ name: '', phone: '', email: '', amount: '' });
+  const [bidForm, setBidForm] = useState({ name: '', phone: '', amount: '' });
   const [bidSuccess, setBidSuccess] = useState(false);
   const [bidError, setBidError] = useState('');
   const [isSubmittingBid, setIsSubmittingBid] = useState(false);
@@ -142,7 +142,7 @@ export default function Auction() {
     const highestBid = getHighestBidInfo(player.id);
     const minBid = highestBid ? Number(highestBid.bidAmount) + 100 : Number(player.basePrice);
     setBiddingPlayer(player);
-    setBidForm({ name: '', phone: '', email: '', amount: String(minBid) });
+    setBidForm({ name: '', phone: '', amount: String(minBid) });
     setBidError('');
     setBidSuccess(false);
   };
@@ -177,7 +177,6 @@ export default function Auction() {
           playerName: biddingPlayer.name,
           bidderName: bidForm.name.trim(),
           phone: bidForm.phone.trim(),
-          email: bidForm.email.trim() || null,
           bidAmount: bidAmountNumber
         })
       });
@@ -737,29 +736,6 @@ export default function Auction() {
                       <small style={{ fontSize: '10px', color: '#64748b', display: 'block', marginTop: '3px' }}>
                         🔒 Private. Never displayed on the public page.
                       </small>
-                    </div>
-
-                    <div style={{ marginBottom: '14px' }}>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
-                        Email Address (Optional)
-                      </label>
-                      <input
-                        type="email"
-                        placeholder="franchise@example.com"
-                        value={bidForm.email}
-                        onChange={(e) => setBidForm({ ...bidForm, email: e.target.value })}
-                        style={{
-                          width: '100%',
-                          height: '44px',
-                          padding: '0 12px',
-                          borderRadius: '8px',
-                          background: '#04070c',
-                          border: '1px solid rgba(255, 255, 255, 0.12)',
-                          color: '#ffffff',
-                          fontSize: '13px',
-                          outline: 'none'
-                        }}
-                      />
                     </div>
 
                     <div style={{ marginBottom: '18px' }}>
