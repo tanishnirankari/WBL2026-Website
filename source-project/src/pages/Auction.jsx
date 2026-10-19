@@ -130,6 +130,8 @@ export default function Auction() {
   });
 
   const [approvedBids, setApprovedBids] = useState([]);
+  const [bidFeedUpdatedAt, setBidFeedUpdatedAt] = useState(null);
+  const [bidFeedError, setBidFeedError] = useState(false);
 
   // Modal states
   const [biddingPlayer, setBiddingPlayer] = useState(null);
@@ -163,9 +165,13 @@ export default function Auction() {
         const res = await fetch(`${apiUrl}/auction/bids/public`);
         if (!res.ok) throw new Error('Could not load approved bids.');
         const data = await res.json();
-        if (active) setApprovedBids(Array.isArray(data) ? data : []);
+        if (active) {
+          setApprovedBids(Array.isArray(data) ? data : []);
+          setBidFeedUpdatedAt(new Date());
+          setBidFeedError(false);
+        }
       } catch {
-        if (active) setApprovedBids([]);
+        if (active) setBidFeedError(true);
       }
     };
     const fetchApprovedPlayers = async () => {
@@ -183,7 +189,10 @@ export default function Auction() {
     };
     fetchLiveBids();
     fetchApprovedPlayers();
-    return () => { active = false; };
+    const refreshTimer = window.setInterval(() => {
+      if (document.visibilityState === 'visible') fetchLiveBids();
+    }, 20000);
+    return () => { active = false; window.clearInterval(refreshTimer); };
   }, [apiUrl]);
 
   const getHighestBidInfo = (playerId) => {
@@ -412,6 +421,13 @@ export default function Auction() {
               </button>
             </div>
           </header>
+
+          <div className={`auction-bid-feed ${bidFeedError ? 'is-stale' : ''}`} role="status">
+            <span className="auction-bid-feed-dot" />
+            {bidFeedError
+              ? 'Live bid updates are temporarily unavailable. Showing the last received bids.'
+              : `Approved bids refresh automatically${bidFeedUpdatedAt ? ` · Updated ${bidFeedUpdatedAt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}` : ' · Connecting…'}`}
+          </div>
 
           {/* Registration Success Notification */}
           {regSuccess && (
