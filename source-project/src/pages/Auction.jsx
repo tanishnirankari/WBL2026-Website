@@ -9,7 +9,6 @@ import {
   X,
   Phone,
   Mail,
-  IndianRupee,
   Sparkles,
   TrendingUp,
   AlertCircle,
@@ -57,7 +56,7 @@ export default function Auction() {
     battingStyle: 'Right-Hand Bat',
     bowlingStyle: 'Right-Arm Fast',
     club: '',
-    basePrice: '₹3,000'
+    basePrice: 'T 3,000'
   });
   const [regSuccess, setRegSuccess] = useState(null);
   const [isSubmittingReg, setIsSubmittingReg] = useState(false);
@@ -159,7 +158,7 @@ export default function Auction() {
     const minRequired = highestBid ? Number(highestBid.bidAmount) + 100 : Number(biddingPlayer.basePrice);
     const bidAmountNumber = Number(bidForm.amount);
     if (!Number.isFinite(bidAmountNumber) || bidAmountNumber < minRequired) {
-      setBidError(`Bid must be at least ₹${minRequired.toLocaleString('en-IN')}`);
+      setBidError(`Bid must be at least T ${minRequired.toLocaleString('en-IN')} Bash Tokens`);
       return;
     }
 
@@ -644,7 +643,7 @@ export default function Auction() {
                           BASE PRICE
                         </span>
                         <span style={{ fontSize: '16px', fontWeight: 800, color: '#f8fafc', fontFamily: "'Outfit', sans-serif" }}>
-                          ₹{Number(player.basePrice).toLocaleString('en-IN')}
+                          T {Number(player.basePrice).toLocaleString('en-IN')} <span style={{ fontSize: '10px', color: '#94a3b8' }}>Bash Tokens</span>
                         </span>
                       </div>
 
@@ -664,7 +663,7 @@ export default function Auction() {
                                 fontFamily: "'Outfit', sans-serif"
                               }}
                             >
-                              ₹{Number(highestBid.bidAmount).toLocaleString('en-IN')}
+                              T {Number(highestBid.bidAmount).toLocaleString('en-IN')}
                             </span>
                             <span
                               style={{
@@ -849,7 +848,7 @@ export default function Auction() {
                     </p>
                     <p style={{ color: '#94a3b8', fontSize: '13px', lineHeight: 1.5, margin: '0 0 24px' }}>
                       Your bid for <strong>{biddingPlayer.name}</strong> of{' '}
-                      <strong style={{ color: '#ffffff' }}>₹{Number(bidForm.amount).toLocaleString('en-IN')}</strong> will be reviewed by the league panel and displayed publicly once approved.
+                      <strong style={{ color: '#ffffff' }}>T {Number(bidForm.amount).toLocaleString('en-IN')} Bash Tokens</strong> will be reviewed by the league panel and displayed publicly once approved.
                     </p>
                     <button
                       onClick={() => setBiddingPlayer(null)}
@@ -889,7 +888,7 @@ export default function Auction() {
                           BASE PRICE
                         </span>
                         <strong style={{ fontSize: '14px', color: '#e2e8f0', fontFamily: "'Outfit', sans-serif" }}>
-                          ₹{Number(biddingPlayer.basePrice).toLocaleString('en-IN')}
+                          T {Number(biddingPlayer.basePrice).toLocaleString('en-IN')} Bash Tokens
                         </strong>
                       </div>
                       <div style={{ textAlign: 'right' }}>
@@ -898,7 +897,7 @@ export default function Auction() {
                         </span>
                         <strong style={{ fontSize: '14px', color: 'var(--lime)', fontFamily: "'Outfit', sans-serif" }}>
                           {getHighestBidInfo(biddingPlayer.id)
-                            ? `₹${Number(getHighestBidInfo(biddingPlayer.id).bidAmount).toLocaleString('en-IN')}`
+                            ? `T ${Number(getHighestBidInfo(biddingPlayer.id).bidAmount).toLocaleString('en-IN')}`
                             : 'None'}
                         </strong>
                       </div>
@@ -1000,7 +999,7 @@ export default function Auction() {
                     <div style={{ marginBottom: '18px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                         <label style={{ fontSize: '12px', fontWeight: 700, color: '#cbd5e1' }}>
-                          Bid Amount (in Rupees ₹) *
+                          Bid Amount (in Bash Tokens T) *
                         </label>
                         <div style={{ display: 'flex', gap: '6px' }}>
                           <button
@@ -1017,7 +1016,7 @@ export default function Auction() {
                               cursor: 'pointer'
                             }}
                           >
-                            +₹500
+                            +T 500
                           </button>
                           <button
                             type="button"
@@ -1033,7 +1032,7 @@ export default function Auction() {
                               cursor: 'pointer'
                             }}
                           >
-                            +₹1,000
+                            +T 1,000
                           </button>
                         </div>
                       </div>
@@ -1049,7 +1048,7 @@ export default function Auction() {
                             fontSize: '15px'
                           }}
                         >
-                          ₹
+                          T
                         </span>
                         <input
                           type="number"
@@ -1402,10 +1401,10 @@ export default function Auction() {
                           fontSize: '13px'
                         }}
                       >
-                        <option value="₹2,000">₹2,000 (Emerging)</option>
-                        <option value="₹2,500">₹2,500 (Category B)</option>
-                        <option value="₹3,000">₹3,000 (Category A)</option>
-                        <option value="₹4,000">₹4,000 (Icon Player)</option>
+                        <option value="T 2,000">T 2,000 (Emerging)</option>
+                        <option value="T 2,500">T 2,500 (Category B)</option>
+                        <option value="T 3,000">T 3,000 (Category A)</option>
+                        <option value="T 4,000">T 4,000 (Icon Player)</option>
                       </select>
                     </div>
                   </div>

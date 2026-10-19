@@ -130,7 +130,7 @@ function AuctionNominations({ password }) {
                     <label>Role<input required maxLength="60" value={draft.role} onChange={(event) => setField('role', event.target.value)} /></label>
                     <label>Category<input maxLength="40" value={draft.category} onChange={(event) => setField('category', event.target.value)} /></label>
                     <label>Club / team<input maxLength="120" value={draft.clubName} onChange={(event) => setField('clubName', event.target.value)} /></label>
-                    <label>Base price (₹)<input required maxLength="20" value={draft.basePrice} onChange={(event) => setField('basePrice', event.target.value)} /></label>
+                    <label>Base price (T – Bash Tokens)<input required maxLength="20" value={draft.basePrice} onChange={(event) => setField('basePrice', event.target.value)} /></label>
                     <label>Batting style<input maxLength="40" value={draft.battingStyle} onChange={(event) => setField('battingStyle', event.target.value)} /></label>
                     <label>Bowling style<input maxLength="40" value={draft.bowlingStyle} onChange={(event) => setField('bowlingStyle', event.target.value)} /></label>
                     <label>Matches<input maxLength="30" value={draft.matches} onChange={(event) => setField('matches', event.target.value)} /></label>
@@ -292,7 +292,7 @@ export default function Admin() {
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Unable to save bid status.');
       setBidsList((current) => current.map((bid) => bid.id === bidId ? { ...bid, status: result.status } : bid));
-      setNote(`Bid from ${targetBid.bidderName} for ₹${Number(targetBid.bidAmount).toLocaleString('en-IN')} ${status.toLowerCase()}.`);
+      setNote(`Bid from ${targetBid.bidderName} for T ${Number(targetBid.bidAmount).toLocaleString('en-IN')} Bash Tokens ${status.toLowerCase()}.`);
     } catch (error) {
       setNote(error.message || 'Unable to save bid status.');
     }
@@ -875,7 +875,7 @@ export default function Admin() {
                       </div>
 
                       <div style={{ fontSize: '12px', color: '#94a3b8' }}>
-                        <div>Base Price: <strong style={{ color: '#ffffff' }}>T {Number(player.basePrice).toLocaleString('en-IN')}</strong></div>
+                        <div>Base Price: <strong style={{ color: '#ffffff' }}>T {Number(player.basePrice).toLocaleString('en-IN')} Bash Tokens</strong></div>
                         <div>Status: <strong style={{ color: player.status === 'SOLD' ? '#ef4444' : 'var(--lime)' }}>{player.status || 'AVAILABLE'}</strong></div>
                       </div>
 
