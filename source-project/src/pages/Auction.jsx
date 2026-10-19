@@ -25,94 +25,6 @@ import {
   Activity
 } from 'lucide-react';
 
-// Curated high-tier real tournament photography players with authentic portraits & styling
-const defaultAuctionPlayers = [
-  {
-    id: 'WBL-P101',
-    name: 'Kabir Varma',
-    role: 'Top-Order Batsman',
-    category: 'CATEGORY A',
-    battingStyle: 'Right-Hand Bat',
-    bowlingStyle: 'Right-Arm Medium',
-    stats: { matches: 28, average: '42.2', strikeRate: '148.6', economy: '—', best: '—' },
-    basePrice: 3000,
-    status: 'AVAILABLE',
-    published: true,
-    photoUrl: '/images/gallery3.jpg',
-    badgeColor: '#00e5ff'
-  },
-  {
-    id: 'WBL-P102',
-    name: 'Aarav "Thunder" Sharma',
-    role: 'Express Fast Bowler',
-    category: 'ICON PLAYER',
-    battingStyle: 'Right-Hand Bat',
-    bowlingStyle: 'Right-Arm Fast (140+ km/h)',
-    stats: { matches: 32, average: '—', strikeRate: '—', economy: '6.40', best: '5/18' },
-    basePrice: 3500,
-    status: 'AVAILABLE',
-    published: true,
-    photoUrl: '/images/gallery6.jpg',
-    badgeColor: 'var(--lime)'
-  },
-  {
-    id: 'WBL-P103',
-    name: 'Rohan Mehra',
-    role: 'Pace All-Rounder',
-    category: 'CATEGORY A',
-    battingStyle: 'Left-Hand Bat',
-    bowlingStyle: 'Right-Arm Fast Medium',
-    stats: { matches: 25, average: '28.5', strikeRate: '155.0', economy: '7.10', best: '3/20' },
-    basePrice: 4000,
-    status: 'AVAILABLE',
-    published: true,
-    photoUrl: '/images/gallery8.jpg',
-    badgeColor: '#ffd166'
-  },
-  {
-    id: 'WBL-P104',
-    name: 'Devansh Kulkarni',
-    role: 'Wicket-Keeper Finisher',
-    category: 'CATEGORY B',
-    battingStyle: 'Right-Hand Bat',
-    bowlingStyle: 'Wicket Keeper',
-    stats: { matches: 22, average: '32.1', strikeRate: '168.2', economy: '—', best: '—' },
-    basePrice: 2500,
-    status: 'AVAILABLE',
-    published: true,
-    photoUrl: '/images/gallery2.jpg',
-    badgeColor: '#c084fc'
-  },
-  {
-    id: 'WBL-P105',
-    name: 'Tariq Al-Mansoor',
-    role: 'Mystery Spin Specialist',
-    category: 'CATEGORY A',
-    battingStyle: 'Right-Hand Bat',
-    bowlingStyle: 'Right-Arm Leg Spin / Googly',
-    stats: { matches: 30, average: '—', strikeRate: '—', economy: '5.80', best: '4/12' },
-    basePrice: 3000,
-    status: 'AVAILABLE',
-    published: true,
-    photoUrl: '/images/gallery5.jpg',
-    badgeColor: '#38bdf8'
-  },
-  {
-    id: 'WBL-P106',
-    name: 'Samarth Jindal',
-    role: 'Hard-Hitting All-Rounder',
-    category: 'CATEGORY B',
-    battingStyle: 'Left-Hand Bat',
-    bowlingStyle: 'Right-Arm Off Spin',
-    stats: { matches: 19, average: '31.4', strikeRate: '162.5', economy: '8.20', best: '3/15' },
-    basePrice: 2500,
-    status: 'AVAILABLE',
-    published: true,
-    photoUrl: '/images/gallery7.jpg',
-    badgeColor: 'var(--lime)'
-  }
-];
-
 export default function Auction() {
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
@@ -120,14 +32,8 @@ export default function Auction() {
   const [activeRole, setActiveRole] = useState('All Players');
   const [registeredPlayers, setRegisteredPlayers] = useState([]);
 
-  const [players, setPlayers] = useState(() => {
-    try {
-      const saved = localStorage.getItem('wbl_auction_players_custom');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [players, setPlayers] = useState([]);
+  const [catalogueError, setCatalogueError] = useState('');
 
   const [approvedBids, setApprovedBids] = useState([]);
   const [bidFeedUpdatedAt, setBidFeedUpdatedAt] = useState(null);
@@ -187,8 +93,22 @@ export default function Auction() {
         })) : []);
       } catch { if (active) setRegisteredPlayers([]); }
     };
+    const fetchCatalogue = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/auction/catalogue`);
+        if (!res.ok) throw new Error('Could not load auction player statistics.');
+        const data = await res.json();
+        if (active) {
+          setPlayers(Array.isArray(data) ? data : []);
+          setCatalogueError('');
+        }
+      } catch (error) {
+        if (active) setCatalogueError(error.message || 'Could not load auction player statistics.');
+      }
+    };
     fetchLiveBids();
     fetchApprovedPlayers();
+    fetchCatalogue();
     const refreshTimer = window.setInterval(() => {
       if (document.visibilityState === 'visible') fetchLiveBids();
     }, 20000);
@@ -428,6 +348,7 @@ export default function Auction() {
               ? 'Live bid updates are temporarily unavailable. Showing the last received bids.'
               : `Approved bids refresh automatically${bidFeedUpdatedAt ? ` · Updated ${bidFeedUpdatedAt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}` : ' · Connecting…'}`}
           </div>
+          {catalogueError && <p role="alert" style={{ color: '#fca5a5', margin: '10px 0 18px' }}>{catalogueError}</p>}
 
           {/* Registration Success Notification */}
           {regSuccess && (
@@ -675,7 +596,7 @@ export default function Auction() {
                   >
                     <div>
                       <span style={{ fontSize: '9px', color: '#64748b', display: 'block', fontWeight: 800, letterSpacing: '0.5px' }}>
-                        AVG
+                        AVERAGE
                       </span>
                       <strong style={{ fontSize: '13px', color: '#f1f5f9', fontWeight: 800 }}>
                         {player.stats?.average || '—'}
@@ -683,7 +604,7 @@ export default function Auction() {
                     </div>
                     <div>
                       <span style={{ fontSize: '9px', color: '#64748b', display: 'block', fontWeight: 800, letterSpacing: '0.5px' }}>
-                        S/RATE
+                        STRIKE RATE
                       </span>
                       <strong style={{ fontSize: '13px', color: 'var(--lime)', fontWeight: 800 }}>
                         {player.stats?.strikeRate || '—'}

@@ -169,6 +169,7 @@ export default function Admin() {
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Unable to open the admin portal.');
       setData(result);
+      if (!data) setAuctionPlayers(result.cataloguePlayers || []);
       setBidsList(result.bids || []);
       setNote('');
     } catch (error) {
@@ -216,14 +217,7 @@ export default function Admin() {
   const [bidFilter, setBidFilter] = useState('ALL'); // ALL, PENDING, APPROVED, REJECTED
   const [auctionSubTab, setAuctionSubTab] = useState('nominations'); // nominations, bids, catalogue
 
-  const [auctionPlayers, setAuctionPlayers] = useState(() => {
-    try {
-      const saved = localStorage.getItem('wbl_auction_players_custom');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [auctionPlayers, setAuctionPlayers] = useState([]);
 
   const [bidsList, setBidsList] = useState([]);
 
@@ -247,27 +241,31 @@ export default function Admin() {
   const handleApproveBid = (bidId) => reviewBid(bidId, 'APPROVED');
   const handleRejectBid = (bidId) => reviewBid(bidId, 'REJECTED');
 
-  // Toggle Published status
+  const saveCataloguePlayer = async (playerId, updates, successMessage) => {
+    try {
+      const response = await fetch(`${api}/admin/auction/catalogue/${encodeURIComponent(playerId)}`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify(updates),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Unable to save player catalogue changes.');
+      setAuctionPlayers((current) => current.map((player) => player.id === playerId ? result : player));
+      if (successMessage) setNote(successMessage);
+    } catch (error) {
+      setNote(error.message || 'Unable to save player catalogue changes.');
+    }
+  };
+
   const togglePlayerPublished = (playerId) => {
-    const updated = auctionPlayers.map((p) =>
-      p.id === playerId ? { ...p, published: p.published === false ? true : false } : p
-    );
-    setAuctionPlayers(updated);
-    localStorage.setItem('wbl_auction_players_custom', JSON.stringify(updated));
-    setNote('Player catalogue visibility updated.');
+    const player = auctionPlayers.find((item) => item.id === playerId);
+    if (player) saveCataloguePlayer(playerId, { published: player.published === false }, 'Player catalogue visibility updated.');
   };
 
-  // Update Player Status (AVAILABLE / SOLD / UNSOLD)
   const setPlayerAuctionStatus = (playerId, status) => {
-    const updated = auctionPlayers.map((p) =>
-      p.id === playerId ? { ...p, status } : p
-    );
-    setAuctionPlayers(updated);
-    localStorage.setItem('wbl_auction_players_custom', JSON.stringify(updated));
-    setNote(`Player marked as ${status}.`);
+    saveCataloguePlayer(playerId, { status }, `Player marked as ${status}.`);
   };
 
-  // Update a single stat field for a player
   const updatePlayerStat = (playerId, field, value) => {
     const updated = auctionPlayers.map((p) =>
       p.id === playerId
@@ -275,11 +273,11 @@ export default function Admin() {
         : p
     );
     setAuctionPlayers(updated);
-    localStorage.setItem('wbl_auction_players_custom', JSON.stringify(updated));
   };
 
   const savePlayerStats = (playerId) => {
-    setNote('Player stats saved.');
+    const player = auctionPlayers.find((item) => item.id === playerId);
+    if (player) saveCataloguePlayer(playerId, { stats: player.stats }, 'Player stats saved.');
   };
 
   const print = async (team) => {
@@ -815,15 +813,15 @@ export default function Admin() {
                       <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '10px' }}>
                         <span style={{ fontSize: '10px', fontWeight: 800, color: '#64748b', letterSpacing: '0.5px', display: 'block', marginBottom: '8px' }}>PERFORMANCE STATS</span>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                          {[{ label: 'AVG', field: 'average' }, { label: 'S/RATE', field: 'strikeRate' }, { label: 'ECONOMY', field: 'economy' }, { label: 'BEST', field: 'best' }].map(({ label, field }) => (
+                          {[{ label: 'AVERAGE', field: 'average' }, { label: 'STRIKE RATE', field: 'strikeRate' }, { label: 'ECONOMY', field: 'economy' }, { label: 'BEST', field: 'best' }].map(({ label, field }) => (
                             <div key={field}>
                               <label style={{ fontSize: '9px', color: '#64748b', fontWeight: 800, letterSpacing: '0.5px', display: 'block', marginBottom: '3px' }}>{label}</label>
                               <input
                                 type="text"
+                                maxLength={30}
                                 placeholder="—"
                                 value={player.stats?.[field] === '—' ? '' : (player.stats?.[field] || '')}
                                 onChange={(e) => updatePlayerStat(player.id, field, e.target.value || '—')}
-                                onBlur={() => savePlayerStats(player.id)}
                                 style={{
                                   width: '100%',
                                   height: '32px',
@@ -841,6 +839,12 @@ export default function Admin() {
                             </div>
                           ))}
                         </div>
+                        <button
+                          onClick={() => savePlayerStats(player.id)}
+                          style={{ marginTop: 8, padding: '6px 10px', borderRadius: 6, background: 'rgba(156,255,0,0.12)', border: '1px solid rgba(156,255,0,0.3)', color: 'var(--lime)', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
+                        >
+                          Save stats
+                        </button>
                       </div>
 
                       <div style={{ display: 'flex', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
