@@ -33,7 +33,7 @@ export default function Teams() {
             transition={{ duration: 0.4, delay: idx * 0.05 }}
             whileHover={{ y: -5, borderColor: 'var(--lime)' }}
           >
-            <img src={team.img} alt={team.name} />
+            <img src={team.img} alt={team.name} loading="lazy" decoding="async" />
             <h3>{team.name}</h3>
           </motion.div>
         ))}

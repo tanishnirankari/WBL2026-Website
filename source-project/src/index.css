@@ -19,6 +19,13 @@ body {
     color: #fff;
 }
 
+.page-loading {
+    min-height: 60vh;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+}
+
 section,
 [id] {
     scroll-margin-top: 100px;
@@ -3194,6 +3201,26 @@ footer p {
 @keyframes auction-heading-glow { 0%, 100% { opacity: .78; text-shadow: 0 0 5px rgba(156, 255, 0, .5), 0 0 12px rgba(156, 255, 0, .24); } 50% { opacity: 1; text-shadow: 0 0 8px rgba(156, 255, 0, .9), 0 0 22px rgba(156, 255, 0, .55); } }
 .auction-player-grid { align-items: stretch; margin-top: 0; }
 .auction-player-card { min-width: 0; }
+.auction-player-loading-card {
+    min-height: 430px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: linear-gradient(100deg, #0b1118 25%, #121c27 50%, #0b1118 75%);
+    background-size: 200% 100%;
+    animation: auction-player-loading 1.4s ease-in-out infinite;
+}
+.auction-player-data-message {
+    margin-top: 24px;
+    color: #94a3b8;
+    text-align: center;
+}
+@keyframes auction-player-loading {
+    from { background-position: 100% 0; }
+    to { background-position: -100% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .auction-player-loading-card { animation: none; }
+}
 .auction-player-portrait { display: flex; min-height: 0; aspect-ratio: 15 / 8; overflow: hidden; background: #04070c; }
 .auction-player-photo-frame { position: relative; display: grid; width: 40%; height: 100%; flex: 0 0 40%; place-items: center; overflow: hidden; background: #04070c; }
 .auction-player-emblem { position: relative; display: grid; width: min(96%, 154px); height: auto; min-width: 0; min-height: 0; aspect-ratio: 1; align-self: center; justify-self: center; place-items: center; isolation: isolate; }

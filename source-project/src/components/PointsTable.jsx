@@ -37,7 +37,7 @@ export default function PointsTable() {
             <td>{idx + 1}</td>
             <td>
               <span className="group-team">
-                <img src={team.img} alt={team.name} />
+                <img src={team.img} alt={team.name} loading="lazy" decoding="async" />
                 <span>{team.name}</span>
               </span>
             </td>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Layout from '../components/Layout';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
@@ -26,12 +26,26 @@ export default function Auction() {
   const prefersReducedMotion = useReducedMotion();
 
   const [registeredPlayers, setRegisteredPlayers] = useState([]);
+  const [isLoadingApprovedPlayers, setIsLoadingApprovedPlayers] = useState(true);
 
   const [players, setPlayers] = useState([]);
   const [catalogueError, setCatalogueError] = useState('');
+  const [isLoadingCatalogue, setIsLoadingCatalogue] = useState(true);
 
   const [approvedBids, setApprovedBids] = useState([]);
   const [bidFeedError, setBidFeedError] = useState(false);
+  const highestBidsByPlayer = useMemo(() => {
+    const highestBids = new Map();
+    approvedBids.forEach((bid) => {
+      if (bid.status !== 'APPROVED') return;
+      const playerId = String(bid.playerId);
+      const currentHighest = highestBids.get(playerId);
+      if (!currentHighest || Number(bid.bidAmount) > Number(currentHighest.bidAmount)) {
+        highestBids.set(playerId, bid);
+      }
+    });
+    return highestBids;
+  }, [approvedBids]);
 
   // Modal states
   const [biddingPlayer, setBiddingPlayer] = useState(null);
@@ -88,6 +102,7 @@ export default function Auction() {
           badgeColor: 'var(--lime)'
         })) : []);
       } catch { if (active) setRegisteredPlayers([]); }
+      finally { if (active) setIsLoadingApprovedPlayers(false); }
     };
     const fetchCatalogue = async () => {
       try {
@@ -99,8 +114,13 @@ export default function Auction() {
           setCatalogueError('');
         }
       } catch (error) {
-        if (active) setCatalogueError(error.message || 'Could not load auction player statistics.');
+        if (active) {
+          setCatalogueError(error.message === 'Failed to fetch'
+            ? 'Player information is temporarily unavailable. Please try again later.'
+            : error.message || 'Could not load auction player statistics.');
+        }
       }
+      finally { if (active) setIsLoadingCatalogue(false); }
     };
     fetchLiveBids();
     fetchApprovedPlayers();
@@ -112,16 +132,11 @@ export default function Auction() {
   }, [apiUrl]);
 
   const getHighestBidInfo = (playerId) => {
-    const playerBids = approvedBids.filter(
-      (b) => String(b.playerId) === String(playerId) && b.status === 'APPROVED'
-    );
-    if (!playerBids.length) return null;
-    return playerBids.reduce((max, current) =>
-      Number(current.bidAmount) > Number(max.bidAmount) ? current : max
-    );
+    return highestBidsByPlayer.get(String(playerId)) || null;
   };
 
   const visiblePlayers = [...players, ...registeredPlayers].filter((player) => player.published !== false);
+  const isLoadingPlayerData = isLoadingApprovedPlayers || isLoadingCatalogue;
 
   const openBidModal = (player) => {
     const highestBid = getHighestBidInfo(player.id);
@@ -248,7 +263,7 @@ export default function Auction() {
                   initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   whileHover={prefersReducedMotion ? undefined : { y: -6 }}
-                  transition={{ duration: 0.35, ease: 'easeOut', delay: prefersReducedMotion ? 0 : Math.min(index * 0.07, 0.35) }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
                   style={{
                     background: 'linear-gradient(180deg, #0b1118 0%, #070b10 100%)',
                     border: '1px solid rgba(255, 255, 255, 0.09)',
@@ -286,6 +301,9 @@ export default function Auction() {
                         <img
                           src={player.photoUrl || '/images/jersey.jpg'}
                           alt={player.name}
+                          loading={index < 4 ? 'eager' : 'lazy'}
+                          decoding="async"
+                          fetchPriority={index < 2 ? 'high' : 'auto'}
                           onError={(e) => {
                             e.currentTarget.src = '/images/jersey.jpg';
                           }}
@@ -466,13 +484,28 @@ export default function Auction() {
                 </motion.article>
               );
             })}
+            {visiblePlayers.length === 0 && isLoadingPlayerData && (
+              <>
+                <span className="sr-only" role="status">Loading auction player information</span>
+                {Array.from({ length: 3 }, (_, index) => (
+                  <div key={`player-skeleton-${index}`} className="auction-player-loading-card" aria-hidden="true" />
+                ))}
+              </>
+            )}
           </div>
 
+          {visiblePlayers.length === 0 && !isLoadingPlayerData && (
+            <p className="auction-player-data-message" role={catalogueError ? 'alert' : 'status'}>
+              {catalogueError || 'No player information is available right now.'}
+            </p>
+          )}
           <div className="sr-only" role="status" aria-live="polite">
             {regSuccess ? `Player nomination submitted under registration ${regSuccess}. Under organiser review.` : ''}
             {bidFeedError ? 'Live bid updates are temporarily unavailable.' : ''}
           </div>
-          {catalogueError && <div className="sr-only" role="alert">{catalogueError}</div>}
+          {catalogueError && visiblePlayers.length > 0 && (
+            <div className="sr-only" role="alert">{catalogueError}</div>
+          )}
           <button
             className="auction-register-fab"
             type="button"

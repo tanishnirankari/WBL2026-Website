@@ -1,22 +1,26 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Register from './pages/Register';
-import Exclusive from './pages/Exclusive';
-import Auction from './pages/Auction';
-import GalleryPage from './pages/Gallery';
-import Admin from './pages/Admin';
+
+const Home = lazy(() => import('./pages/Home'));
+const Register = lazy(() => import('./pages/Register'));
+const Exclusive = lazy(() => import('./pages/Exclusive'));
+const Auction = lazy(() => import('./pages/Auction'));
+const GalleryPage = lazy(() => import('./pages/Gallery'));
+const Admin = lazy(() => import('./pages/Admin'));
 
 function App() {
   return (
     <Router basename={import.meta.env.BASE_URL}>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/auction" element={<Auction />} />
-        <Route path="/gallery" element={<GalleryPage />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/exclusive" element={<Exclusive />} />
-        <Route path="/admin" element={<Admin />} />
-      </Routes>
+      <Suspense fallback={<main className="page-loading" role="status">Loading page…</main>}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/auction" element={<Auction />} />
+          <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/exclusive" element={<Exclusive />} />
+          <Route path="/admin" element={<Admin />} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 }

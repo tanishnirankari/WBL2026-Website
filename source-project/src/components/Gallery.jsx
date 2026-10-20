@@ -32,7 +32,7 @@ export default function Gallery() {
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5, delay: idx * 0.05 }}
           >
-            <img src={img.src} alt={img.alt} />
+            <img src={img.src} alt={img.alt} loading="lazy" decoding="async" />
             {img.overlay && (
               <div className="gallery-overlay">{img.overlay}</div>
             )}

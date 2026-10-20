@@ -6,8 +6,8 @@ export default function Hero() {
     <section
       className="hero"
       style={{
-        '--hero-image': `url("${import.meta.env.BASE_URL}images/hero.png")`,
-        '--hero-mobile-image': `url("${import.meta.env.BASE_URL}images/hero.png")`,
+        '--hero-image': `url("${import.meta.env.BASE_URL}images/hero.jpg")`,
+        '--hero-mobile-image': `url("${import.meta.env.BASE_URL}images/hero.jpg")`,
       }}
     >
       <motion.div
