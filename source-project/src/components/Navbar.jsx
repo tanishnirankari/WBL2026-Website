@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, Gavel, Menu, ShieldCheck, X } from 'lucide-react';
+import { prefetchAuctionPage } from '../utils/auctionPlayerData';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -49,6 +50,9 @@ export default function Navbar() {
             key={link.name}
             to={link.path}
             className={location.pathname === link.path && !location.hash ? 'active' : ''}
+            onMouseEnter={link.path === '/auction' ? prefetchAuctionPage : undefined}
+            onFocus={link.path === '/auction' ? prefetchAuctionPage : undefined}
+            onTouchStart={link.path === '/auction' ? prefetchAuctionPage : undefined}
           >
             {link.name}
           </Link>
@@ -72,6 +76,9 @@ export default function Navbar() {
         <Link
           to="/auction"
           className="mobile-auction-btn"
+          onMouseEnter={prefetchAuctionPage}
+          onFocus={prefetchAuctionPage}
+          onTouchStart={prefetchAuctionPage}
         >
           <Gavel size={14} aria-hidden="true" />
           AUCTION
@@ -95,6 +102,9 @@ export default function Navbar() {
                 key={link.name}
                 to={link.path}
                 onClick={closeMenu}
+                onMouseEnter={link.path === '/auction' ? prefetchAuctionPage : undefined}
+                onFocus={link.path === '/auction' ? prefetchAuctionPage : undefined}
+                onTouchStart={link.path === '/auction' ? prefetchAuctionPage : undefined}
                 style={link.path === '/auction' ? { color: 'var(--lime)', fontWeight: 'bold' } : {}}
               >
                 {link.name === 'Auction' ? '🏏 Player Auction' : link.name}

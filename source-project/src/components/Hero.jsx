@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { prefetchAuctionPage } from '../utils/auctionPlayerData';
 
 export default function Hero() {
   return (
@@ -53,7 +54,13 @@ export default function Hero() {
           <Link to="/register" className="primary-button">
             REGISTER YOUR TEAM &rarr;
           </Link>
-          <Link to="/auction" className="outline-button">
+          <Link
+            to="/auction"
+            className="outline-button"
+            onMouseEnter={prefetchAuctionPage}
+            onFocus={prefetchAuctionPage}
+            onTouchStart={prefetchAuctionPage}
+          >
             PLAYER AUCTION &rarr;
           </Link>
         </div>

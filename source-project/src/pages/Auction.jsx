@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Layout from '../components/Layout';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { fetchPublicAuctionPlayerData, readAuctionPlayerCache } from '../utils/auctionPlayerData';
 import {
   Gavel,
   ShieldCheck,
@@ -24,13 +25,31 @@ import {
 export default function Auction() {
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
   const prefersReducedMotion = useReducedMotion();
+  const [cachedPlayerData] = useState(() => readAuctionPlayerCache(apiUrl));
 
-  const [registeredPlayers, setRegisteredPlayers] = useState([]);
-  const [isLoadingApprovedPlayers, setIsLoadingApprovedPlayers] = useState(true);
+  const [registeredPlayers, setRegisteredPlayers] = useState(() =>
+    cachedPlayerData.registrations.map((player) => ({
+      ...player,
+      id: `approved-${player.id}`,
+      category: player.category || 'APPROVED PLAYER',
+      status: 'AVAILABLE',
+      published: true,
+      basePrice: Number(String(player.basePrice || '0').replace(/[^0-9]/g, '')) || 0,
+      stats: {
+        matches: player.matches || '—',
+        average: player.average || '—',
+        strikeRate: player.strikeRate || '—',
+        economy: player.economy || '—',
+        best: player.best || '—',
+      },
+      badgeColor: 'var(--lime)',
+    }))
+  );
+  const [isLoadingApprovedPlayers, setIsLoadingApprovedPlayers] = useState(!cachedPlayerData.hasRegistrations);
 
-  const [players, setPlayers] = useState([]);
+  const [players, setPlayers] = useState(cachedPlayerData.catalogue);
   const [catalogueError, setCatalogueError] = useState('');
-  const [isLoadingCatalogue, setIsLoadingCatalogue] = useState(true);
+  const [isLoadingCatalogue, setIsLoadingCatalogue] = useState(!cachedPlayerData.hasCatalogue);
 
   const [approvedBids, setApprovedBids] = useState([]);
   const [bidFeedError, setBidFeedError] = useState(false);
@@ -90,41 +109,45 @@ export default function Auction() {
         if (active) setBidFeedError(true);
       }
     };
-    const fetchApprovedPlayers = async () => {
-      try {
-        const res = await fetch(`${apiUrl}/auction/registrations`);
-        if (!res.ok) return;
-        const data = await res.json();
-        if (active) setRegisteredPlayers(Array.isArray(data) ? data.map((p) => ({
-          ...p, id: `approved-${p.id}`, category: p.category || 'APPROVED PLAYER', status: 'AVAILABLE', published: true,
-          basePrice: Number(String(p.basePrice || '0').replace(/[^0-9]/g, '')) || 0,
-          stats: { matches: p.matches || '—', average: p.average || '—', strikeRate: p.strikeRate || '—', economy: p.economy || '—', best: p.best || '—' },
-          badgeColor: 'var(--lime)'
-        })) : []);
-      } catch { if (active) setRegisteredPlayers([]); }
-      finally { if (active) setIsLoadingApprovedPlayers(false); }
-    };
-    const fetchCatalogue = async () => {
-      try {
-        const res = await fetch(`${apiUrl}/auction/catalogue`);
-        if (!res.ok) throw new Error('Could not load auction player statistics.');
-        const data = await res.json();
-        if (active) {
-          setPlayers(Array.isArray(data) ? data : []);
-          setCatalogueError('');
-        }
-      } catch (error) {
-        if (active) {
-          setCatalogueError(error.message === 'Failed to fetch'
-            ? 'Player information is temporarily unavailable. Please try again later.'
-            : error.message || 'Could not load auction player statistics.');
-        }
+    const refreshPlayerData = async () => {
+      const data = await fetchPublicAuctionPlayerData(apiUrl);
+      if (!active) return;
+
+      if (data.catalogue !== null) {
+        setPlayers(data.catalogue);
+        setCatalogueError('');
+      } else {
+        const error = data.catalogueError;
+        setCatalogueError(error?.message === 'Failed to fetch'
+          ? 'Player information is temporarily unavailable. Please try again later.'
+          : error?.message || 'Could not load auction player statistics.');
       }
-      finally { if (active) setIsLoadingCatalogue(false); }
+
+      if (data.registrations !== null) {
+        setRegisteredPlayers(data.registrations.map((player) => ({
+          ...player,
+          id: `approved-${player.id}`,
+          category: player.category || 'APPROVED PLAYER',
+          status: 'AVAILABLE',
+          published: true,
+          basePrice: Number(String(player.basePrice || '0').replace(/[^0-9]/g, '')) || 0,
+          stats: {
+            matches: player.matches || '—',
+            average: player.average || '—',
+            strikeRate: player.strikeRate || '—',
+            economy: player.economy || '—',
+            best: player.best || '—',
+          },
+          badgeColor: 'var(--lime)',
+        })));
+      }
+
+      setIsLoadingApprovedPlayers(false);
+      setIsLoadingCatalogue(false);
     };
+
     fetchLiveBids();
-    fetchApprovedPlayers();
-    fetchCatalogue();
+    refreshPlayerData();
     const refreshTimer = window.setInterval(() => {
       if (document.visibilityState === 'visible') fetchLiveBids();
     }, 20000);
