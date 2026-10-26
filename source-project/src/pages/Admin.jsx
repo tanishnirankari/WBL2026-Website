@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
-  ArrowLeft, CheckCircle2, Eye, EyeOff, Gavel, Image, LockKeyhole,
+  ArrowLeft, CheckCircle2, Eye, EyeOff, Gavel, Image, LockKeyhole, Phone,
   LogOut, Printer, RefreshCw, Search, ShieldCheck, Upload, UserRound, Users,
   Check, XCircle, ToggleLeft, ToggleRight, DollarSign, Tag, CheckSquare, Trash2
 } from 'lucide-react';
@@ -173,32 +173,39 @@ function AuctionNominations({ password }) {
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}><button className="admin-action-button primary" type="submit" disabled={busyId === player.id}><Check size={14} /> Save player details</button><button className="admin-action-button" type="button" onClick={() => { setEditingId(null); setDraft(null); setPhotoData(''); }}>Cancel</button><button className="admin-action-button danger" type="button" onClick={() => removeNomination(player)} disabled={busyId === player.id}><Trash2 size={14} /> Delete nomination</button></div>
                 </form>
               ) : <>
-                <div className="admin-nomination-identity">
-                  <div className="admin-nomination-avatar">
-                    {player.photoUrl ? <img src={player.photoUrl} alt={player.fullName} /> : <UserRound size={22} />}
+                <div className="admin-nomination-card-main">
+                  <div className="admin-nomination-identity">
+                    <div className="admin-nomination-avatar">
+                      {player.photoUrl ? <img src={player.photoUrl} alt={player.fullName} /> : <UserRound size={22} />}
+                    </div>
+                    <div className="admin-nomination-content">
+                      <div className="admin-nomination-title">
+                        <h3>{player.fullName}</h3>
+                        <span className={`admin-review-status ${statusTone(player.status)}`}>{formatStatusLabel(player.status)}</span>
+                      </div>
+                      <p className="admin-nomination-role">
+                        {player.role || 'Role not specified'}
+                        <span aria-hidden="true">·</span>
+                        <span>{player.age ? `Age ${player.age}` : 'Age not provided'}</span>
+                      </p>
+                      <div className="admin-nomination-contact">
+                        <Phone size={15} aria-hidden="true" />
+                        {player.phone
+                          ? <a href={`tel:${String(player.phone).replace(/[^\d+]/g, '')}`}>{player.phone}</a>
+                          : <span className="admin-nomination-no-contact">Not provided</span>}
+                      </div>
+                    </div>
                   </div>
-                  <div className="admin-nomination-content">
-                    <div className="admin-nomination-title">
-                      <h3>{player.fullName}</h3>
-                      <span className={`admin-review-status ${statusTone(player.status)}`}>{formatStatusLabel(player.status)}</span>
-                    </div>
-                    <div className="admin-nomination-meta">
-                      <span><small>Role</small>{player.role || '—'}</span>
-                      <span><small>Age</small>{player.age ? `${player.age} years` : '—'}</span>
-                      <span><small>Club / association</small>{player.clubName || '—'}</span>
-                      <span><small>Contact number</small>{player.phone || 'Not provided'}</span>
-                      <span><small>Base price</small>{formatBasePrice(player.basePrice)}</span>
-                      <span><small>Batting hand</small>{player.battingStyle || '—'}</span>
-                      <span><small>Bowling style</small>{player.bowlingStyle || '—'}</span>
-                    </div>
-                    <small className="admin-nomination-date">Submitted {formatDate(player.createdAt)}</small>
+                  <div className="admin-nomination-price">
+                    <small>Base price</small>
+                    <strong>{formatBasePrice(player.basePrice)}</strong>
                   </div>
                 </div>
                 <div className="admin-nomination-actions">
-                  <button onClick={() => beginEdit(player)} disabled={busyId === player.id} className="admin-action-button">Edit</button>
-                  {player.status !== 'APPROVED' && <button onClick={() => review(player, 'APPROVED')} disabled={busyId === player.id} className="admin-action-button primary"><Check size={14} /> Approve</button>}
-                  {player.status !== 'REJECTED' && <button onClick={() => review(player, 'REJECTED')} disabled={busyId === player.id} className="admin-action-button danger"><XCircle size={14} /> Reject</button>}
-                  <button onClick={() => removeNomination(player)} disabled={busyId === player.id} className="admin-action-button danger" aria-label={`Delete ${player.fullName}`}><Trash2 size={14} /> Delete</button>
+                  <button type="button" onClick={() => beginEdit(player)} disabled={busyId === player.id} className="admin-action-button">Edit</button>
+                  {player.status !== 'APPROVED' && <button type="button" onClick={() => review(player, 'APPROVED')} disabled={busyId === player.id} className="admin-action-button primary"><Check size={14} /> Approve</button>}
+                  {player.status !== 'REJECTED' && <button type="button" onClick={() => review(player, 'REJECTED')} disabled={busyId === player.id} className="admin-action-button danger"><XCircle size={14} /> Reject</button>}
+                  <button type="button" onClick={() => removeNomination(player)} disabled={busyId === player.id} className="admin-action-button danger destructive" aria-label={`Delete ${player.fullName}`}><Trash2 size={14} /> Delete</button>
                 </div>
               </>}
             </article>

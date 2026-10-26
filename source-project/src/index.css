@@ -5429,3 +5429,312 @@ footer p {
         transition: none;
     }
 }
+
+.admin-app .admin-nomination-card {
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+    gap: 12px;
+    padding: 16px;
+    border-color: #e7ebe5 !important;
+    border-radius: 17px;
+    box-shadow: 0 3px 12px rgba(31, 45, 35, .035);
+}
+
+.admin-nomination-card-main {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(150px, 180px);
+    align-items: center;
+    gap: 18px;
+}
+
+.admin-nomination-identity {
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-nomination-avatar {
+    width: 58px;
+    height: 58px;
+    border-radius: 14px;
+    background: #f5f7f3;
+}
+
+.admin-nomination-content {
+    min-width: 0;
+}
+
+.admin-nomination-title {
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-nomination-title h3 {
+    min-width: 0;
+    color: #252f28;
+    font-size: 16px;
+    font-weight: 750;
+    letter-spacing: -.25px;
+    overflow-wrap: anywhere;
+}
+
+.admin-review-status {
+    padding: 5px 8px;
+    font-size: 10px;
+}
+
+.admin-review-status.pending {
+    color: #80651e;
+    border-color: #eee4c8;
+    background: #faf6e9;
+}
+
+.admin-review-status.approved {
+    color: #4b7134;
+    border-color: #dce9d3;
+    background: #f1f7ec;
+}
+
+.admin-review-status.rejected {
+    color: #a34d4d;
+    border-color: #f0d9d7;
+    background: #fff4f2;
+}
+
+.admin-nomination-role {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin: 4px 0 0;
+    color: #647164;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.admin-nomination-role span {
+    color: #808a80;
+}
+
+.admin-nomination-contact {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 8px;
+    color: #778276;
+    font-size: 10px;
+}
+
+.admin-nomination-contact svg {
+    flex: 0 0 auto;
+    color: #75984f;
+}
+
+.admin-nomination-contact a {
+    min-width: 0;
+    color: #3f5840;
+    font-size: 11px;
+    font-weight: 650;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.admin-nomination-contact a:hover {
+    color: #5c842f;
+    text-decoration: underline;
+}
+
+.admin-nomination-no-contact {
+    color: #858e85;
+}
+
+.admin-nomination-price {
+    min-width: 0;
+    min-height: 70px;
+    padding: 11px 13px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    border: 1px solid #e4ecdc;
+    border-radius: 13px;
+    background: #f7faf4;
+}
+
+.admin-nomination-price small {
+    color: #788675;
+    font-size: 9px;
+    font-weight: 750;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+
+.admin-nomination-price strong {
+    color: #30452b;
+    font-size: 19px;
+    font-weight: 800;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+
+.admin-nomination-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    padding-top: 12px;
+    border-top: 1px solid #edf0eb;
+}
+
+.admin-nomination-actions .admin-action-button {
+    min-width: 84px;
+    min-height: 44px;
+    padding-inline: 12px;
+    font-size: 11px;
+}
+
+.admin-nomination-actions .admin-action-button.danger {
+    color: #a34d4d;
+    border-color: #eed8d6;
+    background: #fff8f7;
+}
+
+.admin-nomination-actions .admin-action-button.destructive {
+    color: #a34d4d;
+    border-color: #eacac7;
+    background: #fff3f1;
+}
+
+@media (max-width: 650px) {
+    .admin-app .admin-nomination-card {
+        gap: 11px;
+        padding: 13px;
+        border-radius: 16px;
+    }
+
+    .admin-nomination-card-main {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 11px;
+    }
+
+    .admin-nomination-identity {
+        align-items: flex-start;
+        gap: 9px;
+    }
+
+    .admin-nomination-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 11px;
+    }
+
+    .admin-nomination-avatar svg {
+        width: 19px;
+        height: 19px;
+    }
+
+    .admin-nomination-title {
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 5px 8px;
+    }
+
+    .admin-nomination-title h3 {
+        font-size: 14px;
+    }
+
+    .admin-review-status {
+        padding: 4px 7px;
+        font-size: 9px;
+    }
+
+    .admin-nomination-role {
+        gap: 3px;
+        margin-top: 5px;
+        font-size: 10px;
+    }
+
+    .admin-nomination-contact {
+        align-items: center;
+        gap: 5px;
+        margin-top: 7px;
+    }
+
+    .admin-nomination-contact svg {
+        width: 13px;
+        height: 13px;
+        margin-top: 1px;
+    }
+
+    .admin-nomination-contact a {
+        font-size: 10px;
+    }
+
+    .admin-nomination-price {
+        min-height: 56px;
+        padding: 9px 11px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border-radius: 11px;
+    }
+
+    .admin-nomination-price small {
+        font-size: 8px;
+    }
+
+    .admin-nomination-price strong {
+        font-size: 16px;
+        text-align: right;
+    }
+
+    .admin-nomination-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        padding-top: 10px;
+    }
+
+    .admin-nomination-actions .admin-action-button {
+        min-width: 0;
+        min-height: 44px;
+        flex: 1 1 calc(50% - 7px);
+        padding-inline: 8px;
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 380px) {
+    .admin-nomination-card-main {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 9px;
+    }
+
+    .admin-nomination-identity {
+        gap: 7px;
+    }
+
+    .admin-nomination-avatar {
+        width: 40px;
+        height: 40px;
+    }
+
+    .admin-nomination-title h3 {
+        font-size: 13px;
+    }
+
+    .admin-nomination-price {
+        padding-inline: 9px;
+    }
+
+    .admin-nomination-price strong {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 650px) {
+    .admin-app .admin-nomination-card .admin-nomination-actions .admin-action-button {
+        min-height: 44px;
+    }
+}
