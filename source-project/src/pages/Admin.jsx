@@ -451,7 +451,9 @@ export default function Admin() {
         .signature{display:grid;grid-template-columns:1fr 1fr;gap:38px;margin-top:28px;break-inside:avoid}
         .signature div{padding-top:7px;border-top:1px solid #8c98a5;color:#637286;font-size:9px}
         .footer{display:grid;gap:4px;margin-top:18px;padding-top:9px;border-top:1px solid #e3e8ed;color:#8491a0;font-size:8px;text-align:center}
-        .footer-credit{color:#637286}.footer a{color:#557b31;text-decoration:none;font-weight:700}
+        .footer-credit{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px;color:#637286}
+        .footer-social{display:inline-flex;align-items:center;gap:3px;color:#557b31;text-decoration:none;font-weight:700}
+        .instagram-icon{width:11px;height:11px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8}
         @media screen{body{max-width:800px;margin:24px auto;padding:0 22px}.print-hint{margin:12px 0;padding:10px;border-radius:7px;background:#f3f7ec;color:#55752e;font-size:11px}}
         @media print{.print-hint{display:none}}
       </style></head><body>
@@ -463,7 +465,7 @@ export default function Admin() {
       <section class="details"><div class="detail"><span>Team</span><strong>${escapeHtml(team.teamName)}</strong></div><div class="detail"><span>Team captain</span><strong>${escapeHtml(team.captainName)}</strong></div><div class="detail"><span>Captain phone</span><strong>${escapeHtml(team.captainPhone)}</strong></div><div class="detail"><span>Alternative captain phone</span><strong>${escapeHtml(team.captainAlternatePhone || '—')}</strong></div><div class="detail"><span>Payment method</span><strong>${escapeHtml(team.paymentMode)}</strong></div><div class="detail"><span>Payment status</span><strong>${escapeHtml(team.paymentStatus || 'PENDING')}</strong></div><div class="detail"><span>Organiser approval</span><strong>${escapeHtml(team.organiserApproval || 'PENDING')}</strong></div></section>
       <h2 class="section-title">Player roster · ${roster.length} submitted</h2><section class="player-grid">${playerCards}</section>
       <section class="signature"><div>Captain signature</div><div>Organiser signature and stamp</div></section>
-      <footer class="footer"><div class="footer-credit">Organised by Tanish Nirankari · <a href="https://www.instagram.com/winterbashleague/" target="_blank" rel="noopener noreferrer">@winterbashleague</a></div><div>Winter Bash League · Official registration record · Generated ${escapeHtml(formatDate(new Date()))}</div></footer>
+      <footer class="footer"><div class="footer-credit">Organised by Tanish Nirankari · <a class="footer-social" href="https://www.instagram.com/winterbashleague/" target="_blank" rel="noopener noreferrer"><svg class="instagram-icon" viewBox="0 0 24 24" aria-label="Instagram" role="img"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="18" cy="6" r="1" fill="currentColor" stroke="none"></circle></svg>@winterbashleague</a></div><div>Winter Bash League · Official registration record · Generated ${escapeHtml(formatDate(new Date()))}</div></footer>
       </body></html>`;
     printWindow.document.open();
     printWindow.document.write(html);
