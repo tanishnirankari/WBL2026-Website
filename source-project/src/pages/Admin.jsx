@@ -837,118 +837,70 @@ export default function Admin() {
                   )}
                 </>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+                <div className="admin-catalogue-grid">
                   {auctionPlayers.map((player) => (
-                    <article
-                      key={player.id}
-                      style={{
-                        background: '#0a1017',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        borderRadius: '12px',
-                        padding: '16px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '12px'
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
-                          <h3 style={{ fontSize: '15px', color: '#ffffff', margin: '0 0 2px' }}>{player.name}</h3>
-                          <span style={{ fontSize: '12px', color: 'var(--lime)' }}>{player.role}</span>
+                    <article className="admin-catalogue-card" key={player.id}>
+                      <div className="admin-catalogue-player">
+                        <div className="admin-catalogue-photo">
+                          {player.photoUrl ? <img src={player.photoUrl} alt="" /> : <UserRound size={24} aria-hidden="true" />}
                         </div>
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            fontWeight: 800,
-                            padding: '2px 8px',
-                            borderRadius: '4px',
-                            background: player.published !== false ? 'rgba(156,255,0,0.15)' : 'rgba(255,255,255,0.05)',
-                            color: player.published !== false ? 'var(--lime)' : '#64748b',
-                            border: `1px solid ${player.published !== false ? 'rgba(156,255,0,0.3)' : 'rgba(255,255,255,0.1)'}`
-                          }}
-                        >
-                          {player.published !== false ? 'Published' : 'Hidden'}
+                        <div className="admin-catalogue-player-copy">
+                          <span className="admin-catalogue-eyebrow">{player.category || 'Auction player'}</span>
+                          <h3>{player.name || 'Unnamed player'}</h3>
+                          <p>{player.role || 'Role not specified'}</p>
+                        </div>
+                        <span className={`admin-catalogue-visibility${player.published !== false ? ' published' : ''}`}>
+                          <i aria-hidden="true" />{player.published !== false ? 'Published' : 'Hidden'}
                         </span>
                       </div>
 
-                      <div style={{ fontSize: '12px', color: '#94a3b8' }}>
-                        <div>Base Price: <strong style={{ color: '#ffffff' }}>{Number(player.basePrice).toLocaleString('en-IN')} T</strong></div>
-                        <div>Status: <strong style={{ color: player.status === 'SOLD' ? '#ef4444' : 'var(--lime)' }}>{formatStatusLabel(player.status || 'AVAILABLE')}</strong></div>
+                      <div className="admin-catalogue-summary">
+                        <div className="admin-catalogue-price"><span>Base price</span><strong>{Number(String(player.basePrice || '').replace(/[^\d.]/g, '')).toLocaleString('en-IN')} <small>T</small></strong></div>
+                        <span className={`admin-catalogue-status${player.status === 'SOLD' ? ' sold' : ''}`}>
+                          {formatStatusLabel(player.status || 'AVAILABLE')}
+                        </span>
                       </div>
 
-                      {/* Stat Editor */}
-                      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '10px' }}>
-                        <span style={{ fontSize: '10px', fontWeight: 800, color: '#64748b', letterSpacing: '0.5px', display: 'block', marginBottom: '8px' }}>Performance stats</span>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                          {[{ label: 'AVERAGE', field: 'average' }, { label: 'STRIKE RATE', field: 'strikeRate' }, { label: 'ECONOMY', field: 'economy' }, { label: 'BEST', field: 'best' }].map(({ label, field }) => (
-                            <div key={field}>
-                              <label style={{ fontSize: '9px', color: '#64748b', fontWeight: 800, letterSpacing: '0.5px', display: 'block', marginBottom: '3px' }}>{label}</label>
+                      <div className="admin-catalogue-stats">
+                        <div className="admin-catalogue-section-heading">
+                          <div><strong>Performance</strong><span>Player statistics</span></div>
+                          <button className="admin-action-button primary" type="button" onClick={() => savePlayerStats(player.id)}>Save stats</button>
+                        </div>
+                        <div className="admin-catalogue-stat-grid">
+                          {[{ label: 'Average', field: 'average' }, { label: 'Strike rate', field: 'strikeRate' }, { label: 'Economy', field: 'economy' }, { label: 'Best', field: 'best' }].map(({ label, field }) => (
+                            <label className="admin-catalogue-stat" key={field}>
+                              <span>{label}</span>
                               <input
                                 type="text"
                                 maxLength={30}
                                 placeholder="—"
                                 value={player.stats?.[field] === '—' ? '' : (player.stats?.[field] || '')}
                                 onChange={(e) => updatePlayerStat(player.id, field, e.target.value || '—')}
-                                style={{
-                                  width: '100%',
-                                  height: '32px',
-                                  padding: '0 8px',
-                                  borderRadius: '6px',
-                                  background: '#04070c',
-                                  border: '1px solid rgba(255,255,255,0.12)',
-                                  color: '#ffffff',
-                                  fontSize: '12px',
-                                  fontWeight: 700,
-                                  outline: 'none',
-                                  boxSizing: 'border-box'
-                                }}
+                                aria-label={`${label} for ${player.name || 'player'}`}
                               />
-                            </div>
+                            </label>
                           ))}
                         </div>
-                        <button
-                          onClick={() => savePlayerStats(player.id)}
-                          style={{ marginTop: 8, padding: '6px 10px', borderRadius: 6, background: 'rgba(156,255,0,0.12)', border: '1px solid rgba(156,255,0,0.3)', color: 'var(--lime)', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
-                        >
-                          Save stats
-                        </button>
                       </div>
 
-                      <div style={{ display: 'flex', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
+                      <div className="admin-catalogue-actions">
                         <button
+                          type="button"
+                          className="admin-action-button"
                           onClick={() => togglePlayerPublished(player.id)}
-                          style={{
-                            flex: 1,
-                            padding: '6px 10px',
-                            borderRadius: '6px',
-                            fontSize: '11px',
-                            fontWeight: 700,
-                            background: 'rgba(255,255,255,0.05)',
-                            border: '1px solid rgba(255,255,255,0.15)',
-                            color: '#cbd5e1',
-                            cursor: 'pointer'
-                          }}
                         >
                           {player.published !== false ? 'Unpublish' : 'Publish'}
                         </button>
 
                         <button
+                          type="button"
+                          className={`admin-action-button${player.status === 'SOLD' ? ' primary' : ''}`}
                           onClick={() => setPlayerAuctionStatus(player.id, player.status === 'SOLD' ? 'AVAILABLE' : 'SOLD')}
-                          style={{
-                            flex: 1,
-                            padding: '6px 10px',
-                            borderRadius: '6px',
-                            fontSize: '11px',
-                            fontWeight: 700,
-                            background: player.status === 'SOLD' ? 'rgba(156,255,0,0.15)' : 'rgba(239,68,68,0.15)',
-                            border: player.status === 'SOLD' ? '1px solid var(--lime)' : '1px solid rgba(239,68,68,0.3)',
-                            color: player.status === 'SOLD' ? 'var(--lime)' : '#ef4444',
-                            cursor: 'pointer'
-                          }}
                         >
                           {player.status === 'SOLD' ? 'Mark Available' : 'Mark Sold'}
                         </button>
                         <button
+                          type="button"
                           onClick={() => deleteCataloguePlayer(player)}
                           className="admin-action-button danger"
                         >
