@@ -695,13 +695,34 @@ export default function Admin() {
             <AdminPanel>
               <div className="admin-panel-heading"><div><h2>Registered players</h2><p>Player profiles submitted with team registrations</p></div></div>
               {players.length === 0 ? <p className="admin-empty">No player profiles have been submitted yet.</p> : (
-                <div className="admin-player-grid">
-                  {players.map((player, index) => (
-                    <article className="admin-player-card" key={`${player.playerIndex}-${player.teamName}-${index}`}>
-                      {player.photoUrl ? <img src={player.photoUrl} alt={player.name || 'Player'} /> : <span className="admin-player-card-placeholder"><UserRound size={24} /></span>}
-                      <div><h3>{player.name || 'Unnamed player'}</h3><p>{player.teamName}</p><small>Player {player.playerIndex} · {player.phone || 'No phone'}</small><button className="admin-action-button danger" style={{ marginTop: 8 }} onClick={() => deleteRegisteredPlayer(player)}><Trash2 size={14} /> Delete player</button></div>
-                    </article>
-                  ))}
+                <div className="admin-registered-team-list">
+                  {data.teams.map((team) => {
+                    const teamPlayers = (team.players || [])
+                      .filter((player) => player.name || player.phone || player.photoUrl)
+                      .map((player) => ({ ...player, teamId: team.id, teamName: team.teamName }));
+                    if (!teamPlayers.length) return null;
+                    return (
+                      <details className="admin-registered-team" key={team.id}>
+                        <summary>
+                          <span className="admin-registered-team-mark"><Users size={18} /></span>
+                          <span className="admin-registered-team-copy"><strong>{team.teamName}</strong><small>Team roster</small></span>
+                          <span className="admin-registered-team-count">{teamPlayers.length} {teamPlayers.length === 1 ? 'player' : 'players'}</span>
+                        </summary>
+                        <div className="admin-registered-team-players">
+                          {teamPlayers.map((player) => (
+                            <article className="admin-player-card" key={player.playerIndex}>
+                              {player.photoUrl ? <img src={player.photoUrl} alt={player.name || 'Player'} /> : <span className="admin-player-card-placeholder"><UserRound size={24} /></span>}
+                              <div className="admin-registered-player-copy">
+                                <h3>{player.name || `Player ${player.playerIndex}`}</h3>
+                                <small>Player {player.playerIndex} · {player.phone || 'No phone'}</small>
+                              </div>
+                              <button className="admin-action-button danger" onClick={() => deleteRegisteredPlayer(player)} aria-label={`Delete ${player.name || `player ${player.playerIndex}`} from ${team.teamName}`}><Trash2 size={14} /><span>Delete</span></button>
+                            </article>
+                          ))}
+                        </div>
+                      </details>
+                    );
+                  })}
                 </div>
               )}
             </AdminPanel>

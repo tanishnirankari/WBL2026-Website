@@ -5264,3 +5264,168 @@ footer p {
         transition: none;
     }
 }
+
+.admin-registered-team-list {
+    display: grid;
+    gap: 10px;
+}
+
+.admin-registered-team {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #e6ebe3;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.admin-registered-team > summary {
+    min-height: 68px;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #344238;
+    list-style: none;
+    cursor: pointer;
+}
+
+.admin-registered-team > summary::-webkit-details-marker {
+    display: none;
+}
+
+.admin-registered-team > summary::after {
+    width: 8px;
+    height: 8px;
+    flex: 0 0 auto;
+    margin-left: 4px;
+    border-right: 1.5px solid #788476;
+    border-bottom: 1.5px solid #788476;
+    content: '';
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform .16s ease;
+}
+
+.admin-registered-team[open] > summary::after {
+    transform: rotate(225deg) translate(-2px, -1px);
+}
+
+.admin-registered-team > summary:focus-visible {
+    outline: 3px solid rgba(111, 165, 57, .28);
+    outline-offset: -3px;
+}
+
+.admin-registered-team-mark {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    color: #638d32;
+    border: 1px solid #e3ecd9;
+    border-radius: 10px;
+    background: #f3f8ed;
+}
+
+.admin-registered-team-copy {
+    min-width: 0;
+    flex: 1;
+    display: grid;
+    gap: 3px;
+}
+
+.admin-registered-team-copy strong {
+    color: #2d392f;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.admin-registered-team-copy small {
+    color: #838e83;
+    font-size: 10px;
+}
+
+.admin-registered-team-count {
+    padding: 5px 8px;
+    color: #59783c;
+    border: 1px solid #e3ecd9;
+    border-radius: 999px;
+    background: #f5f9f1;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.admin-registered-team-players {
+    padding: 0 12px 12px;
+    display: grid;
+    gap: 8px;
+}
+
+.admin-registered-team-players .admin-player-card {
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid #edf0eb;
+    border-radius: 10px;
+    background: #fcfdfb;
+}
+
+.admin-registered-team-players .admin-player-card > img,
+.admin-registered-team-players .admin-player-card-placeholder {
+    width: 46px;
+    height: 46px;
+}
+
+.admin-registered-player-copy {
+    min-width: 0;
+    flex: 1;
+}
+
+.admin-registered-team-players .admin-player-card h3 {
+    overflow-wrap: anywhere;
+}
+
+.admin-registered-team-players .admin-player-card small {
+    overflow-wrap: anywhere;
+}
+
+.admin-registered-team-players .admin-action-button {
+    min-height: 40px;
+}
+
+@media (max-width: 650px) {
+    .admin-registered-team > summary {
+        min-height: 64px;
+        padding: 10px;
+        gap: 9px;
+    }
+
+    .admin-registered-team-mark {
+        width: 34px;
+        height: 34px;
+    }
+
+    .admin-registered-team-count {
+        padding: 5px 7px;
+        font-size: 9px;
+    }
+
+    .admin-registered-team-players {
+        padding: 0 8px 8px;
+    }
+
+    .admin-registered-team-players .admin-player-card {
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .admin-registered-team-players .admin-action-button {
+        min-height: 40px;
+        padding-inline: 8px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-registered-team > summary::after {
+        transition: none;
+    }
+}
