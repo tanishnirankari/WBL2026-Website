@@ -22,6 +22,10 @@ export default function Register() {
     borderRadius: '8px', background: selected ? 'rgba(156,255,0,0.08)' : 'transparent', cursor: 'pointer'
   });
 
+  const handlePhoneInput = (e) => {
+    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -96,7 +100,11 @@ export default function Register() {
             </div>
             <div className="field">
               <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Captain Phone</label>
-              <input type="tel" name="captainPhone" placeholder="Enter phone number" required style={inputStyle} />
+              <input type="tel" name="captainPhone" placeholder="Enter phone number" required maxLength={10} pattern="[0-9]{10}" inputMode="numeric" onChange={handlePhoneInput} style={inputStyle} />
+            </div>
+            <div className="field">
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Alternative Captain Phone</label>
+              <input type="tel" name="captainAlternatePhone" placeholder="Enter alternative phone number" maxLength={10} pattern="[0-9]{10}" inputMode="numeric" onChange={handlePhoneInput} style={inputStyle} />
             </div>
             <div className="field">
               <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Team Logo</label>
@@ -121,10 +129,10 @@ export default function Register() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '20px' }}>
               {Array.from({ length: 15 }).map((_, i) => (
                 <div key={i} style={{ background: 'rgba(255,255,255,0.02)', padding: '15px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                  <div style={{ color: 'var(--lime)', fontSize: '12px', fontWeight: 'bold', marginBottom: '10px' }}>PLAYER {i + 1}</div>
-                  <input type="text" name={`player${i + 1}Name`} placeholder={`Player ${i + 1} Name`} style={{ ...inputStyle, marginBottom: '10px' }} />
+                  <div style={{ color: 'var(--lime)', fontSize: '12px', fontWeight: 'bold', marginBottom: '10px' }}>{i === 0 ? 'CAPTAIN' : `PLAYER ${i + 1}`}</div>
+                  <input type="text" name={`player${i + 1}Name`} placeholder={i === 0 ? 'Captain Name' : `Player ${i + 1} Name`} style={{ ...inputStyle, marginBottom: '10px' }} />
                   <input type="file" name={`player${i + 1}Photo`} accept="image/*" style={{ ...fileStyle, marginBottom: '10px' }} />
-                  <input type="tel" name={`player${i + 1}Phone`} placeholder="Phone Number" style={inputStyle} />
+                  <input type="tel" name={`player${i + 1}Phone`} placeholder="Phone Number" maxLength={10} pattern="[0-9]{10}" inputMode="numeric" onChange={handlePhoneInput} style={inputStyle} />
                 </div>
               ))}
             </div>

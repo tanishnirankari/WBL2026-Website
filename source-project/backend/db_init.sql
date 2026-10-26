@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS wbl_registrations (
   team_name VARCHAR(100) NOT NULL UNIQUE,
   captain_name VARCHAR(100) NOT NULL,
   captain_phone VARCHAR(20) NOT NULL,
+  captain_alternate_phone VARCHAR(20),
   payment_mode VARCHAR(20) NOT NULL,
   team_logo_path VARCHAR(255),
   players JSONB NOT NULL,
