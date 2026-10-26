@@ -401,6 +401,23 @@ export default function Admin() {
       setNote('Allow pop-ups to print the registration.');
       return;
     }
+    const wblLogoUrl = new URL(`${import.meta.env.BASE_URL}images/logo.png`, window.location.origin).href;
+    let wblLogoDataUrl;
+    try {
+      const response = await fetch(wblLogoUrl);
+      if (!response.ok) throw new Error('Could not load the WBL logo for the registration PDF.');
+      const logoBlob = await response.blob();
+      wblLogoDataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(reader.error || new Error('Could not prepare the WBL logo for printing.'));
+        reader.readAsDataURL(logoBlob);
+      });
+    } catch (error) {
+      printWindow.close();
+      setNote(error.message || 'Could not prepare the WBL logo for printing.');
+      return;
+    }
     const roster = (team.players || []).filter((player) => player.name || player.phone || player.photoUrl);
     const imageMarkup = (url, alt, className) => url
       ? `<img class="${className}" src="${escapeHtml(url)}" alt="${escapeHtml(alt)}">`
@@ -417,7 +434,6 @@ export default function Admin() {
           </article>`).join('')
       : '<p class="empty-roster">No player details were submitted with this registration.</p>';
     const teamLogo = imageMarkup(team.teamLogoUrl, `${team.teamName} team logo`, 'team-logo');
-    const wblLogoUrl = new URL(`${import.meta.env.BASE_URL}images/logo.png`, window.location.origin).href;
     const date = escapeHtml(formatDate(team.createdAt));
     const logoMarkup = team.teamLogoUrl
       ? teamLogo
@@ -453,27 +469,32 @@ export default function Admin() {
         .footer{display:grid;gap:4px;margin-top:18px;padding-top:9px;border-top:1px solid #e3e8ed;color:#8491a0;font-size:8px;text-align:center}
         .footer-credit{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px;color:#637286}
         .footer-social{display:inline-flex;align-items:center;gap:3px;color:#557b31;text-decoration:none;font-weight:700}
-        .instagram-icon{width:11px;height:11px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8}
+        .instagram-icon{width:11px;height:11px;position:relative;display:inline-block;flex:none;border:1.2px solid currentColor;border-radius:3px}
+        .instagram-icon:before{width:4px;height:4px;position:absolute;top:2.2px;left:2.2px;border:1px solid currentColor;border-radius:50%;content:""}
+        .instagram-icon:after{width:1.5px;height:1.5px;position:absolute;top:1.5px;right:1.5px;border-radius:50%;background:currentColor;content:""}
         @media screen{body{max-width:800px;margin:24px auto;padding:0 22px}.print-hint{margin:12px 0;padding:10px;border-radius:7px;background:#f3f7ec;color:#55752e;font-size:11px}}
         @media print{.print-hint{display:none}}
       </style></head><body>
       <div class="print-hint">Choose “Save as PDF” in the print dialog. For clear player photos, use A4 paper and default or high print quality.</div>
       <div class="topline"></div>
-      <header class="brand"><div class="brand-identity"><img class="wbl-logo" src="${escapeHtml(wblLogoUrl)}" alt="Winter Bash League logo"><div><div class="brand-title">WINTER BASH LEAGUE</div><div class="brand-subtitle">TEAM REGISTRATION RECORD · 2026 SEASON</div></div></div><div class="registration-id"><strong>WBL-${escapeHtml(team.id)}</strong>Registered ${date}</div></header>
+      <header class="brand"><div class="brand-identity"><img class="wbl-logo" src="${escapeHtml(wblLogoDataUrl)}" alt="Winter Bash League logo"><div><div class="brand-title">WINTER BASH LEAGUE</div><div class="brand-subtitle">TEAM REGISTRATION RECORD · 2026 SEASON</div></div></div><div class="registration-id"><strong>WBL-${escapeHtml(team.id)}</strong>Registered ${date}</div></header>
       <section class="team-header">${logoMarkup}<div><h1>${escapeHtml(team.teamName)}</h1><p class="team-meta">Captain: ${escapeHtml(team.captainName)} · ${escapeHtml(team.captainPhone)}</p><div class="status-row"><span class="status">Approval: ${escapeHtml(team.organiserApproval || 'PENDING')}</span><span class="status">Payment: ${escapeHtml(team.paymentStatus || 'PENDING')}</span></div></div></section>
       <h2 class="section-title">Registration details</h2>
       <section class="details"><div class="detail"><span>Team</span><strong>${escapeHtml(team.teamName)}</strong></div><div class="detail"><span>Team captain</span><strong>${escapeHtml(team.captainName)}</strong></div><div class="detail"><span>Captain phone</span><strong>${escapeHtml(team.captainPhone)}</strong></div><div class="detail"><span>Alternative captain phone</span><strong>${escapeHtml(team.captainAlternatePhone || '—')}</strong></div><div class="detail"><span>Payment method</span><strong>${escapeHtml(team.paymentMode)}</strong></div><div class="detail"><span>Payment status</span><strong>${escapeHtml(team.paymentStatus || 'PENDING')}</strong></div><div class="detail"><span>Organiser approval</span><strong>${escapeHtml(team.organiserApproval || 'PENDING')}</strong></div></section>
       <h2 class="section-title">Player roster · ${roster.length} submitted</h2><section class="player-grid">${playerCards}</section>
       <section class="signature"><div>Captain signature</div><div>Organiser signature and stamp</div></section>
-      <footer class="footer"><div class="footer-credit">Organised by Tanish Nirankari · <a class="footer-social" href="https://www.instagram.com/winterbashleague/" target="_blank" rel="noopener noreferrer"><svg class="instagram-icon" viewBox="0 0 24 24" aria-label="Instagram" role="img"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="18" cy="6" r="1" fill="currentColor" stroke="none"></circle></svg>@winterbashleague</a></div><div>Winter Bash League · Official registration record · Generated ${escapeHtml(formatDate(new Date()))}</div></footer>
+      <footer class="footer"><div class="footer-credit">Organised by Tanish Nirankari · <a class="footer-social" href="https://www.instagram.com/winterbashleague/" target="_blank" rel="noopener noreferrer"><span class="instagram-icon" aria-label="Instagram" role="img"></span>@winterbashleague</a></div><div>Winter Bash League · Official registration record · Generated ${escapeHtml(formatDate(new Date()))}</div></footer>
       </body></html>`;
     printWindow.document.open();
     printWindow.document.write(html);
     printWindow.document.close();
     try {
-      await Promise.all(Array.from(printWindow.document.images, (image) => (
-        image.decode().catch(() => undefined)
-      )));
+      await Promise.all(Array.from(printWindow.document.images, (image) => image.complete
+        ? Promise.resolve()
+        : new Promise((resolve) => {
+          image.addEventListener('load', resolve, { once: true });
+          image.addEventListener('error', resolve, { once: true });
+        })));
       printWindow.focus();
       printWindow.print();
     } catch (error) {
