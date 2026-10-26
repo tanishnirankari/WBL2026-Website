@@ -3546,3 +3546,833 @@ footer p {
         transition: none;
     }
 }
+
+/* Winter Bash League admin: bright sports-tech theme */
+.admin-app,
+.admin-login {
+    color: #202a24;
+    background: #f7f8f6;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+.admin-app *,
+.admin-login * {
+    box-sizing: border-box;
+}
+
+.admin-sidebar {
+    color: #344139;
+    border-right: 1px solid #e9ece7;
+    background: #fff;
+    box-shadow: 4px 0 22px rgba(31, 45, 35, .035);
+}
+
+.admin-sidebar-brand {
+    border-bottom-color: #edf0eb;
+}
+
+.admin-sidebar .admin-portal-wordmark small,
+.admin-sidebar .admin-user-chip small {
+    color: #879187;
+}
+
+.admin-side-nav button {
+    color: #647066;
+    border-color: transparent;
+    border-radius: 10px;
+    transition: color .16s ease, background .16s ease, border-color .16s ease;
+}
+
+.admin-side-nav button:hover {
+    color: #273329;
+    background: #f5f7f3;
+}
+
+.admin-side-nav button.active {
+    color: #2e491c;
+    border-color: #e5efd8;
+    background: #f0f8e7;
+    box-shadow: inset 3px 0 0 #9ddd35;
+}
+
+.admin-nav-count {
+    color: #6b766b;
+    background: #f0f2ee;
+}
+
+.admin-sidebar-bottom {
+    border-top-color: #edf0eb;
+}
+
+.admin-user-chip strong {
+    color: #334037;
+}
+
+.admin-user-avatar {
+    color: #263a17;
+    background: #b7ed6b;
+}
+
+.admin-return-link,
+.admin-back-link {
+    color: #68756a;
+}
+
+.admin-back-link:hover,
+.admin-return-link:hover {
+    color: #476f1f;
+}
+
+.admin-topbar {
+    border-bottom-color: #e9ece7;
+    background: rgba(255, 255, 255, .96);
+    box-shadow: 0 3px 15px rgba(31, 45, 35, .025);
+}
+
+.admin-topbar strong {
+    color: #273329;
+}
+
+.admin-live-status {
+    color: #647166;
+}
+
+.admin-refresh {
+    color: #425044;
+    border-color: #e1e6de;
+    border-radius: 9px;
+    background: #fff;
+}
+
+.admin-refresh:hover:not(:disabled) {
+    border-color: #cddbbf;
+    background: #f8fbf5;
+}
+
+.admin-content {
+    padding-top: 38px;
+}
+
+.admin-page-heading h1 {
+    color: #202a24;
+    letter-spacing: -1.15px;
+}
+
+.admin-page-heading p,
+.admin-panel-heading p {
+    color: #778178;
+}
+
+.admin-kicker {
+    color: #66942d;
+}
+
+.admin-season-pill {
+    color: #567d2d;
+    border-color: #e2ebd7;
+    border-radius: 999px;
+    background: #f4f9ed;
+}
+
+.admin-stat-card {
+    border-color: #e6eae4;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 4px 15px rgba(31, 45, 35, .035);
+}
+
+.admin-stat-card:hover,
+.admin-stat-card.selected {
+    border-color: #c6dfa9;
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(52, 79, 31, .08);
+}
+
+.admin-stat-icon {
+    color: #638d32;
+    border: 1px solid #e5efd9;
+    border-radius: 12px;
+    background: #f3f8ed;
+}
+
+.admin-stat-copy small {
+    color: #7a857a;
+}
+
+.admin-stat-copy strong {
+    color: #263329;
+}
+
+.admin-panel {
+    min-width: 0;
+    border-color: #e6eae4;
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(31, 45, 35, .045);
+}
+
+.admin-panel-heading h2 {
+    color: #263229;
+}
+
+.admin-search,
+.admin-filter select,
+.admin-team-actions select,
+.admin-auction-profile-edit input,
+.admin-auction-profile-edit select,
+.admin-auction-profile-edit textarea {
+    color: #303a32;
+    border-color: #e0e5dd;
+    border-radius: 9px;
+    background-color: #fff;
+}
+
+.admin-search:focus-within,
+.admin-filter select:focus-visible,
+.admin-team-actions select:focus-visible,
+.admin-auction-profile-edit input:focus,
+.admin-auction-profile-edit select:focus,
+.admin-auction-profile-edit textarea:focus {
+    border-color: #9bc96b;
+    box-shadow: 0 0 0 3px rgba(127, 181, 67, .12);
+    outline: 0;
+}
+
+.admin-search input,
+.admin-caption-input {
+    color: #303a32;
+}
+
+.admin-team-card,
+.admin-nomination-card,
+.admin-gallery-card,
+.admin-player-card {
+    border-color: #e8ece6;
+    border-radius: 13px;
+    background: #fff;
+}
+
+.admin-team-card:hover,
+.admin-nomination-card:hover,
+.admin-gallery-card:hover {
+    border-color: #d2e2bf;
+    box-shadow: 0 8px 22px rgba(31, 45, 35, .06);
+}
+
+.admin-team-identity h3,
+.admin-player-card h3 {
+    color: #27342a;
+}
+
+.admin-team-identity p,
+.admin-team-details,
+.admin-player-card small {
+    color: #748075;
+}
+
+.admin-status-pill {
+    color: #805f17;
+    background: #fff5db;
+}
+
+.admin-status-pill.approved {
+    color: #3d7137;
+    background: #eaf6e6;
+}
+
+.admin-status-pill.rejected {
+    color: #a64e4e;
+    background: #fff0ef;
+}
+
+.admin-team-details,
+.admin-player-details,
+.admin-player-row,
+.admin-auction-row {
+    border-color: #edf0eb;
+}
+
+.admin-team-actions label,
+.admin-player-details summary {
+    color: #68756a;
+}
+
+.admin-action-button {
+    min-height: 38px;
+    color: #48564a;
+    border-color: #dfe5dc;
+    border-radius: 9px;
+    background: #fff;
+}
+
+.admin-action-button:hover {
+    color: #263629;
+    border-color: #cbd8c2;
+    background: #f7faf4;
+}
+
+.admin-action-button.primary {
+    color: #263b14;
+    border-color: #a7d56b;
+    background: #b8ed76;
+}
+
+.admin-action-button.primary:hover {
+    background: #c8f28f;
+}
+
+.admin-action-button.danger {
+    color: #a34d4d;
+    border-color: #f0d9d7;
+    background: #fff;
+}
+
+.admin-action-button.danger:hover {
+    background: #fff5f4;
+}
+
+.admin-player-row strong,
+.admin-auction-row h3 {
+    color: #344238;
+}
+
+.admin-player-row small,
+.admin-auction-row p {
+    color: #7b867d;
+}
+
+.admin-player-card p {
+    color: #608b30;
+}
+
+.admin-file-picker,
+.admin-caption-input {
+    color: #68756a;
+    border-color: #dfe5dc;
+    border-radius: 9px;
+    background: #fbfcfa;
+}
+
+.admin-gallery-card > div {
+    background: #fff;
+}
+
+.admin-gallery-card p {
+    color: #536157;
+}
+
+.admin-empty,
+.admin-footer {
+    color: #79847b;
+}
+
+.admin-content > .admin-notice,
+.admin-notice {
+    color: #496b2e;
+    border-color: #dfebd2;
+    border-radius: 10px;
+    background: #f4f9ed;
+}
+
+.admin-bids-heading {
+    border-color: #e7ebe5;
+    border-radius: 12px;
+    background: #f9faf8;
+}
+
+.admin-bids-heading strong {
+    color: #334036;
+}
+
+.admin-bids-heading small {
+    color: #788379;
+}
+
+.admin-bids-table-wrap {
+    border-color: #e6eae4;
+    border-radius: 12px;
+}
+
+.admin-bids-table {
+    color: #465349;
+}
+
+.admin-bids-table th {
+    color: #6a776c !important;
+    background: #f6f8f4;
+}
+
+.admin-bids-table th,
+.admin-bids-table td,
+.admin-bids-table tr {
+    border-color: #e9ede7 !important;
+}
+
+.admin-bids-table td strong {
+    color: #2c382e;
+}
+
+.admin-app :is(button, input, select, textarea, summary, a):focus-visible,
+.admin-login :is(button, input, a):focus-visible {
+    outline: 3px solid rgba(111, 165, 57, .28);
+    outline-offset: 2px;
+}
+
+.admin-app button,
+.admin-login button {
+    font-family: inherit;
+}
+
+.admin-app button:not(:disabled),
+.admin-login button:not(:disabled) {
+    touch-action: manipulation;
+}
+
+.admin-login {
+    color: #273329;
+    background: #f8f9f7;
+}
+
+.admin-login-showcase {
+    color: #273329;
+    background:
+        radial-gradient(ellipse at 86% 82%, rgba(156, 216, 91, .13), transparent 34%),
+        linear-gradient(145deg, #fff, #f5f8f1);
+}
+
+.admin-login-showcase .admin-portal-brand {
+    color: #263329;
+}
+
+.admin-login-showcase .admin-portal-mark {
+    color: #557d2e;
+    border-color: #deead1;
+    background: #f1f7e9;
+}
+
+.admin-showcase-copy h1 {
+    color: #202b23;
+}
+
+.admin-showcase-copy p {
+    color: #68766a;
+}
+
+.admin-showcase-note {
+    color: #638b37;
+}
+
+.admin-showcase-note strong {
+    color: #354337;
+}
+
+.admin-showcase-note small {
+    color: #788579;
+}
+
+.admin-showcase-decoration {
+    border-color: rgba(118, 174, 57, .18);
+    box-shadow: 0 0 0 48px rgba(118, 174, 57, .04), 0 0 0 100px rgba(118, 174, 57, .025);
+}
+
+.admin-login-area {
+    color: #263329;
+    background: #f8f9f7;
+}
+
+.admin-login-card h2 {
+    color: #202b23;
+}
+
+.admin-login-description {
+    color: #748075;
+}
+
+.admin-login-card form > label {
+    color: #37443a;
+}
+
+.admin-password-field {
+    border-color: #dfe5dc;
+    border-radius: 11px;
+}
+
+.admin-password-field input {
+    color: #273329;
+}
+
+.admin-password-field:focus-within {
+    border-color: #9bc96b;
+    box-shadow: 0 0 0 3px rgba(127, 181, 67, .12);
+}
+
+.admin-sign-in {
+    color: #263b14;
+    border-radius: 11px;
+    background: #b8ed76;
+}
+
+.admin-sign-in:hover:not(:disabled) {
+    background: #c8f28f;
+}
+
+.admin-login-foot,
+.admin-copyright {
+    color: #7b867d;
+}
+
+.admin-mobile-brand .admin-portal-brand {
+    color: #263329;
+}
+
+.admin-mobile-brand .admin-portal-wordmark small {
+    color: #788579;
+}
+
+/* Keep legacy inline auction styles aligned with the light admin theme. */
+.admin-app [style*="background: #0a1017"],
+.admin-app [style*="background: '#0a1017'"],
+.admin-app [style*="background: #04070c"],
+.admin-app [style*="background: '#04070c'"] {
+    color: #334036 !important;
+    border-color: #e5eae2 !important;
+    background: #fff !important;
+    box-shadow: 0 4px 16px rgba(31, 45, 35, .04);
+}
+
+.admin-app [style*="rgb(10, 16, 23)"],
+.admin-app [style*="rgb(4, 7, 12)"] {
+    color: #334036 !important;
+    border-color: #e5eae2 !important;
+    background: #fff !important;
+    box-shadow: 0 4px 16px rgba(31, 45, 35, .04);
+}
+
+.admin-app [style*="color: #ffffff"],
+.admin-app [style*="color: '#ffffff'"] {
+    color: #2d392f !important;
+}
+
+.admin-app [style*="rgb(255, 255, 255)"] {
+    color: #2d392f !important;
+}
+
+.admin-app [style*="color: #94a3b8"],
+.admin-app [style*="color: '#94a3b8'"],
+.admin-app [style*="color: #cbd5e1"],
+.admin-app [style*="color: '#cbd5e1'"] {
+    color: #69766b !important;
+}
+
+.admin-app [style*="rgb(148, 163, 184)"],
+.admin-app [style*="rgb(203, 213, 225)"] {
+    color: #69766b !important;
+}
+
+.admin-app [style*="background: rgba(255,255,255,0.04)"],
+.admin-app [style*="background: 'rgba(255,255,255,0.04)'"],
+.admin-app [style*="background: rgba(255,255,255,0.05)"],
+.admin-app [style*="background: 'rgba(255,255,255,0.05)'"] {
+    color: #526052 !important;
+    border-color: #dfe5dc !important;
+    background: #fff !important;
+}
+
+.admin-app [style*="background: rgba(239,68,68,0.15)"],
+.admin-app [style*="background: 'rgba(239,68,68,0.15)'"] {
+    color: #a34d4d !important;
+    border-color: #f0d9d7 !important;
+    background: #fff1ef !important;
+}
+
+.admin-app [style*="background: rgba(156,255,0,0.15)"],
+.admin-app [style*="background: 'rgba(156,255,0,0.15)'"],
+.admin-app [style*="background: rgba(156,255,0,0.12)"],
+.admin-app [style*="background: 'rgba(156,255,0,0.12)'"] {
+    color: #426725 !important;
+    border-color: #d9eac7 !important;
+    background: #eff7e8 !important;
+}
+
+.admin-app .admin-nomination-card {
+    color: #344238;
+    border-color: #e8ece6 !important;
+    background: #fff !important;
+}
+
+.admin-app .admin-nomination-card p[style],
+.admin-app .admin-nomination-card small[style] {
+    color: #69766b !important;
+}
+
+.admin-app .admin-nomination-card span[style*="rgba(156,255,0"],
+.admin-app .admin-nomination-card span[style*="rgba(251,191,36"] {
+    color: #53772c !important;
+    border-color: #dfebd2 !important;
+    background: #f3f8ed !important;
+}
+
+.admin-app .admin-nomination-card span[style*="rgba(248,113,113"] {
+    color: #a34d4d !important;
+    border-color: #f0d9d7 !important;
+    background: #fff1ef !important;
+}
+
+.admin-app input:not(.admin-search input),
+.admin-app select,
+.admin-app textarea {
+    color: #303a32;
+}
+
+.admin-app input::placeholder,
+.admin-app textarea::placeholder {
+    color: #9aa39b;
+}
+
+@media (max-width: 900px) {
+    .admin-content {
+        padding-inline: 22px;
+    }
+
+    .admin-app {
+        grid-template-columns: 216px minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 650px) {
+    .admin-app {
+        min-height: 100svh;
+        padding-bottom: calc(68px + env(safe-area-inset-bottom));
+        overflow-x: clip;
+    }
+
+    .admin-sidebar {
+        position: fixed;
+        z-index: 100;
+        inset: auto 0 0;
+        width: 100%;
+        min-height: 0;
+        height: calc(64px + env(safe-area-inset-bottom));
+        padding: 5px 8px env(safe-area-inset-bottom);
+        border-top: 1px solid #e6ebe3;
+        border-right: 0;
+        background: rgba(255, 255, 255, .97);
+        box-shadow: 0 -6px 24px rgba(31, 45, 35, .09);
+        backdrop-filter: blur(14px);
+    }
+
+    .admin-side-nav {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        align-items: stretch;
+        gap: 4px;
+        overflow: visible;
+    }
+
+    .admin-side-nav button {
+        min-width: 0;
+        min-height: 0;
+        padding: 5px 2px 4px;
+        display: flex;
+        flex: initial;
+        flex-direction: column;
+        justify-content: center;
+        gap: 3px;
+        border: 0;
+        border-radius: 10px;
+        color: #778176;
+        background: transparent;
+        font-size: 10px;
+        line-height: 1.1;
+    }
+
+    .admin-side-nav button.active {
+        color: #456e24;
+        border: 0;
+        background: #f0f7e9;
+        box-shadow: inset 0 -2px 0 #a6dc58;
+    }
+
+    .admin-side-nav button svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .admin-nav-count {
+        display: none;
+    }
+
+    .admin-main {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .admin-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        height: 56px;
+        padding: 0 16px;
+        background: rgba(255, 255, 255, .96);
+        backdrop-filter: blur(12px);
+    }
+
+    .admin-topbar > div:first-child,
+    .admin-topbar-actions {
+        gap: 8px;
+    }
+
+    .admin-breadcrumb {
+        font-size: 11px;
+    }
+
+    .admin-topbar strong {
+        font-size: 11px;
+    }
+
+    .admin-content {
+        width: 100%;
+        padding: 22px 14px 24px;
+    }
+
+    .admin-page-heading {
+        align-items: flex-start;
+        margin-bottom: 17px;
+    }
+
+    .admin-page-heading h1 {
+        font-size: 26px;
+    }
+
+    .admin-page-heading p {
+        max-width: 260px;
+        line-height: 1.5;
+    }
+
+    .admin-panel {
+        padding: 16px 13px;
+        border-radius: 13px;
+    }
+
+    .admin-panel-heading {
+        align-items: stretch;
+    }
+
+    .admin-registration-tools {
+        width: 100%;
+    }
+
+    .admin-search,
+    .admin-filter select {
+        min-height: 44px;
+        font-size: 12px;
+    }
+
+    .admin-team-actions select,
+    .admin-action-button,
+    .admin-refresh {
+        min-height: 42px;
+    }
+
+    .admin-team-card {
+        padding: 13px 11px;
+    }
+
+    .admin-team-identity h3 {
+        max-width: min(44vw, 210px);
+    }
+
+    .admin-team-identity p {
+        line-height: 1.45;
+        overflow-wrap: anywhere;
+    }
+
+    .admin-team-details {
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    .admin-player-row {
+        flex-wrap: wrap;
+        padding: 9px 0;
+    }
+
+    .admin-player-row > small:last-child {
+        margin-left: 0;
+    }
+
+    .admin-player-row .admin-action-button {
+        margin-left: auto;
+    }
+
+    .admin-player-grid,
+    .admin-gallery-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .admin-auction-edit-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .admin-auction-profile-edit input,
+    .admin-auction-profile-edit select,
+    .admin-auction-profile-edit textarea {
+        min-height: 42px;
+    }
+
+    .admin-bids-table-wrap {
+        overflow: visible !important;
+    }
+
+    .admin-bids-table tr {
+        background: #fff;
+        box-shadow: 0 3px 12px rgba(31, 45, 35, .035);
+    }
+
+    .admin-bids-table td {
+        color: #455248 !important;
+    }
+
+    .admin-bids-table td[data-label="Bid amount"] {
+        color: #527a2c !important;
+    }
+
+    .admin-login {
+        min-height: 100svh;
+    }
+
+    .admin-login-area {
+        min-height: 100svh;
+        padding: 26px 22px;
+    }
+}
+
+@media (max-width: 380px) {
+    .admin-content {
+        padding-right: 11px;
+        padding-left: 11px;
+    }
+
+    .admin-panel {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+
+    .admin-side-nav button {
+        font-size: 9px;
+    }
+
+    .admin-topbar {
+        padding-inline: 12px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-app *,
+    .admin-login * {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+    }
+}
