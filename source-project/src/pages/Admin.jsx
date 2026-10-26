@@ -417,6 +417,7 @@ export default function Admin() {
           </article>`).join('')
       : '<p class="empty-roster">No player details were submitted with this registration.</p>';
     const teamLogo = imageMarkup(team.teamLogoUrl, `${team.teamName} team logo`, 'team-logo');
+    const wblLogoUrl = new URL(`${import.meta.env.BASE_URL}images/logo.png`, window.location.origin).href;
     const date = escapeHtml(formatDate(team.createdAt));
     const logoMarkup = team.teamLogoUrl
       ? teamLogo
@@ -429,6 +430,7 @@ export default function Admin() {
         body{margin:0;color:#15253a;font:12px/1.45 Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
         .topline{height:5px;background:#81bd34;margin-bottom:18px}
         .brand{display:flex;align-items:center;justify-content:space-between;padding-bottom:13px;border-bottom:1px solid #dce3e9}
+        .brand-identity{display:flex;align-items:center;gap:11px}.wbl-logo{width:48px;height:48px;object-fit:contain}
         .brand-title{font-size:10px;font-weight:800;letter-spacing:2px;color:#5c752f}.brand-subtitle{margin-top:4px;font-size:9px;color:#738194}
         .registration-id{text-align:right;color:#6d7b8c;font-size:9px}.registration-id strong{display:block;color:#17283d;font-size:13px}
         .team-header{display:flex;align-items:center;gap:16px;padding:20px 0 16px;border-bottom:1px solid #e2e7ec}
@@ -448,19 +450,20 @@ export default function Admin() {
         .empty-roster{padding:18px;border:1px dashed #d2dbe2;color:#728194}
         .signature{display:grid;grid-template-columns:1fr 1fr;gap:38px;margin-top:28px;break-inside:avoid}
         .signature div{padding-top:7px;border-top:1px solid #8c98a5;color:#637286;font-size:9px}
-        .footer{margin-top:18px;padding-top:8px;border-top:1px solid #e3e8ed;color:#8491a0;font-size:8px;text-align:center}
+        .footer{display:grid;gap:4px;margin-top:18px;padding-top:9px;border-top:1px solid #e3e8ed;color:#8491a0;font-size:8px;text-align:center}
+        .footer-credit{color:#637286}.footer a{color:#557b31;text-decoration:none;font-weight:700}
         @media screen{body{max-width:800px;margin:24px auto;padding:0 22px}.print-hint{margin:12px 0;padding:10px;border-radius:7px;background:#f3f7ec;color:#55752e;font-size:11px}}
         @media print{.print-hint{display:none}}
       </style></head><body>
       <div class="print-hint">Choose “Save as PDF” in the print dialog. For clear player photos, use A4 paper and default or high print quality.</div>
       <div class="topline"></div>
-      <header class="brand"><div><div class="brand-title">WINTER BASH LEAGUE</div><div class="brand-subtitle">TEAM REGISTRATION RECORD · 2026 SEASON</div></div><div class="registration-id"><strong>WBL-${escapeHtml(team.id)}</strong>Registered ${date}</div></header>
+      <header class="brand"><div class="brand-identity"><img class="wbl-logo" src="${escapeHtml(wblLogoUrl)}" alt="Winter Bash League logo"><div><div class="brand-title">WINTER BASH LEAGUE</div><div class="brand-subtitle">TEAM REGISTRATION RECORD · 2026 SEASON</div></div></div><div class="registration-id"><strong>WBL-${escapeHtml(team.id)}</strong>Registered ${date}</div></header>
       <section class="team-header">${logoMarkup}<div><h1>${escapeHtml(team.teamName)}</h1><p class="team-meta">Captain: ${escapeHtml(team.captainName)} · ${escapeHtml(team.captainPhone)}</p><div class="status-row"><span class="status">Approval: ${escapeHtml(team.organiserApproval || 'PENDING')}</span><span class="status">Payment: ${escapeHtml(team.paymentStatus || 'PENDING')}</span></div></div></section>
       <h2 class="section-title">Registration details</h2>
       <section class="details"><div class="detail"><span>Team</span><strong>${escapeHtml(team.teamName)}</strong></div><div class="detail"><span>Team captain</span><strong>${escapeHtml(team.captainName)}</strong></div><div class="detail"><span>Captain phone</span><strong>${escapeHtml(team.captainPhone)}</strong></div><div class="detail"><span>Alternative captain phone</span><strong>${escapeHtml(team.captainAlternatePhone || '—')}</strong></div><div class="detail"><span>Payment method</span><strong>${escapeHtml(team.paymentMode)}</strong></div><div class="detail"><span>Payment status</span><strong>${escapeHtml(team.paymentStatus || 'PENDING')}</strong></div><div class="detail"><span>Organiser approval</span><strong>${escapeHtml(team.organiserApproval || 'PENDING')}</strong></div></section>
       <h2 class="section-title">Player roster · ${roster.length} submitted</h2><section class="player-grid">${playerCards}</section>
       <section class="signature"><div>Captain signature</div><div>Organiser signature and stamp</div></section>
-      <footer class="footer">Winter Bash League · Official registration record · Generated ${escapeHtml(formatDate(new Date()))}</footer>
+      <footer class="footer"><div class="footer-credit">Organised by Tanish Nirankari · <a href="https://www.instagram.com/winterbashleague/" target="_blank" rel="noopener noreferrer">@winterbashleague</a></div><div>Winter Bash League · Official registration record · Generated ${escapeHtml(formatDate(new Date()))}</div></footer>
       </body></html>`;
     printWindow.document.open();
     printWindow.document.write(html);
