@@ -4376,3 +4376,247 @@ footer p {
         transition-duration: .01ms !important;
     }
 }
+
+.admin-status-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.admin-filter-chip {
+    min-height: 38px;
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #657165;
+    border: 1px solid #e2e7df;
+    border-radius: 9px;
+    background: #fff;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.admin-filter-chip span {
+    min-width: 20px;
+    padding: 2px 5px;
+    color: #69766b;
+    border-radius: 999px;
+    background: #f0f2ee;
+    font-size: 10px;
+    text-align: center;
+}
+
+.admin-filter-chip:hover {
+    border-color: #cbd9c0;
+    background: #f9fbf7;
+}
+
+.admin-filter-chip.active {
+    color: #456c25;
+    border-color: #cbdcba;
+    background: #f1f7e9;
+}
+
+.admin-filter-chip.active span {
+    color: #456c25;
+    background: #e2efd2;
+}
+
+.admin-app .admin-nomination-card {
+    grid-template-columns: 56px minmax(0, 1fr) minmax(175px, 220px);
+    align-items: start;
+    gap: 15px;
+    padding: 16px;
+}
+
+.admin-nomination-avatar {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    color: #73816e;
+    border: 1px solid #e8ece5;
+    border-radius: 12px;
+    background: #f5f7f3;
+}
+
+.admin-nomination-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.admin-nomination-content {
+    min-width: 0;
+}
+
+.admin-nomination-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-nomination-title h3 {
+    min-width: 0;
+    margin: 0;
+    color: #28342b;
+    font-size: 15px;
+    font-weight: 750;
+    letter-spacing: -.2px;
+    overflow-wrap: anywhere;
+}
+
+.admin-review-status {
+    width: fit-content;
+    padding: 4px 8px;
+    color: #805f17;
+    border: 1px solid #f2e4bd;
+    border-radius: 999px;
+    background: #fff7e4;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.admin-review-status.approved {
+    color: #42733b;
+    border-color: #dcebd5;
+    background: #eff7eb;
+}
+
+.admin-review-status.rejected {
+    color: #a24f4b;
+    border-color: #f0d9d6;
+    background: #fff1ef;
+}
+
+.admin-nomination-summary {
+    margin: 5px 0 0;
+    color: #68756a;
+    font-size: 12px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.admin-nomination-meta {
+    margin-top: 13px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 16px;
+}
+
+.admin-nomination-meta > span {
+    min-width: 0;
+    color: #334137;
+    font-size: 11px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.admin-nomination-meta small {
+    display: block;
+    margin-bottom: 3px;
+    color: #899389;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+}
+
+.admin-nomination-date {
+    display: block;
+    margin-top: 12px;
+    color: #8a948b;
+    font-size: 10px;
+}
+
+.admin-nomination-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 7px;
+}
+
+.admin-nomination-actions .admin-action-button {
+    min-height: 36px;
+    padding-inline: 9px;
+}
+
+.admin-bids-table .admin-review-status {
+    display: inline-flex;
+}
+
+.admin-status-pill.pending {
+    color: #805f17;
+    background: #fff5db;
+}
+
+@media (max-width: 900px) {
+    .admin-app .admin-nomination-card {
+        grid-template-columns: 52px minmax(0, 1fr);
+    }
+
+    .admin-nomination-actions {
+        grid-column: 2;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 650px) {
+    .admin-status-filters {
+        gap: 6px;
+        margin-bottom: 14px;
+    }
+
+    .admin-filter-chip {
+        min-height: 40px;
+        padding-inline: 10px;
+        font-size: 11px;
+    }
+
+    .admin-app .admin-nomination-card {
+        grid-template-columns: 44px minmax(0, 1fr);
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .admin-nomination-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+    }
+
+    .admin-nomination-avatar svg {
+        width: 19px;
+        height: 19px;
+    }
+
+    .admin-nomination-title h3 {
+        font-size: 14px;
+    }
+
+    .admin-nomination-meta {
+        gap: 9px 10px;
+    }
+
+    .admin-nomination-actions {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        justify-content: stretch;
+    }
+
+    .admin-nomination-actions .admin-action-button {
+        width: 100%;
+        min-height: 42px;
+        padding-inline: 6px;
+        font-size: 10px;
+    }
+}

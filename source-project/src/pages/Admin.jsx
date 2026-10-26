@@ -620,13 +620,13 @@ export default function Admin() {
                   <label className="admin-filter">Approval
                     <select value={approvalFilter} onChange={(event) => setApprovalFilter(event.target.value)}>
                       <option value="ALL">All statuses</option>
-                      {['PENDING', 'APPROVED', 'REJECTED'].map((status) => <option key={status}>{status}</option>)}
+                      {['PENDING', 'APPROVED', 'REJECTED'].map((status) => <option key={status} value={status}>{formatStatusLabel(status)}</option>)}
                     </select>
                   </label>
                   <label className="admin-filter">Payment
                     <select value={paymentFilter} onChange={(event) => setPaymentFilter(event.target.value)}>
                       <option value="ALL">All statuses</option>
-                      {['PENDING', 'PAID', 'PARTIALLY PAID', 'NOT REQUIRED'].map((status) => <option key={status}>{status}</option>)}
+                      {['PENDING', 'PAID', 'PARTIALLY PAID', 'NOT REQUIRED'].map((status) => <option key={status} value={status}>{formatStatusLabel(status)}</option>)}
                     </select>
                   </label>
                 </div>
@@ -646,8 +646,8 @@ export default function Admin() {
                       </div>
                       <div className="admin-team-details"><span>{team.captainPhone}</span>{team.captainAlternatePhone && <span>Alternative: {team.captainAlternatePhone}</span>}<span>Payment method: {team.paymentMode}</span><span>{(team.players || []).filter((player) => player.name || player.phone || player.photoUrl).length} player records</span><span>Registered: {formatDate(team.createdAt)}</span></div>
                       <div className="admin-team-actions">
-                        <label>Approval<select value={team.organiserApproval || 'PENDING'} onChange={(event) => patchTeam(team, 'organiserApproval', event.target.value)}>{['PENDING', 'APPROVED', 'REJECTED'].map((status) => <option key={status}>{status}</option>)}</select></label>
-                        <label>Payment<select value={team.paymentStatus || 'PENDING'} onChange={(event) => patchTeam(team, 'paymentStatus', event.target.value)}>{['PENDING', 'PAID', 'PARTIALLY PAID', 'NOT REQUIRED'].map((status) => <option key={status}>{status}</option>)}</select></label>
+                        <label>Approval<select value={team.organiserApproval || 'PENDING'} onChange={(event) => patchTeam(team, 'organiserApproval', event.target.value)}>{['PENDING', 'APPROVED', 'REJECTED'].map((status) => <option key={status} value={status}>{formatStatusLabel(status)}</option>)}</select></label>
+                        <label>Payment<select value={team.paymentStatus || 'PENDING'} onChange={(event) => patchTeam(team, 'paymentStatus', event.target.value)}>{['PENDING', 'PAID', 'PARTIALLY PAID', 'NOT REQUIRED'].map((status) => <option key={status} value={status}>{formatStatusLabel(status)}</option>)}</select></label>
                         <button className="admin-action-button primary" onClick={() => save(team)}><CheckCircle2 size={15} /> Save review</button>
                         <button className="admin-action-button" onClick={() => print(team)}><Printer size={15} /> Print / Save PDF</button>
                         <button className="admin-action-button danger" onClick={() => deleteTeam(team)}><Trash2 size={15} /> Delete team</button>
@@ -861,18 +861,18 @@ export default function Admin() {
                             border: `1px solid ${player.published !== false ? 'rgba(156,255,0,0.3)' : 'rgba(255,255,255,0.1)'}`
                           }}
                         >
-                          {player.published !== false ? 'PUBLISHED' : 'HIDDEN'}
+                          {player.published !== false ? 'Published' : 'Hidden'}
                         </span>
                       </div>
 
                       <div style={{ fontSize: '12px', color: '#94a3b8' }}>
                         <div>Base Price: <strong style={{ color: '#ffffff' }}>{Number(player.basePrice).toLocaleString('en-IN')} T</strong></div>
-                        <div>Status: <strong style={{ color: player.status === 'SOLD' ? '#ef4444' : 'var(--lime)' }}>{player.status || 'AVAILABLE'}</strong></div>
+                        <div>Status: <strong style={{ color: player.status === 'SOLD' ? '#ef4444' : 'var(--lime)' }}>{formatStatusLabel(player.status || 'AVAILABLE')}</strong></div>
                       </div>
 
                       {/* Stat Editor */}
                       <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '10px' }}>
-                        <span style={{ fontSize: '10px', fontWeight: 800, color: '#64748b', letterSpacing: '0.5px', display: 'block', marginBottom: '8px' }}>PERFORMANCE STATS</span>
+                        <span style={{ fontSize: '10px', fontWeight: 800, color: '#64748b', letterSpacing: '0.5px', display: 'block', marginBottom: '8px' }}>Performance stats</span>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                           {[{ label: 'AVERAGE', field: 'average' }, { label: 'STRIKE RATE', field: 'strikeRate' }, { label: 'ECONOMY', field: 'economy' }, { label: 'BEST', field: 'best' }].map(({ label, field }) => (
                             <div key={field}>
