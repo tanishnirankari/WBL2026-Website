@@ -31,6 +31,11 @@ const formatDate = (value) => {
     : new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 };
 
+const formatBasePrice = (value) => {
+  const amount = Number(String(value || '').replace(/[^\d.]/g, ''));
+  return `${Number.isFinite(amount) ? amount.toLocaleString('en-IN') : '—'} T`;
+};
+
 const formatStatusLabel = (status) => {
   const value = String(status || 'PENDING').trim();
   if (value.toUpperCase().startsWith('PENDING')) return 'Pending';
@@ -51,6 +56,7 @@ function AuctionNominations({ password }) {
   const [filter, setFilter] = useState('PENDING');
   const [busyId, setBusyId] = useState(null);
   const [message, setMessage] = useState('');
+  const [loadError, setLoadError] = useState('');
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(null);
@@ -63,8 +69,9 @@ function AuctionNominations({ password }) {
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Could not load player nominations.');
       setPlayers(result.auctionPlayers || []);
+      setLoadError('');
       setMessage('');
-    } catch (error) { setMessage(error.message); }
+    } catch (error) { setLoadError(error.message || 'Could not load player nominations.'); }
     finally { setLoading(false); }
   };
   useEffect(() => { load(); }, [password]);
@@ -123,13 +130,17 @@ function AuctionNominations({ password }) {
   const shown = players.filter((player) => filter === 'ALL' || player.status === filter);
   return (
     <section>
-      <div className="admin-panel-heading"><div><h2>Player nominations</h2><p>Review each player before publishing them to the public auction page.</p></div><button className="admin-refresh" onClick={load} disabled={loading}><RefreshCw size={15} /> Refresh</button></div>
-      <div className="admin-status-filters">
-        {['PENDING', 'APPROVED', 'REJECTED', 'ALL'].map((status) => <button key={status} onClick={() => setFilter(status)} className={`admin-filter-chip${filter === status ? ' active' : ''}`}>{status === 'ALL' ? 'All' : formatStatusLabel(status)}<span>{players.filter((player) => status === 'ALL' || player.status === status).length}</span></button>)}
+      <div className="admin-panel-heading admin-nominations-heading">
+        <div><h2>Player nominations</h2><p>Review each player before publishing them to the public auction page.</p></div>
+        <button className="admin-refresh" onClick={load} disabled={loading}><RefreshCw size={15} /> Refresh</button>
+      </div>
+      <div className="admin-status-filters" role="group" aria-label="Filter player nominations by status">
+        {['PENDING', 'APPROVED', 'REJECTED', 'ALL'].map((status) => <button key={status} type="button" aria-pressed={filter === status} onClick={() => setFilter(status)} className={`admin-filter-chip${filter === status ? ' active' : ''}`}>{status === 'ALL' ? 'All' : formatStatusLabel(status)}<span>{players.filter((player) => status === 'ALL' || player.status === status).length}</span></button>)}
       </div>
       {message && <p role="status" className="admin-notice">{message}</p>}
-      {loading ? <p className="admin-empty">Loading nominations…</p> : shown.length === 0 ? <p className="admin-empty">No {filter === 'ALL' ? '' : filter.toLowerCase() + ' '}nominations yet.</p> : (
-        <div style={{ display: 'grid', gap: 12 }}>
+      {loadError && <div className="admin-nomination-error" role="alert"><p>{loadError}</p><button className="admin-action-button" onClick={load} disabled={loading}>Try again</button></div>}
+      {loading ? <div className="admin-nomination-loading" role="status"><span className="admin-spinner" /> Loading nominations…</div> : loadError ? null : shown.length === 0 ? <div className="admin-nomination-empty"><UserRound size={21} /><strong>No {filter === 'ALL' ? '' : filter.toLowerCase() + ' '}nominations yet</strong><span>New player submissions will appear here.</span></div> : (
+        <div className="admin-nomination-list">
           {shown.map((player) => (
             <article key={player.id} className="admin-nomination-card">
               {(editingId === player.id && draft) ? (
@@ -155,22 +166,26 @@ function AuctionNominations({ password }) {
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}><button className="admin-action-button primary" type="submit" disabled={busyId === player.id}><Check size={14} /> Save player details</button><button className="admin-action-button" type="button" onClick={() => { setEditingId(null); setDraft(null); setPhotoData(''); }}>Cancel</button><button className="admin-action-button danger" type="button" onClick={() => removeNomination(player)} disabled={busyId === player.id}><Trash2 size={14} /> Delete nomination</button></div>
                 </form>
               ) : <>
-                <div className="admin-nomination-avatar">
-                  {player.photoUrl ? <img src={player.photoUrl} alt={player.fullName} /> : <UserRound size={22} />}
-                </div>
-                <div className="admin-nomination-content">
-                  <div className="admin-nomination-title">
-                    <h3>{player.fullName}</h3>
-                    <span className={`admin-review-status ${statusTone(player.status)}`}>{formatStatusLabel(player.status)}</span>
+                <div className="admin-nomination-identity">
+                  <div className="admin-nomination-avatar">
+                    {player.photoUrl ? <img src={player.photoUrl} alt={player.fullName} /> : <UserRound size={22} />}
                   </div>
-                  <p className="admin-nomination-summary">{[player.role, player.age && `Age ${player.age}`, player.clubName].filter(Boolean).join(' · ') || 'Player profile'}</p>
-                  <div className="admin-nomination-meta">
-                    <span><small>Contact</small>{player.phone || 'Not provided'}</span>
-                    <span><small>Base price</small>{Number(String(player.basePrice || '').replace(/[^\d.]/g, '')).toLocaleString('en-IN')} T</span>
-                    <span><small>Batting</small>{player.battingStyle || '—'}</span>
-                    <span><small>Bowling</small>{player.bowlingStyle || '—'}</span>
+                  <div className="admin-nomination-content">
+                    <div className="admin-nomination-title">
+                      <h3>{player.fullName}</h3>
+                      <span className={`admin-review-status ${statusTone(player.status)}`}>{formatStatusLabel(player.status)}</span>
+                    </div>
+                    <div className="admin-nomination-meta">
+                      <span><small>Role</small>{player.role || '—'}</span>
+                      <span><small>Age</small>{player.age ? `${player.age} years` : '—'}</span>
+                      <span><small>Club / association</small>{player.clubName || '—'}</span>
+                      <span><small>Contact number</small>{player.phone || 'Not provided'}</span>
+                      <span><small>Base price</small>{formatBasePrice(player.basePrice)}</span>
+                      <span><small>Batting hand</small>{player.battingStyle || '—'}</span>
+                      <span><small>Bowling style</small>{player.bowlingStyle || '—'}</span>
+                    </div>
+                    <small className="admin-nomination-date">Submitted {formatDate(player.createdAt)}</small>
                   </div>
-                  <small className="admin-nomination-date">Submitted {formatDate(player.createdAt)}</small>
                 </div>
                 <div className="admin-nomination-actions">
                   <button onClick={() => beginEdit(player)} disabled={busyId === player.id} className="admin-action-button">Edit</button>
@@ -692,41 +707,25 @@ export default function Admin() {
                   <h2>Player Auction & Bidding Portal</h2>
                   <p>Review incoming franchise bids and manage published player catalogue</p>
                 </div>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <div className="admin-auction-tabs" role="group" aria-label="Auction management sections">
                   <button
+                    type="button"
+                    className={`admin-auction-tab${auctionSubTab === 'nominations' ? ' active' : ''}`}
+                    aria-pressed={auctionSubTab === 'nominations'}
                     onClick={() => setAuctionSubTab('nominations')}
-                    style={{ padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', border: auctionSubTab === 'nominations' ? '1px solid var(--lime)' : '1px solid rgba(255,255,255,0.15)', background: auctionSubTab === 'nominations' ? 'var(--lime)' : 'transparent', color: auctionSubTab === 'nominations' ? '#070a0f' : '#cbd5e1' }}
                   >Player Nominations ({data?.auctionPlayers?.length || 0})</button>
                   <button
+                    type="button"
+                    className={`admin-auction-tab${auctionSubTab === 'bids' ? ' active' : ''}`}
+                    aria-pressed={auctionSubTab === 'bids'}
                     onClick={() => setAuctionSubTab('bids')}
-                    style={{
-                      padding: '8px 16px',
-                      borderRadius: '20px',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      border: auctionSubTab === 'bids' ? '1px solid var(--lime)' : '1px solid rgba(255,255,255,0.15)',
-                      background: auctionSubTab === 'bids' ? 'var(--lime)' : 'transparent',
-                      color: auctionSubTab === 'bids' ? '#070a0f' : '#cbd5e1'
-                    }}
-                  >
-                    Bids Management ({bidsList.length})
-                  </button>
+                  >Bids Management ({bidsList.length})</button>
                   <button
+                    type="button"
+                    className={`admin-auction-tab${auctionSubTab === 'catalogue' ? ' active' : ''}`}
+                    aria-pressed={auctionSubTab === 'catalogue'}
                     onClick={() => setAuctionSubTab('catalogue')}
-                    style={{
-                      padding: '8px 16px',
-                      borderRadius: '20px',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      border: auctionSubTab === 'catalogue' ? '1px solid var(--lime)' : '1px solid rgba(255,255,255,0.15)',
-                      background: auctionSubTab === 'catalogue' ? 'var(--lime)' : 'transparent',
-                      color: auctionSubTab === 'catalogue' ? '#070a0f' : '#cbd5e1'
-                    }}
-                  >
-                    Player Catalogue
-                  </button>
+                  >Player Catalogue</button>
                 </div>
               </div>
 
