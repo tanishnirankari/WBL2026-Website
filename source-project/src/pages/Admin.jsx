@@ -134,9 +134,16 @@ function AuctionNominations({ password }) {
         <div><h2>Player nominations</h2><p>Review each player before publishing them to the public auction page.</p></div>
         <button className="admin-refresh" onClick={load} disabled={loading}><RefreshCw size={15} /> Refresh</button>
       </div>
-      <div className="admin-status-filters" role="group" aria-label="Filter player nominations by status">
-        {['PENDING', 'APPROVED', 'REJECTED', 'ALL'].map((status) => <button key={status} type="button" aria-pressed={filter === status} onClick={() => setFilter(status)} className={`admin-filter-chip${filter === status ? ' active' : ''}`}>{status === 'ALL' ? 'All' : formatStatusLabel(status)}<span>{players.filter((player) => status === 'ALL' || player.status === status).length}</span></button>)}
-      </div>
+      <label className="admin-filter admin-nomination-filter">
+        <span>Filter by status</span>
+        <select value={filter} onChange={(event) => setFilter(event.target.value)} aria-label="Filter player nominations by status">
+          {['PENDING', 'APPROVED', 'REJECTED', 'ALL'].map((status) => (
+            <option key={status} value={status}>
+              {status === 'ALL' ? 'All nominations' : formatStatusLabel(status)} ({players.filter((player) => status === 'ALL' || player.status === status).length})
+            </option>
+          ))}
+        </select>
+      </label>
       {message && <p role="status" className="admin-notice">{message}</p>}
       {loadError && <div className="admin-nomination-error" role="alert"><p>{loadError}</p><button className="admin-action-button" onClick={load} disabled={loading}>Try again</button></div>}
       {loading ? <div className="admin-nomination-loading" role="status"><span className="admin-spinner" /> Loading nominations…</div> : loadError ? null : shown.length === 0 ? <div className="admin-nomination-empty"><UserRound size={21} /><strong>No {filter === 'ALL' ? '' : filter.toLowerCase() + ' '}nominations yet</strong><span>New player submissions will appear here.</span></div> : (

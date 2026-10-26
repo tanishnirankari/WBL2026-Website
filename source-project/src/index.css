@@ -4724,6 +4724,30 @@ footer p {
     background: #f7f8f6;
 }
 
+.admin-nomination-filter {
+    width: min(100%, 280px);
+    display: grid;
+    gap: 6px;
+    margin: 0 0 16px;
+    color: #69766b;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.admin-nomination-filter select {
+    width: 100%;
+    max-width: none;
+    min-height: 44px;
+    padding: 0 36px 0 12px;
+    color: #344238;
+    border: 1px solid #dfe5dc;
+    border-radius: 10px;
+    background-color: #fff;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 650;
+}
+
 .admin-filter-chip {
     min-height: 40px;
     padding-inline: 11px;
@@ -4854,27 +4878,9 @@ footer p {
 }
 
 @media (max-width: 650px) {
-    .admin-status-filters {
+    .admin-nomination-filter {
         width: 100%;
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 2px;
         margin-bottom: 14px;
-    }
-
-    .admin-filter-chip {
-        min-width: 0;
-        min-height: 40px;
-        justify-content: center;
-        gap: 4px;
-        padding-inline: 3px;
-        font-size: 10px;
-    }
-
-    .admin-filter-chip span {
-        min-width: 17px;
-        padding-inline: 3px;
-        font-size: 9px;
     }
 
     .admin-app .admin-nomination-card {
@@ -4977,14 +4983,6 @@ footer p {
         gap: 9px;
     }
 
-    .admin-filter-chip {
-        font-size: 9px;
-    }
-
-    .admin-filter-chip span {
-        min-width: 15px;
-        font-size: 8px;
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {
