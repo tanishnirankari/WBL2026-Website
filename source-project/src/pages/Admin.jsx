@@ -31,6 +31,12 @@ const formatDate = (value) => {
     : new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 };
 
+const formatStatusLabel = (status) => String(status || 'PENDING')
+  .toLowerCase()
+  .replace(/\b\w/g, (character) => character.toUpperCase());
+
+const statusTone = (status) => String(status || 'PENDING').toLowerCase().replace(/\s+/g, '-');
+
 function AdminPanel({ children, className = '' }) {
   return <section className={`admin-panel ${className}`}>{children}</section>;
 }
@@ -110,12 +116,11 @@ function AuctionNominations({ password }) {
   };
   const setField = (key, value) => setDraft((current) => ({ ...current, [key]: value }));
   const shown = players.filter((player) => filter === 'ALL' || player.status === filter);
-  const buttonStyle = (active) => ({ padding: '7px 12px', borderRadius: 18, border: active ? '1px solid var(--lime)' : '1px solid rgba(255,255,255,.14)', background: active ? 'rgba(156,255,0,.14)' : 'transparent', color: active ? 'var(--lime)' : '#cbd5e1', cursor: 'pointer', fontWeight: 700, fontSize: 12 });
   return (
     <section>
       <div className="admin-panel-heading"><div><h2>Player nominations</h2><p>Review each player before publishing them to the public auction page.</p></div><button className="admin-refresh" onClick={load} disabled={loading}><RefreshCw size={15} /> Refresh</button></div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 18 }}>
-        {['PENDING', 'APPROVED', 'REJECTED', 'ALL'].map((status) => <button key={status} onClick={() => setFilter(status)} style={buttonStyle(filter === status)}>{status} ({players.filter((player) => status === 'ALL' || player.status === status).length})</button>)}
+      <div className="admin-status-filters">
+        {['PENDING', 'APPROVED', 'REJECTED', 'ALL'].map((status) => <button key={status} onClick={() => setFilter(status)} className={`admin-filter-chip${filter === status ? ' active' : ''}`}>{status === 'ALL' ? 'All' : formatStatusLabel(status)}<span>{players.filter((player) => status === 'ALL' || player.status === status).length}</span></button>)}
       </div>
       {message && <p role="status" className="admin-notice">{message}</p>}
       {loading ? <p className="admin-empty">Loading nominations…</p> : shown.length === 0 ? <p className="admin-empty">No {filter === 'ALL' ? '' : filter.toLowerCase() + ' '}nominations yet.</p> : (
@@ -145,13 +150,30 @@ function AuctionNominations({ password }) {
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}><button className="admin-action-button primary" type="submit" disabled={busyId === player.id}><Check size={14} /> Save player details</button><button className="admin-action-button" type="button" onClick={() => { setEditingId(null); setDraft(null); setPhotoData(''); }}>Cancel</button><button className="admin-action-button danger" type="button" onClick={() => removeNomination(player)} disabled={busyId === player.id}><Trash2 size={14} /> Delete nomination</button></div>
                 </form>
               ) : <>
-                {player.photoUrl ? <img src={player.photoUrl} alt={player.fullName} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 10 }} /> : <div className="admin-player-card-placeholder"><UserRound size={22} /></div>}
-                <div style={{ minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}><h3 style={{ margin: 0 }}>{player.fullName}</h3><span style={{ padding: '3px 8px', borderRadius: 20, fontSize: 10, fontWeight: 800, color: player.status === 'APPROVED' ? 'var(--lime)' : player.status === 'REJECTED' ? '#f87171' : '#fbbf24', background: player.status === 'APPROVED' ? 'rgba(156,255,0,.12)' : player.status === 'REJECTED' ? 'rgba(248,113,113,.12)' : 'rgba(251,191,36,.12)' }}>{player.status || 'PENDING'}</span></div><p style={{ margin: '5px 0', color: '#cbd5e1' }}>{player.role} · Age {player.age} · {player.clubName || 'No club listed'}</p><small style={{ color: '#94a3b8' }}>Phone: {player.phone} · Batting: {player.battingStyle || '—'} · Bowling: {player.bowlingStyle || '—'} · Base price: {Number(String(player.basePrice || '').replace(/[^\d.]/g, '')).toLocaleString('en-IN')} T</small><small style={{ display: 'block', color: '#64748b', marginTop: 4 }}>Submitted {formatDate(player.createdAt)}</small></div>
-                <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', justifyContent: 'flex-end' }}><button onClick={() => beginEdit(player)} disabled={busyId === player.id} className="admin-action-button">Edit player</button>{player.status !== 'APPROVED' && <button onClick={() => review(player, 'APPROVED')} disabled={busyId === player.id} className="admin-action-button primary"><Check size={14} /> Approve & publish</button>}{player.status !== 'REJECTED' && <button onClick={() => review(player, 'REJECTED')} disabled={busyId === player.id} className="admin-action-button danger"><XCircle size={14} /> Reject</button>}<button onClick={() => removeNomination(player)} disabled={busyId === player.id} className="admin-action-button danger"><Trash2 size={14} /> Delete</button></div>
+                <div className="admin-nomination-avatar">
+                  {player.photoUrl ? <img src={player.photoUrl} alt={player.fullName} /> : <UserRound size={22} />}
+                </div>
+                <div className="admin-nomination-content">
+                  <div className="admin-nomination-title">
+                    <h3>{player.fullName}</h3>
+                    <span className={`admin-review-status ${statusTone(player.status)}`}>{formatStatusLabel(player.status)}</span>
+                  </div>
+                  <p className="admin-nomination-summary">{[player.role, player.age && `Age ${player.age}`, player.clubName].filter(Boolean).join(' · ') || 'Player profile'}</p>
+                  <div className="admin-nomination-meta">
+                    <span><small>Contact</small>{player.phone || 'Not provided'}</span>
+                    <span><small>Base price</small>{Number(String(player.basePrice || '').replace(/[^\d.]/g, '')).toLocaleString('en-IN')} T</span>
+                    <span><small>Batting</small>{player.battingStyle || '—'}</span>
+                    <span><small>Bowling</small>{player.bowlingStyle || '—'}</span>
+                  </div>
+                  <small className="admin-nomination-date">Submitted {formatDate(player.createdAt)}</small>
+                </div>
+                <div className="admin-nomination-actions">
+                  <button onClick={() => beginEdit(player)} disabled={busyId === player.id} className="admin-action-button">Edit</button>
+                  {player.status !== 'APPROVED' && <button onClick={() => review(player, 'APPROVED')} disabled={busyId === player.id} className="admin-action-button primary"><Check size={14} /> Approve</button>}
+                  {player.status !== 'REJECTED' && <button onClick={() => review(player, 'REJECTED')} disabled={busyId === player.id} className="admin-action-button danger"><XCircle size={14} /> Reject</button>}
+                  <button onClick={() => removeNomination(player)} disabled={busyId === player.id} className="admin-action-button danger" aria-label={`Delete ${player.fullName}`}><Trash2 size={14} /> Delete</button>
+                </div>
               </>}
-              {player.photoUrl ? <img src={player.photoUrl} alt={player.fullName} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 10 }} /> : <div className="admin-player-card-placeholder"><UserRound size={22} /></div>}
-              <div style={{ minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}><h3 style={{ margin: 0 }}>{player.fullName}</h3><span style={{ padding: '3px 8px', borderRadius: 20, fontSize: 10, fontWeight: 800, color: player.status === 'APPROVED' ? 'var(--lime)' : player.status === 'REJECTED' ? '#f87171' : '#fbbf24', background: player.status === 'APPROVED' ? 'rgba(156,255,0,.12)' : player.status === 'REJECTED' ? 'rgba(248,113,113,.12)' : 'rgba(251,191,36,.12)' }}>{player.status || 'PENDING'}</span></div><p style={{ margin: '5px 0', color: '#cbd5e1' }}>{player.role} · Age {player.age} · {player.clubName || 'No club listed'}</p><small style={{ color: '#94a3b8' }}>Phone: {player.phone} · Batting: {player.battingStyle || '—'} · Bowling: {player.bowlingStyle || '—'} · Base price: {Number(String(player.basePrice || '').replace(/[^\d.]/g, '')).toLocaleString('en-IN')} T</small><small style={{ display: 'block', color: '#64748b', marginTop: 4 }}>Submitted {formatDate(player.createdAt)}</small></div>
-              <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', justifyContent: 'flex-end' }}>{player.status !== 'APPROVED' && <button onClick={() => review(player, 'APPROVED')} disabled={busyId === player.id} className="admin-action-button primary"><Check size={14} /> Approve & publish</button>}{player.status !== 'REJECTED' && <button onClick={() => review(player, 'REJECTED')} disabled={busyId === player.id} className="admin-action-button danger"><XCircle size={14} /> Reject</button>}</div>
             </article>
           ))}
         </div>
