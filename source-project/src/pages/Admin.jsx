@@ -637,7 +637,7 @@ export default function Admin() {
                             : <span className="admin-team-logo-placeholder"><ShieldCheck size={22} /></span>}
                           <div><h3>{team.teamName}</h3><p>Registration WBL-{team.id} · Captain {team.captainName}</p></div>
                         </div>
-                        <span className={`admin-status-pill ${team.organiserApproval === 'APPROVED' ? 'approved' : team.organiserApproval === 'REJECTED' ? 'rejected' : ''}`}>{team.organiserApproval || 'PENDING'}</span>
+                        <span className={`admin-status-pill ${statusTone(team.organiserApproval)}`}>{formatStatusLabel(team.organiserApproval)}</span>
                       </div>
                       <div className="admin-team-details"><span>{team.captainPhone}</span>{team.captainAlternatePhone && <span>Alternative: {team.captainAlternatePhone}</span>}<span>Payment method: {team.paymentMode}</span><span>{(team.players || []).filter((player) => player.name || player.phone || player.photoUrl).length} player records</span><span>Registered: {formatDate(team.createdAt)}</span></div>
                       <div className="admin-team-actions">
@@ -744,7 +744,7 @@ export default function Admin() {
                           color: bidFilter === filter ? 'var(--lime)' : '#94a3b8'
                         }}
                       >
-                        {filter} ({bidsList.filter((b) => filter === 'ALL' || b.status === filter).length})
+                        {filter === 'ALL' ? 'All' : formatStatusLabel(filter)} ({bidsList.filter((b) => filter === 'ALL' || b.status === filter).length})
                       </button>
                     ))}
                   </div>
@@ -780,34 +780,7 @@ export default function Admin() {
                                   {bid.phone} {bid.email && `• ${bid.email}`}
                                 </td>
                                 <td data-label="Status" style={{ padding: '12px' }}>
-                                  <span
-                                    style={{
-                                      fontSize: '11px',
-                                      fontWeight: 800,
-                                      padding: '3px 8px',
-                                      borderRadius: '4px',
-                                      background:
-                                        bid.status === 'APPROVED'
-                                          ? 'rgba(156,255,0,0.15)'
-                                          : bid.status === 'REJECTED'
-                                          ? 'rgba(239,68,68,0.15)'
-                                          : 'rgba(255,255,255,0.08)',
-                                      color:
-                                        bid.status === 'APPROVED'
-                                          ? 'var(--lime)'
-                                          : bid.status === 'REJECTED'
-                                          ? '#ef4444'
-                                          : '#f8fafc',
-                                      border:
-                                        bid.status === 'APPROVED'
-                                          ? '1px solid var(--lime)'
-                                          : bid.status === 'REJECTED'
-                                          ? '1px solid rgba(239,68,68,0.4)'
-                                          : '1px solid rgba(255,255,255,0.15)'
-                                    }}
-                                  >
-                                    {bid.status}
-                                  </span>
+                                  <span className={`admin-review-status ${statusTone(bid.status)}`}>{formatStatusLabel(bid.status)}</span>
                                 </td>
                                 <td data-label="Review" style={{ padding: '12px', textAlign: 'right' }}>
                                   <div style={{ display: 'inline-flex', gap: '6px' }}>
