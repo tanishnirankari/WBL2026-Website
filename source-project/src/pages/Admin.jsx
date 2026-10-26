@@ -31,11 +31,16 @@ const formatDate = (value) => {
     : new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 };
 
-const formatStatusLabel = (status) => String(status || 'PENDING')
-  .toLowerCase()
-  .replace(/\b\w/g, (character) => character.toUpperCase());
+const formatStatusLabel = (status) => {
+  const value = String(status || 'PENDING').trim();
+  if (value.toUpperCase().startsWith('PENDING')) return 'Pending';
+  return value.toLowerCase().replace(/\b\w/g, (character) => character.toUpperCase());
+};
 
-const statusTone = (status) => String(status || 'PENDING').toLowerCase().replace(/\s+/g, '-');
+const statusTone = (status) => {
+  const value = String(status || 'PENDING').toLowerCase();
+  return value.startsWith('pending') ? 'pending' : value.replace(/\s+/g, '-');
+};
 
 function AdminPanel({ children, className = '' }) {
   return <section className={`admin-panel ${className}`}>{children}</section>;
@@ -728,23 +733,14 @@ export default function Admin() {
               {auctionSubTab === 'nominations' ? <AuctionNominations password={password} /> : auctionSubTab === 'bids' ? (
                 <>
                   <div className="admin-bids-heading"><div><strong>Incoming bids</strong><small>New bids sync automatically while this page is open.</small></div><button className="admin-refresh" onClick={load} disabled={loading}><RefreshCw size={15} /> Refresh now</button></div>
-                  <div style={{ display: 'flex', gap: '10px', marginBottom: '18px', flexWrap: 'wrap' }}>
+                  <div className="admin-status-filters">
                     {['ALL', 'PENDING', 'APPROVED', 'REJECTED'].map((filter) => (
                       <button
                         key={filter}
                         onClick={() => setBidFilter(filter)}
-                        style={{
-                          padding: '6px 14px',
-                          borderRadius: '16px',
-                          fontSize: '12px',
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                          background: bidFilter === filter ? 'rgba(156,255,0,0.15)' : 'rgba(255,255,255,0.04)',
-                          border: bidFilter === filter ? '1px solid var(--lime)' : '1px solid rgba(255,255,255,0.1)',
-                          color: bidFilter === filter ? 'var(--lime)' : '#94a3b8'
-                        }}
+                        className={`admin-filter-chip${bidFilter === filter ? ' active' : ''}`}
                       >
-                        {filter === 'ALL' ? 'All' : formatStatusLabel(filter)} ({bidsList.filter((b) => filter === 'ALL' || b.status === filter).length})
+                        {filter === 'ALL' ? 'All' : formatStatusLabel(filter)}<span>{bidsList.filter((b) => filter === 'ALL' || b.status === filter).length}</span>
                       </button>
                     ))}
                   </div>
