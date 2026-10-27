@@ -6349,3 +6349,10 @@ footer {
         transition: none;
     }
 }
+
+
+@media (min-width: 651px) {
+    .hero-title {
+        font-size: clamp(50px, 6.4vw, 84px);
+    }
+}
