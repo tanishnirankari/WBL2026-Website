@@ -16,12 +16,7 @@ export default function Teams() {
   ];
 
   return (
-    <section id="teams" className="section teams-section">
-      <div className="section-heading">
-        <h2>WBL Teams</h2>
-        <a href="#teams" className="view-all">View All &rarr;</a>
-      </div>
-
+    <section id="teams" className="teams-section">
       <div className="team-grid">
         {teams.map((team, idx) => (
           <motion.div

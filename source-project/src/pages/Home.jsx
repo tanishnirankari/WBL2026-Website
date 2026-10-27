@@ -2,9 +2,6 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Layout from '../components/Layout';
 import Hero from '../components/Hero';
-import Teams from '../components/Teams';
-import FeatureCards from '../components/FeatureCards';
-import Gallery from '../components/Gallery';
 import Sponsors from '../components/Sponsors';
 
 export default function Home() {
@@ -27,9 +24,6 @@ export default function Home() {
   return (
     <Layout>
       <Hero />
-      <Teams />
-      <FeatureCards />
-      <Gallery />
       <Sponsors />
     </Layout>
   );

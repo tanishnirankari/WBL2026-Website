@@ -20,12 +20,12 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Auction', path: '/auction' },
+    { name: 'Teams', path: '/teams' },
     { name: 'Gallery', path: '/gallery' },
     { name: 'Exclusive', path: '/exclusive' },
   ];
 
   const hashLinks = [
-    { name: 'Teams', hash: '#teams' },
     { name: 'Contact us', hash: '#contact' },
   ];
 

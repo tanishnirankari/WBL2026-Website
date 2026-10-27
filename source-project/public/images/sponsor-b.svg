@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="1060" y1="35" x2="125" y2="690" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#24345F"/>
+      <stop offset=".48" stop-color="#14243D"/>
+      <stop offset="1" stop-color="#091521"/>
+    </linearGradient>
+    <linearGradient id="shape" x1="690" y1="159" x2="969" y2="520" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A6D8FF"/>
+      <stop offset="1" stop-color="#657BFF"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="matrix(-453 263 -264 -454 918 280)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#789BFF" stop-opacity=".24"/>
+      <stop offset="1" stop-color="#789BFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h1200v680H0z"/>
+  <path fill="url(#glow)" d="M0 0h1200v680H0z"/>
+  <path d="M802 136 1004 254v234L802 606 600 488V254l202-118Z" stroke="#A6D8FF" stroke-opacity=".2" stroke-width="2"/>
+  <path d="M802 187 960 279v184l-158 92-158-92V279l158-92Z" stroke="#A6D8FF" stroke-opacity=".32" stroke-width="2"/>
+  <path d="m802 246 89 51v103l-89 51-89-51V297l89-51Z" fill="url(#shape)" fill-opacity=".16" stroke="url(#shape)" stroke-width="3"/>
+  <path d="m802 280 59 34v68l-59 34-59-34v-68l59-34Z" fill="url(#shape)"/>
+  <path d="m775 348 18 18 38-42" stroke="#10213A" stroke-linecap="round" stroke-linejoin="round" stroke-width="9"/>
+  <circle cx="153" cy="146" r="3" fill="#A6D8FF"/>
+  <circle cx="182" cy="146" r="3" fill="#A6D8FF" fill-opacity=".55"/>
+  <circle cx="211" cy="146" r="3" fill="#A6D8FF" fill-opacity=".3"/>
+  <path d="M116 544h282" stroke="#A6D8FF" stroke-opacity=".38"/>
+  <text x="116" y="286" fill="#A6D8FF" font-family="Arial,sans-serif" font-size="16" font-weight="700" letter-spacing="5">WINTER BASH LEAGUE</text>
+  <text x="112" y="375" fill="#F5F8FB" font-family="Arial,sans-serif" font-size="68" font-weight="700" letter-spacing="-3">SPONSOR B</text>
+  <text x="116" y="433" fill="#AEBCC5" font-family="Arial,sans-serif" font-size="20" letter-spacing="1">BUILT FOR THE BIG MOMENTS</text>
+  <text x="116" y="584" fill="#8290A9" font-family="Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="4">OFFICIAL PARTNER · 2026</text>
+</svg>
