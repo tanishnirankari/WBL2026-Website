@@ -1249,6 +1249,7 @@ footer {
 .about-page {
     position: relative;
     isolation: isolate;
+    overflow-x: clip;
     width: min(1200px, calc(100% - 40px));
     margin: 0 auto;
     padding: 132px 0 84px;
