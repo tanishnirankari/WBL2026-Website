@@ -33,11 +33,9 @@ export default function Footer() {
             WINTER BASH <span>LEAGUE</span>
           </strong>
         </Link>
-        <p className="footer-tagline">Beyond Boundaries</p>
       </div>
 
       <div className="footer-contact">
-        <h2>Get in touch</h2>
         <div className="footer-contact-list">
           {contactItems.map(({ label, value, href, icon: Icon }) => (
             <div className="footer-contact-item" key={label}>
@@ -50,11 +48,6 @@ export default function Footer() {
           ))}
         </div>
         <p className="footer-organizer">Founded by <strong>Tanish Nirankari</strong></p>
-      </div>
-
-      <div className="footer-meta">
-        <p>&copy; {new Date().getFullYear()} Winter Bash League. All rights reserved.</p>
-        <p>Cricket, community, and competition.</p>
       </div>
     </footer>
   );
