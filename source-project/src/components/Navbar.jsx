@@ -22,7 +22,7 @@ export default function Navbar() {
     { name: 'Auction', path: '/auction' },
     { name: 'Teams', path: '/teams' },
     { name: 'Gallery', path: '/gallery' },
-    { name: 'Exclusive', path: '/exclusive' },
+    { name: 'About Us', path: '/exclusive' },
   ];
 
   const hashLinks = [
