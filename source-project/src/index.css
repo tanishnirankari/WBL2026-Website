@@ -182,15 +182,19 @@ img {
 
 .hero {
 
+    margin-top: 106px;
     min-height: 720px;
 
     position: relative;
     overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 28px 28px 76px 76px;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
     display: flex;
     align-items: center;
 
-    padding: 130px 7% 80px;
+    padding: 24px 7% 80px;
 
     background:
         linear-gradient(90deg,
@@ -272,7 +276,6 @@ img {
     color: #d2dbe3;
 }
 
-
 /* HERO DETAILS */
 
 .hero-details {
@@ -285,7 +288,6 @@ img {
 }
 
 .hero-detail {
-
     padding: 0 23px;
 
     border-right: 1px solid rgba(255, 255, 255, 0.22);
@@ -942,75 +944,74 @@ img {
     overflow: hidden;
     padding: clamp(36px, 5vw, 60px) var(--page-gutter);
     background:
-        radial-gradient(ellipse at 50% 45%, rgba(156, 255, 0, 0.075), transparent 42%),
-        linear-gradient(180deg, #071522 0%, #091b2a 100%);
+        radial-gradient(ellipse at 50% 42%, rgba(70, 111, 130, 0.16), transparent 48%),
+        linear-gradient(180deg, #071522 0%, #081725 100%);
     border-block: 1px solid rgba(255, 255, 255, 0.07);
 }
 
+.sponsors::before {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: min(42%, 420px);
+    height: 1px;
+    content: "";
+    background: linear-gradient(90deg, transparent, rgba(156, 255, 0, 0.42), transparent);
+    transform: translateX(-50%);
+}
+
 .sponsors-content {
-    width: min(100%, 860px);
+    width: 100%;
     margin-inline: auto;
 }
 
-.sponsor-carousel {
-    display: grid;
-    grid-template-columns: 48px minmax(0, 1fr) 48px;
-    align-items: center;
-    gap: clamp(12px, 3vw, 28px);
-    perspective: 1400px;
+.sponsor-marquee {
+    overflow: hidden;
+    width: 100%;
+    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
 }
 
-.sponsor-slide-window {
-    min-width: 0;
-    overflow: hidden;
-    perspective: 1100px;
-    perspective-origin: 50% 45%;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.035);
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.26);
-    touch-action: pan-y;
+.sponsor-marquee-track {
+    display: flex;
+    width: max-content;
+    animation: sponsor-marquee 32s linear infinite;
+}
+
+.sponsor-marquee-group {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 16px;
+    padding-right: 16px;
 }
 
 .sponsor-card {
     position: relative;
-    min-width: 0;
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
-    border-radius: inherit;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.015));
-    box-shadow: 0 18px 38px rgba(0, 0, 0, 0.2);
-}
-
-.sponsor-card::before {
-    position: absolute;
-    z-index: -1;
-    content: "";
-    inset: 10px 12px -10px;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: inherit;
-    background: linear-gradient(150deg, rgba(130, 170, 185, 0.1), rgba(12, 31, 47, 0.4));
-    box-shadow: 0 22px 30px rgba(0, 0, 0, 0.24);
-    transform: translateZ(-24px);
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 108px 48px;
+    flex: 0 0 clamp(220px, 24vw, 270px);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.055);
 }
 
 .sponsor-art {
     position: relative;
     display: grid;
-    min-height: 250px;
+    min-width: 0;
+    min-height: 0;
     place-items: center;
     overflow: hidden;
-    background: #0b2233;
-    transform: translateZ(8px);
-    transform-style: preserve-3d;
+    background: linear-gradient(145deg, #10293a, #081725);
 }
 
 .sponsor-art img {
     display: block;
     width: 100%;
-    height: clamp(220px, 32vw, 340px);
+    height: 100%;
     object-fit: cover;
-    transform: translateZ(12px);
 }
 
 .sponsor-art img[hidden] {
@@ -1024,25 +1025,10 @@ img {
 }
 
 .sponsor-art--starbucks img {
-    width: min(62%, 340px);
+    width: min(62%, 200px);
     height: auto;
-    max-height: 110px;
+    max-height: 52px;
     object-fit: contain;
-}
-
-.sponsor-art--starbucks .sponsor-art-caption {
-    padding: 5px 8px;
-    color: #355b4b;
-    border-radius: 999px;
-    background: rgba(248, 246, 237, 0.88);
-}
-
-.sponsor-art-fallback {
-    color: #f5f8fb;
-    font-size: clamp(22px, 5vw, 44px);
-    font-weight: 700;
-    letter-spacing: -1px;
-    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
 }
 
 .sponsor-art--partner-preview {
@@ -1057,92 +1043,69 @@ img {
         linear-gradient(135deg, #24345f, #0b1c2a 75%);
 }
 
-.sponsor-art-caption {
-    position: absolute;
-    right: 24px;
-    bottom: 20px;
-    color: rgba(255, 255, 255, 0.62);
-    font-size: 9px;
+.sponsor-art-fallback {
+    color: #f5f8fb;
+    font-size: 26px;
     font-weight: 800;
-    letter-spacing: 2px;
+    letter-spacing: -0.04em;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
 }
 
-.sponsor-art-caption span {
-    color: white;
+.sponsor-art-caption {
+    position: absolute;
+    right: 10px;
+    bottom: 8px;
+    padding: 4px 6px;
+    color: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    background: rgba(4, 12, 20, 0.54);
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
 }
 
 .sponsor-card-info {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    padding: 22px 26px 24px;
-    transform: translateZ(18px);
+    gap: 10px;
+    min-width: 0;
+    padding: 7px 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(110deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.01));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .sponsor-category {
-    color: #91a0ad;
-    font-size: 9px;
+    overflow: hidden;
+    color: #a4b2bd;
+    font-size: 7px;
     font-weight: 800;
-    letter-spacing: 2px;
+    letter-spacing: 0.1em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .sponsor-card-info h3 {
-    margin: 5px 0 0;
-    color: #f5f8fb;
-    font-size: 24px;
-    font-weight: 650;
-    letter-spacing: -0.5px;
+    flex: 0 0 auto;
+    margin: 0;
+    color: #f7fafc;
+    font-size: 15px;
+    font-weight: 750;
+    letter-spacing: -0.03em;
 }
 
-.sponsor-arrow {
-    display: grid;
-    width: 48px;
-    height: 48px;
-    place-items: center;
-    padding: 0;
-    color: #f5f8fb;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.055);
-    cursor: pointer;
-    transition: color 180ms ease, background 180ms ease, border-color 180ms ease, transform 180ms ease;
+@keyframes sponsor-marquee {
+    to {
+        transform: translateX(-50%);
+    }
 }
 
-.sponsor-arrow:hover {
-    color: #071525;
-    border-color: var(--lime);
-    background: var(--lime);
-    transform: scale(1.05);
-}
-
-.sponsor-arrow:focus-visible,
-.sponsor-dot:focus-visible {
-    outline: 2px solid var(--lime);
-    outline-offset: 4px;
-}
-
-.sponsor-pagination {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 22px;
-}
-
-.sponsor-dot {
-    width: 7px;
-    height: 7px;
-    padding: 0;
-    border: 0;
-    border-radius: 999px;
-    background: #435260;
-    cursor: pointer;
-    transition: width 180ms ease, background 180ms ease;
-}
-
-.sponsor-dot.is-active {
-    width: 24px;
-    background: var(--lime);
+@media (prefers-reduced-motion: reduce) {
+    .sponsor-marquee-track {
+        animation-play-state: paused;
+    }
 }
 
 
@@ -1599,8 +1562,10 @@ footer {
 
 
     .hero {
+        margin-top: 92px;
         min-height: auto;
-        padding: 112px 18px 44px;
+        padding: 20px 18px 44px;
+        border-radius: 22px 22px 36px 36px;
 
         background:
             linear-gradient(180deg,
@@ -1653,9 +1618,9 @@ footer {
     }
 
     .hero-detail strong {
-        font-size: clamp(12px, 3.6vw, 14px);
+        font-size: clamp(12px, 3.7vw, 14px);
         line-height: 1.35;
-        overflow-wrap: anywhere;
+        overflow-wrap: break-word;
     }
 
     .hero-detail small {
@@ -6098,78 +6063,42 @@ footer {
 
 @media (max-width: 650px) {
     .sponsors {
-        padding: 22px 14px 20px;
+        padding: 24px 14px 22px;
     }
 
-    .sponsor-carousel {
-        grid-template-columns: 30px minmax(0, 1fr) 30px;
-        gap: 7px;
+    .sponsor-marquee-track {
+        animation-duration: 27s;
     }
 
-    .sponsor-slide-window {
-        border-radius: 15px;
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+    .sponsor-marquee-group {
+        gap: 12px;
+        padding-right: 12px;
     }
 
-    .sponsor-card::before {
-        inset: 6px 8px -6px;
-    }
-
-    .sponsor-art,
-    .sponsor-art img {
-        min-height: 0;
-        height: clamp(132px, 42vw, 178px);
-    }
-
-    .sponsor-art--starbucks img {
-        width: min(72%, 280px);
-        height: auto;
-        max-height: 72px;
+    .sponsor-card {
+        grid-template-rows: 92px 44px;
+        flex-basis: min(72vw, 236px);
+        border-radius: 10px;
     }
 
     .sponsor-art-caption {
-        right: 10px;
-        bottom: 9px;
-        font-size: 7px;
-        letter-spacing: 1px;
+        right: 7px;
+        bottom: 6px;
+        padding: 3px 5px;
+        font-size: 6px;
     }
 
     .sponsor-card-info {
-        gap: 8px;
-        padding: 11px 13px 13px;
+        gap: 6px;
+        padding: 6px 9px;
     }
 
     .sponsor-category {
-        font-size: 7px;
-        letter-spacing: 1px;
+        font-size: 6px;
     }
 
     .sponsor-card-info h3 {
-        margin-top: 3px;
-        font-size: 17px;
-    }
-
-    .sponsor-arrow {
-        width: 30px;
-        height: 30px;
-    }
-
-    .sponsor-arrow svg {
-        width: 17px;
-        height: 17px;
-    }
-
-    .sponsor-pagination {
-        margin-top: 12px;
-    }
-
-    .sponsor-dot {
-        width: 6px;
-        height: 6px;
-    }
-
-    .sponsor-dot.is-active {
-        width: 19px;
+        font-size: 14px;
     }
 }
 
@@ -6178,22 +6107,7 @@ footer {
         padding-inline: 10px;
     }
 
-    .sponsor-carousel {
-        grid-template-columns: 26px minmax(0, 1fr) 26px;
-        gap: 5px;
-    }
-
-    .sponsor-art,
-    .sponsor-art img {
-        height: 126px;
-    }
-
-    .sponsor-card-info {
-        padding-inline: 10px;
-    }
-
-    .sponsor-arrow {
-        width: 26px;
-        height: 26px;
+    .sponsor-card {
+        flex-basis: min(76vw, 220px);
     }
 }
