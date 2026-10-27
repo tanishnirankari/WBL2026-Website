@@ -188,7 +188,7 @@ img {
     position: relative;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 28px 28px 76px 76px;
+    border-radius: 28px 28px 48px 48px;
     box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
     display: flex;
@@ -946,7 +946,7 @@ img {
     background:
         radial-gradient(ellipse at 50% 42%, rgba(70, 111, 130, 0.16), transparent 48%),
         linear-gradient(180deg, #071522 0%, #081725 100%);
-    border-block: 1px solid rgba(255, 255, 255, 0.07);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .sponsors::before {
@@ -1565,7 +1565,7 @@ footer {
         margin-top: 92px;
         min-height: auto;
         padding: 20px 18px 44px;
-        border-radius: 22px 22px 36px 36px;
+        border-radius: 22px 22px 20px 20px;
 
         background:
             linear-gradient(180deg,
