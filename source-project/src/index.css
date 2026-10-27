@@ -6356,3 +6356,14 @@ footer {
         font-size: clamp(50px, 6.4vw, 84px);
     }
 }
+
+
+@media (min-width: 651px) {
+    .hero-content {
+        width: min(100%, 760px);
+    }
+
+    .hero-title {
+        white-space: nowrap;
+    }
+}
