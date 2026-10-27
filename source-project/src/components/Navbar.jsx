@@ -105,9 +105,9 @@ export default function Navbar() {
                 onMouseEnter={link.path === '/auction' ? prefetchAuctionPage : undefined}
                 onFocus={link.path === '/auction' ? prefetchAuctionPage : undefined}
                 onTouchStart={link.path === '/auction' ? prefetchAuctionPage : undefined}
-                style={link.path === '/auction' ? { color: 'var(--lime)', fontWeight: 'bold' } : {}}
+                style={link.path === '/auction' ? { color: '#fff', fontWeight: 'bold' } : {}}
               >
-                {link.name === 'Auction' ? '🏏 Player Auction' : link.name}
+                {link.name}
               </Link>
             ))}
             {hashLinks.map((link) => (
@@ -115,7 +115,7 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
-            <Link to="/register" style={{ color: 'var(--lime)', fontWeight: 'bold', borderBottom: 'none' }} onClick={closeMenu}>
+            <Link to="/register" style={{ color: '#fff', fontWeight: 'bold', borderBottom: 'none' }} onClick={closeMenu}>
               Register Your Team &rarr;
             </Link>
             <Link to="/admin" className="organiser-access-link" onClick={closeMenu}>
