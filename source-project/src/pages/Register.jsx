@@ -220,6 +220,7 @@ export default function Register() {
   const handleFileChange = async (event) => {
     const { name, files } = event.target;
     const file = files[0];
+    event.target.value = '';
 
     if (!file) {
       setSavedFiles((current) => {
