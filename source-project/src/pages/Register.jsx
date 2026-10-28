@@ -259,14 +259,6 @@ export default function Register() {
   return (
     <Layout>
       <main className="page content-page register-page">
-        <div className="register-heading">
-          <div className="register-kicker">
-            TOURNAMENT REGISTRATION
-          </div>
-          <h1 className="register-title">Register Your Team</h1>
-          <p className="register-subtitle">A few quick steps to get your team ready for the season.</p>
-        </div>
-
         {successId && (
           <motion.section className="registration-confirmation" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
             <div className="confirmation-icon" aria-hidden="true">✓</div>
