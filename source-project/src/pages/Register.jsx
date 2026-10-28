@@ -57,9 +57,11 @@ function openDraftDatabase() {
       return;
     }
 
-    const request = window.indexedDB.open(DRAFT_DATABASE, 1);
+    const request = window.indexedDB.open(DRAFT_DATABASE, 2);
     request.onupgradeneeded = () => {
-      request.result.createObjectStore(DRAFT_STORE);
+      if (!request.result.objectStoreNames.contains(DRAFT_STORE)) {
+        request.result.createObjectStore(DRAFT_STORE);
+      }
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error || new Error('Could not open saved registration files.'));
@@ -89,7 +91,16 @@ async function runDraftTransaction(mode, operation) {
 }
 
 function readDraftFiles() {
-  return runDraftTransaction('readonly', (store) => store.getAll());
+  return runDraftTransaction('readonly', (store) => store.getAll()).then((files) => (
+    files.map((file) => ({
+      ...file,
+      blob: file.blob instanceof Blob
+        ? file.blob
+        : file.data instanceof ArrayBuffer
+          ? new Blob([file.data], { type: file.type || 'application/octet-stream' })
+          : null,
+    }))
+  ));
 }
 
 function hasImageFileData(file) {
@@ -112,7 +123,7 @@ async function isRestorableImageFile(file) {
       image.close();
       return true;
     } catch {
-      return false;
+      // Fall back to the browser image decoder for mobile formats not handled by createImageBitmap.
     }
   }
 
@@ -132,11 +143,11 @@ async function isRestorableImageFile(file) {
   }
 }
 
-function saveDraftFile(fieldName, file) {
-  const blob = file.slice(0, file.size, file.type);
+async function saveDraftFile(fieldName, file) {
+  const data = await file.arrayBuffer();
   return runDraftTransaction('readwrite', (store) => store.put({
     key: fieldName,
-    blob,
+    data,
     name: file.name,
     type: file.type,
   }, fieldName));
