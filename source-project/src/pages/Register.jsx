@@ -92,10 +92,51 @@ function readDraftFiles() {
   return runDraftTransaction('readonly', (store) => store.getAll());
 }
 
+function hasImageFileData(file) {
+  return Boolean(
+    file
+    && typeof file.key === 'string'
+    && typeof file.name === 'string'
+    && file.blob instanceof Blob
+    && file.blob.size > 0
+    && file.blob.type.startsWith('image/')
+  );
+}
+
+async function isRestorableImageFile(file) {
+  if (!hasImageFileData(file)) return false;
+
+  if (typeof createImageBitmap === 'function') {
+    try {
+      const image = await createImageBitmap(file.blob);
+      image.close();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  const imageUrl = URL.createObjectURL(file.blob);
+  try {
+    await new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = resolve;
+      image.onerror = () => reject(new Error('The saved image could not be decoded.'));
+      image.src = imageUrl;
+    });
+    return true;
+  } catch {
+    return false;
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
 function saveDraftFile(fieldName, file) {
+  const blob = file.slice(0, file.size, file.type);
   return runDraftTransaction('readwrite', (store) => store.put({
     key: fieldName,
-    blob: file,
+    blob,
     name: file.name,
     type: file.type,
   }, fieldName));
@@ -116,14 +157,24 @@ export default function Register() {
   const [step, setStep] = useState(initialDraft.step);
   const [savedFiles, setSavedFiles] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [savingFile, setSavingFile] = useState(false);
   const [errorStatus, setErrorStatus] = useState(initialDraft.error || initialSuccess.error);
   const [successId, setSuccessId] = useState(initialSuccess.id);
   const [draftEnabled, setDraftEnabled] = useState(true);
 
   useEffect(() => {
     readDraftFiles()
-      .then((files) => {
-        setSavedFiles(Object.fromEntries(files.map((file) => [file.key, file])));
+      .then(async (files) => {
+        const checks = await Promise.all(files.map(isRestorableImageFile));
+        const validFiles = files.filter((_, index) => checks[index]);
+        const invalidFiles = files.filter((_, index) => !checks[index]);
+        setSavedFiles(Object.fromEntries(validFiles.map((file) => [file.key, file])));
+        return Promise.all(invalidFiles.map((file) => deleteDraftFile(file.key)))
+          .then(() => {
+            if (invalidFiles.length) {
+              setErrorStatus('A previously saved photo could not be restored. Please select that image again to continue.');
+            }
+          });
       })
       .catch((error) => {
         setErrorStatus(`Saved uploads could not be restored: ${error.message}`);
@@ -184,12 +235,35 @@ export default function Register() {
       return;
     }
 
-    const savedFile = { key: name, blob: file, name: file.name, type: file.type };
-    setSavedFiles((current) => ({ ...current, [name]: savedFile }));
+    if (!file.type.startsWith('image/') || file.size === 0 || file.size > 5 * 1024 * 1024) {
+      event.target.value = '';
+      setErrorStatus('Choose a valid image file that is smaller than 5 MB.');
+      return;
+    }
+
+    setSavingFile(true);
     try {
+      const candidate = {
+        key: name,
+        blob: file.slice(0, file.size, file.type),
+        name: file.name,
+        type: file.type,
+      };
+      if (!await isRestorableImageFile(candidate)) {
+        event.target.value = '';
+        setErrorStatus('This image file could not be opened. Please choose another image.');
+        return;
+      }
       await saveDraftFile(name, file);
+      setSavedFiles((current) => ({
+        ...current,
+        [name]: candidate,
+      }));
+      setErrorStatus(null);
     } catch (error) {
       setErrorStatus(`The upload could not be saved for refresh: ${error.message}`);
+    } finally {
+      setSavingFile(false);
     }
   };
 
@@ -208,10 +282,22 @@ export default function Register() {
 
     const formData = new FormData();
     Object.entries(formValues).forEach(([name, value]) => formData.append(name, value));
-    Object.values(savedFiles).forEach((file) => {
-      if (file.key === 'teamQr') return;
-      if (file.key === 'player1Photo' && savedFiles.captainPhoto) return;
-      const fieldName = file.key === 'player1Photo' ? 'captainPhoto' : file.key;
+    const requiredFiles = [
+      'teamLogo',
+      'captainPhoto',
+      ...Array.from({ length: 14 }, (_, index) => `player${index + 2}Photo`),
+    ];
+    const uploadFiles = requiredFiles.map((fieldName) => ({
+      fieldName,
+      file: savedFiles[fieldName] || (fieldName === 'captainPhoto' ? savedFiles.player1Photo : null),
+    }));
+    const missingFile = uploadFiles.find(({ file }) => !hasImageFileData(file));
+    if (missingFile) {
+      setErrorStatus(`Please upload a valid image for ${missingFile.fieldName.replace(/([A-Z])/g, ' $1')}.`);
+      setIsLoading(false);
+      return;
+    }
+    uploadFiles.forEach(({ fieldName, file }) => {
       formData.append(fieldName, file.blob, file.name);
     });
 
@@ -464,10 +550,10 @@ export default function Register() {
             <button
               type="submit"
               className="primary-button register-continue-button"
-              disabled={isLoading}
-              style={{ cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.7 : 1 }}
+              disabled={isLoading || savingFile}
+              style={{ cursor: isLoading || savingFile ? 'not-allowed' : 'pointer', opacity: isLoading || savingFile ? 0.7 : 1 }}
             >
-              {isLoading ? 'SUBMITTING...' : step === REVIEW_STEP ? 'CONFIRM & SUBMIT REGISTRATION \u2192' : 'CONTINUE \u2192'}
+              {savingFile ? 'SAVING PHOTO...' : isLoading ? 'SUBMITTING...' : step === REVIEW_STEP ? 'CONFIRM & SUBMIT REGISTRATION \u2192' : 'CONTINUE \u2192'}
             </button>
           </div>
         </motion.form>}
