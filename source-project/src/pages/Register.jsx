@@ -148,7 +148,9 @@ export default function Register() {
 
   const handleValueChange = (event) => {
     const { name, value } = event.target;
-    setFormValues((current) => ({ ...current, [name]: value }));
+    const maxDigits = /Age$/.test(name) ? 2 : /JerseyNumber$/.test(name) ? 3 : null;
+    const nextValue = maxDigits ? value.replace(/\D/g, '').slice(0, maxDigits) : value;
+    setFormValues((current) => ({ ...current, [name]: nextValue }));
   };
 
   const handleFileChange = async (event) => {
@@ -194,7 +196,7 @@ export default function Register() {
     const formData = new FormData();
     Object.entries(formValues).forEach(([name, value]) => formData.append(name, value));
     Object.values(savedFiles).forEach((file) => {
-      if (file.key === 'teamLogo') return;
+      if (file.key === 'teamQr') return;
       if (file.key === 'player1Photo' && savedFiles.captainPhoto) return;
       const fieldName = file.key === 'player1Photo' ? 'captainPhoto' : file.key;
       formData.append(fieldName, file.blob, file.name);
@@ -308,7 +310,18 @@ export default function Register() {
                   <label htmlFor="teamLocation" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Team Location</label>
                   <input id="teamLocation" type="text" name="teamLocation" value={formValues.teamLocation} onChange={handleValueChange} placeholder="Enter team location" required style={inputStyle} />
                 </div>
-                {renderFileInput('teamQr', 'Team QR (CricHeroes App)')}
+                {renderFileInput('teamLogo', 'Team Logo')}
+                <div style={{ gridColumn: '1 / -1', marginTop: '4px' }}>
+                  <div style={{ color: 'var(--lime)', marginBottom: '12px', fontWeight: 'bold', textTransform: 'uppercase' }}>Payment Mode</div>
+                  <div className="register-payment-options" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                    {['Cash', 'UPI', 'Both'].map((mode) => (
+                      <label key={mode} className="register-payment-option" style={radioStyle(formValues.paymentMode === mode)}>
+                        <input type="radio" name="paymentMode" value={mode} checked={formValues.paymentMode === mode} onChange={handleValueChange} required />
+                        {mode}
+                      </label>
+                    ))}
+                  </div>
+                </div>
             </div>
           ) : step === 1 ? (
             <div className="register-step-card">
@@ -330,22 +343,11 @@ export default function Register() {
               </div>
               <div className="field" style={{ marginBottom: '16px' }}>
                 <label htmlFor="captainAge" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Age</label>
-                <input id="captainAge" type="number" name="captainAge" value={formValues.captainAge || ''} onChange={handleValueChange} placeholder="Enter age" required min="1" max="100" step="1" style={inputStyle} />
+                <input id="captainAge" type="text" name="captainAge" value={formValues.captainAge || ''} onChange={handleValueChange} placeholder="Enter age (2 digits)" required inputMode="numeric" pattern="[0-9]{1,2}" maxLength={2} style={inputStyle} />
               </div>
               <div className="field">
                 <label htmlFor="captainJerseyNumber" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Jersey Number</label>
-                <input id="captainJerseyNumber" type="number" name="captainJerseyNumber" value={formValues.captainJerseyNumber || ''} onChange={handleValueChange} placeholder="Enter jersey number (0-99)" required min="0" max="99" step="1" style={inputStyle} />
-              </div>
-              <div style={{ marginTop: '24px' }}>
-                <div style={{ color: 'var(--lime)', marginBottom: '12px', fontWeight: 'bold', textTransform: 'uppercase' }}>Payment Mode</div>
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                  {['Cash', 'UPI', 'Both'].map((mode) => (
-                    <label key={mode} style={radioStyle(formValues.paymentMode === mode)}>
-                      <input type="radio" name="paymentMode" value={mode} checked={formValues.paymentMode === mode} onChange={handleValueChange} required />
-                      {mode}
-                    </label>
-                  ))}
-                </div>
+                <input id="captainJerseyNumber" type="text" name="captainJerseyNumber" value={formValues.captainJerseyNumber || ''} onChange={handleValueChange} placeholder="Enter jersey number (up to 3 digits)" required inputMode="numeric" pattern="[0-9]{1,3}" maxLength={3} style={inputStyle} />
               </div>
             </div>
           ) : step === REVIEW_STEP ? (
@@ -356,7 +358,8 @@ export default function Register() {
                 <dl className="review-grid">
                   <div><dt>Team name</dt><dd>{formValues.teamName}</dd></div>
                   <div><dt>Team location</dt><dd>{formValues.teamLocation}</dd></div>
-                  <div className="review-wide"><dt>CricHeroes team QR</dt><dd>{getSavedFileName('teamQr')}</dd></div>
+                  <div><dt>Team logo</dt><dd>{getSavedFileName('teamLogo')}</dd></div>
+                  <div><dt>Payment mode</dt><dd>{formValues.paymentMode}</dd></div>
                 </dl>
               </section>
               <section className="review-section">
@@ -367,7 +370,6 @@ export default function Register() {
                   <div><dt>Alternative phone</dt><dd>{formValues.captainAlternatePhone}</dd></div>
                   <div><dt>Age</dt><dd>{formValues.captainAge}</dd></div>
                   <div><dt>Jersey number</dt><dd>{formValues.captainJerseyNumber}</dd></div>
-                  <div><dt>Payment mode</dt><dd>{formValues.paymentMode}</dd></div>
                   <div className="review-wide"><dt>Captain photo</dt><dd>{getSavedFileName('captainPhoto')}</dd></div>
                 </dl>
               </section>
@@ -404,11 +406,11 @@ export default function Register() {
               </div>
               <div className="field" style={{ marginTop: '16px' }}>
                 <label htmlFor={`player${step}Age`} style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Age</label>
-                <input id={`player${step}Age`} type="number" name={`player${step}Age`} value={formValues[`player${step}Age`] || ''} onChange={handleValueChange} placeholder="Enter age" required min="1" max="100" step="1" style={inputStyle} />
+                <input id={`player${step}Age`} type="text" name={`player${step}Age`} value={formValues[`player${step}Age`] || ''} onChange={handleValueChange} placeholder="Enter age (2 digits)" required inputMode="numeric" pattern="[0-9]{1,2}" maxLength={2} style={inputStyle} />
               </div>
               <div className="field" style={{ marginTop: '16px' }}>
                 <label htmlFor={`player${step}JerseyNumber`} style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Jersey Number</label>
-                <input id={`player${step}JerseyNumber`} type="number" name={`player${step}JerseyNumber`} value={formValues[`player${step}JerseyNumber`] || ''} onChange={handleValueChange} placeholder="Enter jersey number (0-99)" required min="0" max="99" step="1" style={inputStyle} />
+                <input id={`player${step}JerseyNumber`} type="text" name={`player${step}JerseyNumber`} value={formValues[`player${step}JerseyNumber`] || ''} onChange={handleValueChange} placeholder="Enter jersey number (up to 3 digits)" required inputMode="numeric" pattern="[0-9]{1,3}" maxLength={3} style={inputStyle} />
               </div>
             </div>
           )}

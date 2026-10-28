@@ -32,7 +32,7 @@ const ensure = async () => {
   await pool.query("ALTER TABLE wbl_registrations ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) NOT NULL DEFAULT 'PENDING'");
   await pool.query('ALTER TABLE wbl_registrations ADD COLUMN IF NOT EXISTS captain_alternate_phone VARCHAR(20)');
   await pool.query('ALTER TABLE wbl_registrations ADD COLUMN IF NOT EXISTS team_location VARCHAR(160)');
-  await pool.query('ALTER TABLE wbl_registrations ADD COLUMN IF NOT EXISTS team_qr_path TEXT');
+  await pool.query('ALTER TABLE wbl_registrations ADD COLUMN IF NOT EXISTS team_logo_path TEXT');
   await pool.query('CREATE TABLE IF NOT EXISTS wbl_gallery_images (id SERIAL PRIMARY KEY, image_url TEXT NOT NULL, cloudinary_public_id TEXT, caption VARCHAR(240), created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)');
   await pool.query("CREATE TABLE IF NOT EXISTS wbl_auction_registrations (id SERIAL PRIMARY KEY, full_name VARCHAR(120) NOT NULL, phone VARCHAR(30) NOT NULL, age SMALLINT NOT NULL CHECK (age BETWEEN 14 AND 50), playing_role VARCHAR(60) NOT NULL, batting_style VARCHAR(40), bowling_style VARCHAR(40), club_name VARCHAR(120), base_price VARCHAR(20) NOT NULL, photo_url TEXT, status VARCHAR(40) NOT NULL DEFAULT 'PENDING', created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)");
   await pool.query("ALTER TABLE wbl_auction_registrations ADD COLUMN IF NOT EXISTS photo_url TEXT");
@@ -52,31 +52,31 @@ const ensure = async () => {
 let ready; const init=()=>ready||(ready=ensure().catch(e=>{ready=null;throw e}));
 function admin(req,res,next){const a=Buffer.from(process.env.ADMIN_PASSWORD||'');const b=Buffer.from(req.get('x-admin-password')||'');if(!a.length||a.length!==b.length||!crypto.timingSafeEqual(a,b))return res.status(401).json({error:'Enter the correct admin password.'});next()}
 function players(value,req){let list=value;if(typeof list==='string'){try{list=JSON.parse(list)}catch{list=[]}}return (Array.isArray(list)?list:[]).map(p=>({...p,photoUrl:/^https?:/i.test(p.photoPath||'')?p.photoPath:null}))}
-app.post('/api/registrations',upload.fields([{name:'teamQr',maxCount:1},{name:'captainPhoto',maxCount:1},...Array.from({length:14},(_,i)=>({name:'player'+(i+2)+'Photo',maxCount:1}))]),asyncHandler(async(req,res)=>{
+app.post('/api/registrations',upload.fields([{name:'teamLogo',maxCount:1},{name:'captainPhoto',maxCount:1},...Array.from({length:14},(_,i)=>({name:'player'+(i+2)+'Photo',maxCount:1}))]),asyncHandler(async(req,res)=>{
   const {teamName,teamLocation,captainName,captainPhone,captainAlternatePhone,paymentMode}=req.body;
-  if(typeof teamName!=='string'||!teamName.trim()||typeof teamLocation!=='string'||!teamLocation.trim()||!req.files?.teamQr?.[0])return res.status(400).json({error:'Team name, team location, and CricHeroes team QR are required.'});
+  if(typeof teamName!=='string'||!teamName.trim()||typeof teamLocation!=='string'||!teamLocation.trim()||!req.files?.teamLogo?.[0])return res.status(400).json({error:'Team name, team location, and team logo are required.'});
   if(typeof captainName!=='string'||!captainName.trim()||!captainPhone||!captainAlternatePhone||!req.files?.captainPhoto?.[0])return res.status(400).json({error:'Complete all required captain details, including the captain photo.'});
   if(typeof captainPhone!=='string'||!/^\d{10}$/.test(captainPhone))return res.status(400).json({error:'Captain phone number must contain exactly 10 digits.'});
   if(typeof captainAlternatePhone!=='string'||!/^\d{10}$/.test(captainAlternatePhone))return res.status(400).json({error:'Alternative captain phone number must contain exactly 10 digits.'});
   if(!['Cash','UPI','Both'].includes(paymentMode))return res.status(400).json({error:'Select a valid payment mode.'});
   const captainAge=req.body.captainAge,captainJerseyNumber=req.body.captainJerseyNumber;
-  if(typeof captainAge!=='string'||!/^\d+$/.test(captainAge)||Number(captainAge)<1||Number(captainAge)>100)return res.status(400).json({error:'Captain age must be a whole number between 1 and 100.'});
-  if(typeof captainJerseyNumber!=='string'||!/^\d+$/.test(captainJerseyNumber)||Number(captainJerseyNumber)>99)return res.status(400).json({error:'Captain jersey number must be a whole number between 0 and 99.'});
+  if(typeof captainAge!=='string'||!/^\d{1,2}$/.test(captainAge)||Number(captainAge)<1)return res.status(400).json({error:'Captain age must be a whole number between 1 and 99.'});
+  if(typeof captainJerseyNumber!=='string'||!/^\d{1,3}$/.test(captainJerseyNumber))return res.status(400).json({error:'Captain jersey number must be a whole number with up to 3 digits.'});
   for(let i=2;i<=15;i++){
     const name=req.body['player'+i+'Name'],phone=req.body['player'+i+'Phone'],age=req.body['player'+i+'Age'],jerseyNumber=req.body['player'+i+'JerseyNumber'];
     if(typeof name!=='string'||!name.trim())return res.status(400).json({error:`Player ${i} name is required.`});
     if(typeof phone!=='string'||!/^\d{10}$/.test(phone))return res.status(400).json({error:`Player ${i} phone number must contain exactly 10 digits.`});
-    if(typeof age!=='string'||!/^\d+$/.test(age)||Number(age)<1||Number(age)>100)return res.status(400).json({error:`Player ${i} age must be a whole number between 1 and 100.`});
-    if(typeof jerseyNumber!=='string'||!/^\d+$/.test(jerseyNumber)||Number(jerseyNumber)>99)return res.status(400).json({error:`Player ${i} jersey number must be a whole number between 0 and 99.`});
+    if(typeof age!=='string'||!/^\d{1,2}$/.test(age)||Number(age)<1)return res.status(400).json({error:`Player ${i} age must be a whole number between 1 and 99.`});
+    if(typeof jerseyNumber!=='string'||!/^\d{1,3}$/.test(jerseyNumber))return res.status(400).json({error:`Player ${i} jersey number must be a whole number with up to 3 digits.`});
     if(!req.files?.['player'+i+'Photo']?.[0])return res.status(400).json({error:`Player ${i} photo is required.`});
   }
   await init();
   if((await pool.query('SELECT id FROM wbl_registrations WHERE LOWER(team_name)=LOWER($1)',[teamName.trim()])).rows.length)return res.status(409).json({error:'A team with this name is already registered.'});
-  const teamQr=await saveImage(req.files.teamQr[0],'wbl-2026/team-qrs');
+  const teamLogo=await saveImage(req.files.teamLogo[0],'wbl-2026/team-logos');
   const captainPhoto=await saveImage(req.files.captainPhoto[0]);
   const roster=[{playerIndex:1,name:captainName.trim(),phone:captainPhone,age:Number(captainAge),jerseyNumber:Number(captainJerseyNumber),photoPath:captainPhoto.secure_url}];
   for(let i=2;i<=15;i++){const f=req.files['player'+i+'Photo'][0];const photo=(await saveImage(f)).secure_url;roster.push({playerIndex:i,name:req.body['player'+i+'Name'].trim(),phone:req.body['player'+i+'Phone'],age:Number(req.body['player'+i+'Age']),jerseyNumber:Number(req.body['player'+i+'JerseyNumber']),photoPath:photo})}
-  const result=await pool.query('INSERT INTO wbl_registrations (team_name,team_location,captain_name,captain_phone,captain_alternate_phone,payment_mode,team_qr_path,players) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id',[teamName.trim(),teamLocation.trim(),captainName.trim(),captainPhone.trim(),captainAlternatePhone.trim(),paymentMode,teamQr.secure_url,JSON.stringify(roster)]);res.status(201).json({message:'Team successfully registered!',registrationId:result.rows[0].id});
+  const result=await pool.query('INSERT INTO wbl_registrations (team_name,team_location,captain_name,captain_phone,captain_alternate_phone,payment_mode,team_logo_path,players) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id',[teamName.trim(),teamLocation.trim(),captainName.trim(),captainPhone.trim(),captainAlternatePhone.trim(),paymentMode,teamLogo.secure_url,JSON.stringify(roster)]);res.status(201).json({message:'Team successfully registered!',registrationId:result.rows[0].id});
 }));
 app.get('/api/admin/dashboard',admin,asyncHandler(async(req,res)=>{
   await init();
@@ -89,7 +89,7 @@ app.get('/api/admin/dashboard',admin,asyncHandler(async(req,res)=>{
   ]);
   res.json({
     bids:b.rows.map(x=>({id:x.id,playerId:x.player_id,playerName:x.player_name,bidderName:x.bidder_name,phone:x.phone,email:x.email,bidAmount:Number(x.bid_amount),status:x.status,createdAt:x.created_at})),
-    teams:t.rows.map(x=>({id:x.id,teamName:x.team_name,teamLocation:x.team_location,teamQrUrl:x.team_qr_path,captainName:x.captain_name,captainPhone:x.captain_phone,captainAlternatePhone:x.captain_alternate_phone,paymentMode:x.payment_mode,organiserApproval:x.organiser_approval,paymentStatus:x.payment_status,createdAt:x.created_at,teamLogoUrl:x.team_logo_path,players:players(x.players,req)})),
+    teams:t.rows.map(x=>({id:x.id,teamName:x.team_name,teamLocation:x.team_location,captainName:x.captain_name,captainPhone:x.captain_phone,captainAlternatePhone:x.captain_alternate_phone,paymentMode:x.payment_mode,organiserApproval:x.organiser_approval,paymentStatus:x.payment_status,createdAt:x.created_at,teamLogoUrl:x.team_logo_path,players:players(x.players,req)})),
     auctionPlayers:a.rows.map(x=>({id:x.id,fullName:x.full_name,phone:x.phone,age:x.age,role:x.playing_role,battingStyle:x.batting_style,bowlingStyle:x.bowling_style,clubName:x.club_name,basePrice:x.base_price,photoUrl:x.photo_url,category:x.auction_category,matches:x.matches,primaryStat:x.primary_stat,strikeRate:x.strike_rate,economy:x.economy,average:x.average,best:x.best,status:x.status,createdAt:x.created_at})),
     cataloguePlayers:c.rows.map(x=>({id:x.id,name:x.name,role:x.role,category:x.category,battingStyle:x.batting_style,bowlingStyle:x.bowling_style,stats:{average:x.average||'—',strikeRate:x.strike_rate||'—',economy:x.economy||'—',best:x.best||'—'},basePrice:Number(x.base_price),status:x.status,published:x.published,photoUrl:x.photo_url,badgeColor:x.badge_color})),
     gallery:g.rows.map(x=>({id:x.id,url:x.image_url,caption:x.caption||'',createdAt:x.created_at}))

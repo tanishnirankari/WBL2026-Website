@@ -2354,20 +2354,23 @@ footer {
     }
 
     .register-form {
-        padding: 20px !important;
-        border-radius: 20px;
+        width: 100%;
+        padding: 16px !important;
+        border-radius: 18px;
     }
 
     .register-page {
+        width: calc(100% - 28px);
+        padding-top: 96px;
         padding-bottom: 34px;
     }
 
     .register-heading {
-        margin-bottom: 26px;
+        margin-bottom: 20px;
     }
 
     .register-title {
-        font-size: clamp(32px, 9vw, 40px) !important;
+        font-size: clamp(28px, 8vw, 34px) !important;
         line-height: 1.1;
     }
 
@@ -2378,28 +2381,89 @@ footer {
     }
 
     .register-step-header {
-        margin-bottom: 22px;
+        margin-bottom: 18px;
+        padding-bottom: 14px;
     }
 
     .register-step-name {
-        font-size: 16px;
+        font-size: 15px;
+    }
+
+    .register-step-count {
+        padding: 6px 9px;
+        font-size: 11px;
     }
 
     .register-step-fields {
-        gap: 18px;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .register-page .field label {
+        margin-bottom: 6px !important;
+        font-size: 12px !important;
+    }
+
+    .register-page .field input:not([type="file"]) {
+        min-height: 43px;
+        padding: 10px 11px !important;
+        border-radius: 10px !important;
+        font-size: 14px;
+    }
+
+    .register-page input[type="file"] {
+        min-height: 42px;
+        padding: 8px !important;
+        font-size: 11px;
+    }
+
+    .register-step-card {
+        padding: 15px;
+        border-radius: 15px;
+    }
+
+    .register-card-eyebrow {
+        margin-bottom: 15px;
+    }
+
+    .register-step-card .field {
+        margin-top: 0 !important;
+        margin-bottom: 12px !important;
+    }
+
+    .register-step-card > div[style*="margin-bottom: 16px"] {
+        margin-bottom: 12px !important;
+    }
+
+    .register-payment-options {
+        gap: 8px !important;
+    }
+
+    .register-payment-option {
+        min-height: 42px;
+        padding: 9px 10px !important;
+        gap: 7px !important;
+        font-size: 13px;
+    }
+
+    .register-payment-option input {
+        width: 14px;
+        height: 14px;
     }
 
     .register-actions {
-        margin-top: 26px;
+        gap: 9px;
+        margin-top: 20px;
         flex-direction: column-reverse;
     }
 
     .register-continue-button,
     .register-back-button {
         width: 100%;
-        min-height: 56px;
-        padding: 16px 22px !important;
-        font-size: 14px !important;
+        min-height: 46px;
+        padding: 12px 18px !important;
+        border-radius: 11px !important;
+        font-size: 12px !important;
     }
 
     .review-section {
@@ -2421,6 +2485,23 @@ footer {
 
     .review-player > button {
         padding: 8px 10px;
+    }
+
+    .registration-confirmation {
+        padding: 28px 20px;
+        border-radius: 20px;
+    }
+
+    .confirmation-icon {
+        width: 52px;
+        height: 52px;
+        margin-bottom: 18px;
+        border-radius: 17px;
+        font-size: 27px;
+    }
+
+    .confirmation-copy {
+        font-size: 13px;
     }
 
     .gallery-page-card {
