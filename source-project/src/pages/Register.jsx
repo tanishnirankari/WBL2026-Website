@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import Layout from '../components/Layout';
 import { motion } from 'framer-motion';
 
@@ -190,7 +190,7 @@ export default function Register() {
       });
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!draftEnabled) return;
 
     try {
@@ -199,6 +199,21 @@ export default function Register() {
       setErrorStatus(`Your form progress could not be saved: ${error.message}`);
     }
   }, [draftEnabled, formValues, step]);
+
+  useEffect(() => {
+    const hasEnteredDetails = Object.entries(formValues)
+      .some(([name, value]) => name !== 'paymentMode' && String(value).trim() !== '');
+    const hasProgress = hasEnteredDetails || step > 0 || Object.keys(savedFiles).length > 0;
+    if (!draftEnabled || successId || !hasProgress) return undefined;
+
+    const warnBeforeLeaving = (event) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', warnBeforeLeaving);
+    return () => window.removeEventListener('beforeunload', warnBeforeLeaving);
+  }, [draftEnabled, formValues, savedFiles, step, successId]);
 
   const inputStyle = {
     width: '100%', padding: '12px', borderRadius: '8px',
