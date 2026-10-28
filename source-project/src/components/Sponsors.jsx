@@ -11,8 +11,8 @@ const sponsors = [
   },
   {
     id: 'sponsor-placeholder-2',
-    name: 'T.B.D.',
-    category: 'SPONSOR PREVIEW',
+    name: 'TANISH',
+    category: 'HEAD OF LEAGUE',
     image: `${import.meta.env.BASE_URL}images/sponser2.jpg`,
     description: 'Sponsor placeholder',
     brand: 'partner-preview',

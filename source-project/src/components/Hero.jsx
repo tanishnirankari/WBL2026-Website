@@ -19,7 +19,7 @@ export default function Hero() {
         className="hero-content"
       >
         <div className="eyebrow">
-          Biggest Swinger Ball Tournament of Ghaziabad
+          The Biggest Swinger Ball League
         </div>
 
         <h1 className="hero-title">
@@ -33,11 +33,11 @@ export default function Hero() {
 
         <div className="hero-details">
           <div className="hero-detail">
-            <strong>₹40,000+</strong>
+            <strong>₹30,000+</strong>
             <small>PRIZE POOL</small>
           </div>
           <div className="hero-detail">
-            <strong>NOVEMBER</strong>
+            <strong>DECEMBER</strong>
             <small>TOURNAMENT</small>
           </div>
           <div className="hero-detail">
@@ -45,7 +45,7 @@ export default function Hero() {
             <small>VENUE</small>
           </div>
           <div className="hero-detail">
-            <strong>10+ TEAMS</strong>
+            <strong>10 TEAMS</strong>
             <small>15 PLAYERS / TEAM</small>
           </div>
         </div>
