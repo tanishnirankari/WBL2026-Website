@@ -12,8 +12,8 @@ const sponsors = [
   },
   {
     id: 'HEAD OF LEAGUE',
-    name: 'TANISH',
-    category: 'TANISH',
+    name: 'FOUNDER',
+    category: 'TANISH NIRANKARI',
     image: `${import.meta.env.BASE_URL}images/tanishs.jpg`,
     description: 'Sponsor placeholder',
     brand: 'partner-preview',
