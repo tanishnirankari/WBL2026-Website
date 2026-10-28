@@ -174,7 +174,10 @@ export default function Register() {
         const checks = files.map(hasImageFileData);
         const validFiles = files.filter((_, index) => checks[index]);
         const invalidFiles = files.filter((_, index) => !checks[index]);
-        setSavedFiles(Object.fromEntries(validFiles.map((file) => [file.key, file])));
+        setSavedFiles((current) => ({
+          ...Object.fromEntries(validFiles.map((file) => [file.key, file])),
+          ...current,
+        }));
         return Promise.all(invalidFiles.map((file) => deleteDraftFile(file.key)))
           .then(() => {
             if (invalidFiles.length) {
@@ -366,10 +369,10 @@ export default function Register() {
   const renderFileInput = (name, label) => (
     <div className="field">
       <label htmlFor={name} style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>{label}</label>
-      <input id={name} type="file" name={name} accept="image/*,.heic,.heif" onChange={handleFileChange} required={!savedFiles[name]} disabled={isRestoringFiles || savingFile} style={fileStyle} />
+      <input id={name} type="file" name={name} accept="image/*,.heic,.heif" onChange={handleFileChange} required={!savedFiles[name]} disabled={savingFile} style={fileStyle} />
       {isRestoringFiles && (
         <div style={{ color: 'var(--text-muted, #9aa8b5)', fontSize: '12px', marginTop: '6px' }}>
-          Checking saved photos…
+          Checking saved photos. You can upload now.
         </div>
       )}
       {!isRestoringFiles && savingFile && (
