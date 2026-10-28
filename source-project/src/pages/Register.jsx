@@ -158,6 +158,7 @@ export default function Register() {
   const [savedFiles, setSavedFiles] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [savingFile, setSavingFile] = useState(false);
+  const [isRestoringFiles, setIsRestoringFiles] = useState(true);
   const [errorStatus, setErrorStatus] = useState(initialDraft.error || initialSuccess.error);
   const [successId, setSuccessId] = useState(initialSuccess.id);
   const [draftEnabled, setDraftEnabled] = useState(true);
@@ -178,6 +179,9 @@ export default function Register() {
       })
       .catch((error) => {
         setErrorStatus(`Saved uploads could not be restored: ${error.message}`);
+      })
+      .finally(() => {
+        setIsRestoringFiles(false);
       });
   }, []);
 
@@ -218,9 +222,10 @@ export default function Register() {
   };
 
   const handleFileChange = async (event) => {
-    const { name, files } = event.target;
-    const file = files[0];
-    event.target.value = '';
+    const input = event.currentTarget;
+    const { name, files } = input;
+    const file = files?.[0];
+    input.value = '';
 
     if (!file) {
       setSavedFiles((current) => {
@@ -237,7 +242,6 @@ export default function Register() {
     }
 
     if (!file.type.startsWith('image/') || file.size === 0 || file.size > 5 * 1024 * 1024) {
-      event.target.value = '';
       setErrorStatus('Choose a valid image file that is smaller than 5 MB.');
       return;
     }
@@ -251,7 +255,6 @@ export default function Register() {
         type: file.type,
       };
       if (!await isRestorableImageFile(candidate)) {
-        event.target.value = '';
         setErrorStatus('This image file could not be opened. Please choose another image.');
         return;
       }
@@ -344,7 +347,17 @@ export default function Register() {
   const renderFileInput = (name, label) => (
     <div className="field">
       <label htmlFor={name} style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>{label}</label>
-      <input id={name} type="file" name={name} accept="image/*" onChange={handleFileChange} required={!savedFiles[name]} style={fileStyle} />
+      <input id={name} type="file" name={name} accept="image/*" onChange={handleFileChange} required={!savedFiles[name]} disabled={isRestoringFiles || savingFile} style={fileStyle} />
+      {isRestoringFiles && (
+        <div style={{ color: 'var(--text-muted, #9aa8b5)', fontSize: '12px', marginTop: '6px' }}>
+          Checking saved photos…
+        </div>
+      )}
+      {!isRestoringFiles && savingFile && (
+        <div style={{ color: 'var(--text-muted, #9aa8b5)', fontSize: '12px', marginTop: '6px' }}>
+          Saving selected photo…
+        </div>
+      )}
       {savedFiles[name] && (
         <div style={{ color: 'var(--lime)', fontSize: '12px', marginTop: '6px' }}>
           Saved for this draft: {savedFiles[name].name}
