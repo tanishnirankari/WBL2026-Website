@@ -9,8 +9,10 @@ const aboutSections = [
     name: 'Tanish Nirankari',
     image: 'tanish.jpg',
     imageAlt: 'Trophy presentation at a Winter Bash League event',
-    description:
-      'Founded by Tanish Nirankari, Winter I am Tanish Nirankari, founder of the Winter Bash League, Following the massive success of the 2026 Summer Bash League, I am elevating the standard for the upcoming winter edition with a strict focus on structured tournament management and total team engagement. Dedicated to building anticipation and cultivating a high-energy atmosphere, my goal is to ensure every season is more memorable, fiercely competitive, and expertly executed than the last.',
+    description: [
+      'I am Tanish Nirankari, founder of the Winter Bash League. Following the massive success of the 2026 Summer Bash League, I am elevating the standard for the upcoming winter edition with a strict focus on structured tournament management and total team engagement.',
+      'Dedicated to building anticipation and cultivating a high-energy atmosphere, my goal is to ensure every season is more memorable, fiercely competitive, and expertly executed than the last.',
+    ],
   },
   {
     id: 'aim',
@@ -54,7 +56,11 @@ export default function Exclusive() {
                 <span>{section.eyebrow}</span>
                 <h2 id={`about-${section.id}-title`}>{section.title}</h2>
                 {section.name && <h3>{section.name}</h3>}
-                <p>{section.description}</p>
+                {Array.isArray(section.description)
+                  ? section.description.map((paragraph, idx) => (
+                      <p key={`${section.id}-paragraph-${idx}`}>{paragraph}</p>
+                    ))
+                  : <p>{section.description}</p>}
               </div>
             </motion.section>
           ))}
