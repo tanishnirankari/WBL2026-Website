@@ -5,10 +5,12 @@ import { motion } from 'framer-motion';
 const DRAFT_KEY = 'wbl-team-registration-draft-v1';
 const DRAFT_DATABASE = 'wbl-team-registration-files';
 const DRAFT_STORE = 'files';
-const TOTAL_STEPS = 16;
+const REVIEW_STEP = 16;
+const TOTAL_STEPS = REVIEW_STEP + 1;
 
 const emptyValues = {
   teamName: '',
+  teamLocation: '',
   captainName: '',
   captainPhone: '',
   captainAlternatePhone: '',
@@ -21,9 +23,10 @@ function readDraft() {
     if (!savedDraft) return { values: emptyValues, step: 0, error: null };
 
     const draft = JSON.parse(savedDraft);
+    const savedStep = draft.step >= 2 ? Math.min(draft.step, REVIEW_STEP) : draft.step;
     return {
       values: { ...emptyValues, ...draft.values },
-      step: Number.isInteger(draft.step) && draft.step >= 0 && draft.step < TOTAL_STEPS ? draft.step : 0,
+      step: Number.isInteger(draft.step) && draft.step >= 0 ? savedStep : 0,
       error: null,
     };
   } catch (error) {
@@ -191,7 +194,10 @@ export default function Register() {
     const formData = new FormData();
     Object.entries(formValues).forEach(([name, value]) => formData.append(name, value));
     Object.values(savedFiles).forEach((file) => {
-      formData.append(file.key, file.blob, file.name);
+      if (file.key === 'teamLogo') return;
+      if (file.key === 'player1Photo' && savedFiles.captainPhoto) return;
+      const fieldName = file.key === 'player1Photo' ? 'captainPhoto' : file.key;
+      formData.append(fieldName, file.blob, file.name);
     });
 
     try {
@@ -228,7 +234,7 @@ export default function Register() {
   const renderFileInput = (name, label) => (
     <div className="field">
       <label htmlFor={name} style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>{label}</label>
-      <input id={name} type="file" name={name} accept="image/*" onChange={handleFileChange} style={fileStyle} />
+      <input id={name} type="file" name={name} accept="image/*" onChange={handleFileChange} required={!savedFiles[name]} style={fileStyle} />
       {savedFiles[name] && (
         <div style={{ color: 'var(--lime)', fontSize: '12px', marginTop: '6px' }}>
           Saved for this draft: {savedFiles[name].name}
@@ -237,71 +243,110 @@ export default function Register() {
     </div>
   );
 
+  const getSavedFileName = (name) => savedFiles[name]?.name || 'Not selected';
+  const reviewPlayers = Array.from({ length: 14 }, (_, index) => {
+    const playerIndex = index + 2;
+    return {
+      playerIndex,
+      name: formValues[`player${playerIndex}Name`] || '—',
+      phone: formValues[`player${playerIndex}Phone`] || '—',
+      age: formValues[`player${playerIndex}Age`] || '—',
+      jerseyNumber: formValues[`player${playerIndex}JerseyNumber`] ?? '—',
+      photo: getSavedFileName(`player${playerIndex}Photo`),
+    };
+  });
+
   return (
     <Layout>
       <main className="page content-page register-page">
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <div style={{ color: 'var(--lime)', fontSize: '12px', letterSpacing: '4px', fontWeight: 'bold' }}>
+        <div className="register-heading">
+          <div className="register-kicker">
             TOURNAMENT REGISTRATION
           </div>
           <h1 className="register-title">Register Your Team</h1>
+          <p className="register-subtitle">A few quick steps to get your team ready for the season.</p>
         </div>
 
         {successId && (
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} style={{ background: 'rgba(156, 255, 0, 0.1)', border: '1px solid var(--lime)', padding: '20px', borderRadius: '12px', textAlign: 'center', marginBottom: '30px' }}>
-            <h2 style={{ color: 'var(--lime)', margin: '0 0 10px 0' }}>Registration Successful!</h2>
-            <p>Your team has been securely registered in the system (Confirmation ID: {successId}). We will contact you soon for further details.</p>
-          </motion.div>
+          <motion.section className="registration-confirmation" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="confirmation-icon" aria-hidden="true">✓</div>
+            <div className="confirmation-eyebrow">REGISTRATION RECEIVED</div>
+            <h2>Thank you for registering your team.</h2>
+            <p className="confirmation-copy">Your details have been submitted successfully. Our team will review your registration and contact you if anything else is needed.</p>
+            <div className="confirmation-status">
+              <span className="confirmation-status-dot" />
+              <span>Registration is under review</span>
+            </div>
+            <div className="confirmation-reference">
+              <span>Confirmation ID</span>
+              <strong>WBL-{successId}</strong>
+            </div>
+          </motion.section>
         )}
 
         {errorStatus && (
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} style={{ background: 'rgba(255, 107, 107, 0.1)', border: '1px solid #ff6b6b', padding: '15px', borderRadius: '12px', textAlign: 'center', marginBottom: '30px', color: '#ff6b6b' }}>
+          <motion.div className="register-message register-error" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
             <strong>Error:</strong> {errorStatus}
           </motion.div>
         )}
 
-        <motion.form
+        {!successId && <motion.form
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           onSubmit={handleSubmit}
           className="register-form"
-          style={{ background: 'rgba(11, 32, 51, 0.9)', borderRadius: '18px', border: '1px solid var(--border)' }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
-            <div style={{ color: 'var(--lime)', fontWeight: 'bold', textTransform: 'uppercase' }}>
-              {step === 0 ? 'Team & Captain Details' : `Player ${step} Details`}
+          <div className="register-step-header">
+            <div className="register-step-name">
+              {step === 0 ? 'Team Details' : step === 1 ? 'Captain Details' : step === REVIEW_STEP ? 'Review Registration' : `Player ${step} Details`}
             </div>
-            <div aria-live="polite" style={{ fontSize: '14px', opacity: 0.8 }}>
+            <div className="register-step-count" aria-live="polite">
               Step {step + 1} of {TOTAL_STEPS}
             </div>
           </div>
 
           {step === 0 ? (
-            <>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '20px' }}>
+            <div className="register-step-fields">
                 <div className="field">
                   <label htmlFor="teamName" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Team Name</label>
                   <input id="teamName" type="text" name="teamName" value={formValues.teamName} onChange={handleValueChange} placeholder="Enter team name" required style={inputStyle} />
                 </div>
                 <div className="field">
-                  <label htmlFor="captainName" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Captain Name</label>
-                  <input id="captainName" type="text" name="captainName" value={formValues.captainName} onChange={handleValueChange} placeholder="Enter captain name" required style={inputStyle} />
+                  <label htmlFor="teamLocation" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Team Location</label>
+                  <input id="teamLocation" type="text" name="teamLocation" value={formValues.teamLocation} onChange={handleValueChange} placeholder="Enter team location" required style={inputStyle} />
                 </div>
-                <div className="field">
-                  <label htmlFor="captainPhone" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Captain Phone</label>
-                  <input id="captainPhone" type="tel" name="captainPhone" value={formValues.captainPhone} onChange={handlePhoneChange} placeholder="Enter phone number" required maxLength={10} pattern="[0-9]{10}" inputMode="numeric" style={inputStyle} />
-                </div>
-                <div className="field">
-                  <label htmlFor="captainAlternatePhone" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Alternative Captain Phone</label>
-                  <input id="captainAlternatePhone" type="tel" name="captainAlternatePhone" value={formValues.captainAlternatePhone} onChange={handlePhoneChange} placeholder="Enter alternative phone number" maxLength={10} pattern="[0-9]{10}" inputMode="numeric" style={inputStyle} />
-                </div>
-                {renderFileInput('teamLogo', 'Team Logo')}
+                {renderFileInput('teamQr', 'Team QR (CricHeroes App)')}
+            </div>
+          ) : step === 1 ? (
+            <div className="register-step-card">
+              <div className="register-card-eyebrow">TEAM CAPTAIN</div>
+              <div className="field" style={{ marginBottom: '16px' }}>
+                <label htmlFor="captainName" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Captain Name</label>
+                <input id="captainName" type="text" name="captainName" value={formValues.captainName} onChange={handleValueChange} placeholder="Enter captain name" required style={inputStyle} />
               </div>
-
-              <div style={{ marginTop: '35px' }}>
-                <div style={{ color: 'var(--lime)', marginBottom: '16px', fontWeight: 'bold', textTransform: 'uppercase' }}>Payment Mode</div>
-                <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+              <div className="field" style={{ marginBottom: '16px' }}>
+                <label htmlFor="captainPhone" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Captain Phone</label>
+                <input id="captainPhone" type="tel" name="captainPhone" value={formValues.captainPhone} onChange={handlePhoneChange} placeholder="Enter phone number" required maxLength={10} pattern="[0-9]{10}" inputMode="numeric" style={inputStyle} />
+              </div>
+              <div className="field" style={{ marginBottom: '16px' }}>
+                <label htmlFor="captainAlternatePhone" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Alternative Captain Phone</label>
+                <input id="captainAlternatePhone" type="tel" name="captainAlternatePhone" value={formValues.captainAlternatePhone} onChange={handlePhoneChange} placeholder="Enter alternative phone number" required maxLength={10} pattern="[0-9]{10}" inputMode="numeric" style={inputStyle} />
+              </div>
+              <div style={{ marginBottom: '16px' }}>
+                {renderFileInput('captainPhoto', 'Captain Photo')}
+              </div>
+              <div className="field" style={{ marginBottom: '16px' }}>
+                <label htmlFor="captainAge" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Age</label>
+                <input id="captainAge" type="number" name="captainAge" value={formValues.captainAge || ''} onChange={handleValueChange} placeholder="Enter age" required min="1" max="100" step="1" style={inputStyle} />
+              </div>
+              <div className="field">
+                <label htmlFor="captainJerseyNumber" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Jersey Number</label>
+                <input id="captainJerseyNumber" type="number" name="captainJerseyNumber" value={formValues.captainJerseyNumber || ''} onChange={handleValueChange} placeholder="Enter jersey number (0-99)" required min="0" max="99" step="1" style={inputStyle} />
+              </div>
+              <div style={{ marginTop: '24px' }}>
+                <div style={{ color: 'var(--lime)', marginBottom: '12px', fontWeight: 'bold', textTransform: 'uppercase' }}>Payment Mode</div>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                   {['Cash', 'UPI', 'Both'].map((mode) => (
                     <label key={mode} style={radioStyle(formValues.paymentMode === mode)}>
                       <input type="radio" name="paymentMode" value={mode} checked={formValues.paymentMode === mode} onChange={handleValueChange} required />
@@ -310,40 +355,88 @@ export default function Register() {
                   ))}
                 </div>
               </div>
-            </>
+            </div>
+          ) : step === REVIEW_STEP ? (
+            <div className="registration-review">
+              <p className="review-intro">Please check your team information before submitting. Use Back to make any changes.</p>
+              <section className="review-section">
+                <div className="review-section-heading"><h2>Team details</h2><button type="button" onClick={() => setStep(0)}>Edit</button></div>
+                <dl className="review-grid">
+                  <div><dt>Team name</dt><dd>{formValues.teamName}</dd></div>
+                  <div><dt>Team location</dt><dd>{formValues.teamLocation}</dd></div>
+                  <div className="review-wide"><dt>CricHeroes team QR</dt><dd>{getSavedFileName('teamQr')}</dd></div>
+                </dl>
+              </section>
+              <section className="review-section">
+                <div className="review-section-heading"><h2>Captain details</h2><button type="button" onClick={() => setStep(1)}>Edit</button></div>
+                <dl className="review-grid">
+                  <div><dt>Name</dt><dd>{formValues.captainName}</dd></div>
+                  <div><dt>Phone</dt><dd>{formValues.captainPhone}</dd></div>
+                  <div><dt>Alternative phone</dt><dd>{formValues.captainAlternatePhone}</dd></div>
+                  <div><dt>Age</dt><dd>{formValues.captainAge}</dd></div>
+                  <div><dt>Jersey number</dt><dd>{formValues.captainJerseyNumber}</dd></div>
+                  <div><dt>Payment mode</dt><dd>{formValues.paymentMode}</dd></div>
+                  <div className="review-wide"><dt>Captain photo</dt><dd>{getSavedFileName('captainPhoto')}</dd></div>
+                </dl>
+              </section>
+              <section className="review-section">
+                <div className="review-section-heading"><h2>Player roster</h2><span>14 players</span></div>
+                <div className="review-player-list">
+                  {reviewPlayers.map((player) => (
+                    <article className="review-player" key={player.playerIndex}>
+                      <span className="review-player-number">{player.playerIndex}</span>
+                      <div className="review-player-info">
+                        <strong>{player.name}</strong>
+                        <span>{player.phone} · Age {player.age} · Jersey {player.jerseyNumber}</span>
+                        <small>Photo: {player.photo}</small>
+                      </div>
+                      <button type="button" onClick={() => setStep(player.playerIndex)}>Edit</button>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            </div>
           ) : (
-            <div style={{ maxWidth: '600px', margin: '0 auto', background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-              <div style={{ color: 'var(--lime)', fontSize: '12px', fontWeight: 'bold', marginBottom: '16px' }}>PLAYER {step}</div>
+            <div className="register-step-card">
+              <div className="register-card-eyebrow">PLAYER {step}</div>
               <div className="field" style={{ marginBottom: '16px' }}>
                 <label htmlFor={`player${step}Name`} style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Player Name</label>
-                <input id={`player${step}Name`} type="text" name={`player${step}Name`} value={formValues[`player${step}Name`] || ''} onChange={handleValueChange} placeholder={`Enter player ${step} name`} style={inputStyle} />
+                <input id={`player${step}Name`} type="text" name={`player${step}Name`} value={formValues[`player${step}Name`] || ''} onChange={handleValueChange} placeholder={`Enter player ${step} name`} required style={inputStyle} />
               </div>
               <div style={{ marginBottom: '16px' }}>
                 {renderFileInput(`player${step}Photo`, 'Player Photo')}
               </div>
               <div className="field">
                 <label htmlFor={`player${step}Phone`} style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Phone Number</label>
-                <input id={`player${step}Phone`} type="tel" name={`player${step}Phone`} value={formValues[`player${step}Phone`] || ''} onChange={handlePhoneChange} placeholder="Enter phone number" maxLength={10} pattern="[0-9]{10}" inputMode="numeric" style={inputStyle} />
+                <input id={`player${step}Phone`} type="tel" name={`player${step}Phone`} value={formValues[`player${step}Phone`] || ''} onChange={handlePhoneChange} placeholder="Enter phone number" required maxLength={10} pattern="[0-9]{10}" inputMode="numeric" style={inputStyle} />
+              </div>
+              <div className="field" style={{ marginTop: '16px' }}>
+                <label htmlFor={`player${step}Age`} style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Age</label>
+                <input id={`player${step}Age`} type="number" name={`player${step}Age`} value={formValues[`player${step}Age`] || ''} onChange={handleValueChange} placeholder="Enter age" required min="1" max="100" step="1" style={inputStyle} />
+              </div>
+              <div className="field" style={{ marginTop: '16px' }}>
+                <label htmlFor={`player${step}JerseyNumber`} style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Jersey Number</label>
+                <input id={`player${step}JerseyNumber`} type="number" name={`player${step}JerseyNumber`} value={formValues[`player${step}JerseyNumber`] || ''} onChange={handleValueChange} placeholder="Enter jersey number (0-99)" required min="0" max="99" step="1" style={inputStyle} />
               </div>
             </div>
           )}
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '40px', flexWrap: 'wrap' }}>
+          <div className="register-actions">
             {step > 0 && (
-              <button type="button" className="primary-button" onClick={() => setStep((current) => current - 1)} style={{ padding: '16px 30px', fontSize: '16px', border: '1px solid var(--lime)', cursor: 'pointer', background: 'transparent' }}>
+              <button type="button" className="register-back-button" onClick={() => setStep((current) => current - 1)}>
                 &larr; BACK
               </button>
             )}
             <button
               type="submit"
-              className="primary-button"
+              className="primary-button register-continue-button"
               disabled={isLoading}
-              style={{ padding: '16px 36px', fontSize: '16px', border: 'none', cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.7 : 1 }}
+              style={{ cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.7 : 1 }}
             >
-              {isLoading ? 'SUBMITTING...' : step === TOTAL_STEPS - 1 ? 'SUBMIT TEAM REGISTRATION \u2192' : 'DONE & CONTINUE \u2192'}
+              {isLoading ? 'SUBMITTING...' : step === REVIEW_STEP ? 'CONFIRM & SUBMIT REGISTRATION \u2192' : 'CONTINUE \u2192'}
             </button>
           </div>
-        </motion.form>
+        </motion.form>}
       </main>
     </Layout>
   );

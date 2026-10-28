@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS wbl_registrations (
   captain_phone VARCHAR(20) NOT NULL,
   captain_alternate_phone VARCHAR(20),
   payment_mode VARCHAR(20) NOT NULL,
+  team_location VARCHAR(160) NOT NULL,
+  team_qr_path TEXT NOT NULL,
   team_logo_path VARCHAR(255),
   players JSONB NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

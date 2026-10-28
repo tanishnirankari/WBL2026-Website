@@ -19,6 +19,27 @@ body {
     color: #fff;
 }
 
+.site-layout {
+    display: flex;
+    min-height: 100vh;
+    min-height: 100svh;
+    flex-direction: column;
+}
+
+.layout-content {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+}
+
+.layout-content > main {
+    flex: 1 0 auto;
+}
+
+.site-layout > footer {
+    margin-top: auto;
+}
+
 .page-loading {
     min-height: 60vh;
     display: grid;
@@ -1224,16 +1245,439 @@ footer {
 
 .register-page {
     max-width: 1000px;
+    flex: 1 0 auto;
+    padding-top: 132px;
+    padding-bottom: 56px;
 }
 
 .register-form {
-    padding: clamp(18px, 4vw, 35px);
+    padding: clamp(22px, 4vw, 40px);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    background:
+        radial-gradient(ellipse at 100% 0%, rgba(156, 255, 0, 0.055), transparent 35%),
+        linear-gradient(145deg, rgba(13, 30, 47, 0.98), rgba(7, 20, 33, 0.98));
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.045);
+}
+
+.register-heading {
+    margin-bottom: 34px;
+    text-align: center;
+}
+
+.register-kicker {
+    color: var(--lime);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
 }
 
 .register-title {
-    font-size: clamp(30px, 4vw, 42px);
-    margin-top: 10px;
+    margin-top: 12px;
+    font-size: clamp(32px, 5vw, 46px);
+    font-weight: 750;
+    letter-spacing: -0.055em;
+    line-height: 1.05;
+    text-transform: none;
+}
+
+.register-subtitle {
+    margin: 12px 0 0;
+    color: #91a0ad;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.register-step-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.register-step-name {
+    color: #f5f8fb;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+.register-step-count {
+    padding: 7px 11px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.045);
+    color: #aab6c1;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.register-step-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    gap: 22px;
+}
+
+.register-step-card {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: clamp(18px, 4vw, 28px);
+    border: 1px solid rgba(255, 255, 255, 0.085);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.register-card-eyebrow {
+    margin-bottom: 20px;
+    color: var(--lime);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+}
+
+.register-page .field label {
+    color: #d7e0e8;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+
+.register-page .field input:not([type="file"]) {
+    min-height: 48px;
+    border: 1px solid rgba(255, 255, 255, 0.13) !important;
+    border-radius: 11px !important;
+    background: rgba(3, 12, 21, 0.48) !important;
+    color: #f7fafc !important;
+    outline: none;
+    transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.register-page .field input:not([type="file"]):focus {
+    border-color: rgba(156, 255, 0, 0.72) !important;
+    background: rgba(3, 12, 21, 0.72) !important;
+    box-shadow: 0 0 0 3px rgba(156, 255, 0, 0.1);
+}
+
+.register-page .field input::placeholder {
+    color: #738292;
+}
+
+.register-page input[type="file"] {
+    min-height: 48px;
+    border-radius: 11px !important;
+    font-size: 12px;
+}
+
+.register-page .field input[type="radio"] {
+    accent-color: var(--lime);
+}
+
+.register-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 34px;
+    flex-wrap: wrap;
+}
+
+.register-continue-button,
+.register-back-button {
+    min-height: 50px;
+    padding: 14px 26px !important;
+    border-radius: 12px !important;
+    font-size: 13px !important;
+    letter-spacing: 0.035em;
+}
+
+.register-continue-button:hover {
+    box-shadow: 0 8px 26px rgba(156, 255, 0, 0.16);
+}
+
+.register-back-button {
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.045);
+    color: #e6edf2;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.register-back-button:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.register-message {
+    margin-bottom: 22px;
+    padding: 18px 20px;
+    border-radius: 14px;
+    text-align: center;
+}
+
+.register-success {
+    border: 1px solid rgba(156, 255, 0, 0.45);
+    background: rgba(156, 255, 0, 0.075);
+}
+
+.register-success h2 {
+    margin-bottom: 8px;
+    color: var(--lime);
+    font-size: 18px;
+}
+
+.register-success p {
+    color: #d3ddc7;
+    line-height: 1.6;
+}
+
+.register-error {
+    border: 1px solid rgba(255, 107, 107, 0.45);
+    background: rgba(255, 107, 107, 0.08);
+    color: #ff9a9a;
+}
+
+.registration-review {
+    display: grid;
+    max-width: 760px;
+    gap: 16px;
+    margin: 0 auto;
+}
+
+.review-intro {
+    margin: 0 0 3px;
+    color: #a7b3bd;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.review-section {
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.085);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.review-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.review-section-heading h2 {
+    color: #f0f4f7;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.review-section-heading > span {
+    color: #8d9ba8;
+    font-size: 12px;
+}
+
+.review-section-heading button,
+.review-player > button {
+    padding: 7px 12px;
+    border: 1px solid rgba(156, 255, 0, 0.27);
+    border-radius: 9px;
+    background: rgba(156, 255, 0, 0.06);
+    color: var(--lime);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.review-section-heading button:hover,
+.review-player > button:hover {
+    background: rgba(156, 255, 0, 0.12);
+}
+
+.review-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0;
+}
+
+.review-grid > div {
+    min-width: 0;
+    padding: 11px 12px;
+    border-radius: 10px;
+    background: rgba(3, 12, 21, 0.38);
+}
+
+.review-grid .review-wide {
+    grid-column: 1 / -1;
+}
+
+.review-grid dt {
+    margin-bottom: 5px;
+    color: #8795a2;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
+}
+
+.review-grid dd {
+    margin: 0;
+    color: #e8edf1;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.review-player-list {
+    display: grid;
+    gap: 8px;
+}
+
+.review-player {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    border-radius: 12px;
+    background: rgba(3, 12, 21, 0.32);
+}
+
+.review-player-number {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    place-items: center;
+    border-radius: 11px;
+    background: rgba(156, 255, 0, 0.1);
+    color: var(--lime);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.review-player-info {
+    display: grid;
+    min-width: 0;
+    flex: 1;
+    gap: 3px;
+}
+
+.review-player-info strong {
+    color: #e8edf1;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.review-player-info span,
+.review-player-info small {
+    color: #97a5b1;
+    font-size: 11px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.registration-confirmation {
+    width: min(100%, 680px);
+    margin: 0 auto;
+    padding: clamp(28px, 6vw, 52px);
+    border: 1px solid rgba(156, 255, 0, 0.2);
+    border-radius: 26px;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(156, 255, 0, 0.11), transparent 48%),
+        linear-gradient(145deg, rgba(13, 30, 47, 0.98), rgba(7, 20, 33, 0.98));
+    box-shadow: 0 28px 90px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.055);
+    text-align: center;
+}
+
+.confirmation-icon {
+    display: grid;
+    width: 62px;
+    height: 62px;
+    margin: 0 auto 22px;
+    place-items: center;
+    border: 1px solid rgba(156, 255, 0, 0.4);
+    border-radius: 20px;
+    background: rgba(156, 255, 0, 0.1);
+    color: var(--lime);
+    font-size: 32px;
+    font-weight: 500;
+    box-shadow: 0 0 40px rgba(156, 255, 0, 0.09);
+}
+
+.confirmation-eyebrow {
+    color: var(--lime);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+}
+
+.registration-confirmation h2 {
+    margin: 13px auto 0;
+    color: #f5f8fa;
+    font-size: clamp(25px, 5vw, 34px);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 1.2;
+}
+
+.confirmation-copy {
+    max-width: 480px;
+    margin: 13px auto 0;
+    color: #a8b4bf;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.confirmation-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 24px;
+    padding: 10px 15px;
+    border: 1px solid rgba(156, 255, 0, 0.17);
+    border-radius: 999px;
+    background: rgba(156, 255, 0, 0.055);
+    color: #d7e5c4;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.confirmation-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--lime);
+    box-shadow: 0 0 12px rgba(156, 255, 0, 0.65);
+}
+
+.confirmation-reference {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    max-width: 360px;
+    margin: 26px auto 0;
+    padding: 14px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 13px;
+    background: rgba(3, 12, 21, 0.4);
+    text-align: left;
+}
+
+.confirmation-reference span {
+    color: #8e9ba8;
+    font-size: 12px;
+}
+
+.confirmation-reference strong {
+    color: #f1f5f7;
+    font-size: 13px;
+    letter-spacing: 0.04em;
 }
 
 .gallery-page-card {
@@ -1911,11 +2355,72 @@ footer {
 
     .register-form {
         padding: 20px !important;
+        border-radius: 20px;
+    }
+
+    .register-page {
+        padding-bottom: 34px;
+    }
+
+    .register-heading {
+        margin-bottom: 26px;
     }
 
     .register-title {
-        font-size: clamp(30px, 9vw, 38px) !important;
+        font-size: clamp(32px, 9vw, 40px) !important;
         line-height: 1.1;
+    }
+
+    .register-subtitle {
+        max-width: 310px;
+        margin-inline: auto;
+        font-size: 13px;
+    }
+
+    .register-step-header {
+        margin-bottom: 22px;
+    }
+
+    .register-step-name {
+        font-size: 16px;
+    }
+
+    .register-step-fields {
+        gap: 18px;
+    }
+
+    .register-actions {
+        margin-top: 26px;
+        flex-direction: column-reverse;
+    }
+
+    .register-continue-button,
+    .register-back-button {
+        width: 100%;
+        min-height: 56px;
+        padding: 16px 22px !important;
+        font-size: 14px !important;
+    }
+
+    .review-section {
+        padding: 14px;
+    }
+
+    .review-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .review-grid .review-wide {
+        grid-column: auto;
+    }
+
+    .review-player {
+        gap: 9px;
+        padding: 9px;
+    }
+
+    .review-player > button {
+        padding: 8px 10px;
     }
 
     .gallery-page-card {

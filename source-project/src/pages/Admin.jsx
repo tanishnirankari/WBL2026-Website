@@ -418,7 +418,7 @@ export default function Admin() {
       setNote(error.message || 'Could not prepare the WBL logo for printing.');
       return;
     }
-    const roster = (team.players || []).filter((player) => player.name || player.phone || player.photoUrl);
+    const roster = (team.players || []).filter((player) => player.name || player.phone || player.photoUrl || player.age != null || player.jerseyNumber != null);
     const imageMarkup = (url, alt, className) => url
       ? `<img class="${className}" src="${escapeHtml(url)}" alt="${escapeHtml(alt)}">`
       : `<div class="${className} image-placeholder">No photo</div>`;
@@ -427,12 +427,14 @@ export default function Admin() {
           <article class="player-card">
             ${imageMarkup(player.photoUrl, `${player.name || `Player ${player.playerIndex}`} photo`, 'player-photo')}
             <div class="player-info">
-              <span class="player-number">PLAYER ${escapeHtml(player.playerIndex)}</span>
+              <span class="player-number">${player.playerIndex === 1 ? 'TEAM CAPTAIN' : `PLAYER ${escapeHtml(player.playerIndex)}`}</span>
               <h3>${escapeHtml(player.name || 'Name not provided')}</h3>
               <p>${escapeHtml(player.phone || 'Phone not provided')}</p>
+              <p>Age: ${escapeHtml(player.age ?? '—')} · Jersey: ${escapeHtml(player.jerseyNumber ?? '—')}</p>
             </div>
           </article>`).join('')
       : '<p class="empty-roster">No player details were submitted with this registration.</p>';
+    const teamQrUrl = team.teamQrUrl;
     const teamLogo = imageMarkup(team.teamLogoUrl, `${team.teamName} team logo`, 'team-logo');
     const date = escapeHtml(formatDate(team.createdAt));
     const logoMarkup = team.teamLogoUrl
@@ -476,9 +478,10 @@ export default function Admin() {
       <div class="print-hint">Choose “Save as PDF” in the print dialog. For clear player photos, use A4 paper and default or high print quality.</div>
       <div class="topline"></div>
       <header class="brand"><div class="brand-identity"><img class="wbl-logo" src="${escapeHtml(wblLogoDataUrl)}" alt="Winter Bash League logo"><div><div class="brand-title">WINTER BASH LEAGUE</div><div class="brand-subtitle">TEAM REGISTRATION RECORD · 2026 SEASON</div></div></div><div class="registration-id"><strong>WBL-${escapeHtml(team.id)}</strong>Registered ${date}</div></header>
-      <section class="team-header">${logoMarkup}<div><h1>${escapeHtml(team.teamName)}</h1><p class="team-meta">Captain: ${escapeHtml(team.captainName)} · ${escapeHtml(team.captainPhone)}</p><div class="status-row"><span class="status">Approval: ${escapeHtml(team.organiserApproval || 'PENDING')}</span><span class="status">Payment: ${escapeHtml(team.paymentStatus || 'PENDING')}</span></div></div></section>
+      <section class="team-header">${logoMarkup}<div><h1>${escapeHtml(team.teamName)}</h1><p class="team-meta">Location: ${escapeHtml(team.teamLocation || '—')}</p><p class="team-meta">Captain: ${escapeHtml(team.captainName)} · ${escapeHtml(team.captainPhone)}</p><div class="status-row"><span class="status">Approval: ${escapeHtml(team.organiserApproval || 'PENDING')}</span><span class="status">Payment: ${escapeHtml(team.paymentStatus || 'PENDING')}</span></div></div></section>
       <h2 class="section-title">Registration details</h2>
-      <section class="details"><div class="detail"><span>Team</span><strong>${escapeHtml(team.teamName)}</strong></div><div class="detail"><span>Team captain</span><strong>${escapeHtml(team.captainName)}</strong></div><div class="detail"><span>Captain phone</span><strong>${escapeHtml(team.captainPhone)}</strong></div><div class="detail"><span>Alternative captain phone</span><strong>${escapeHtml(team.captainAlternatePhone || '—')}</strong></div><div class="detail"><span>Payment method</span><strong>${escapeHtml(team.paymentMode)}</strong></div><div class="detail"><span>Payment status</span><strong>${escapeHtml(team.paymentStatus || 'PENDING')}</strong></div><div class="detail"><span>Organiser approval</span><strong>${escapeHtml(team.organiserApproval || 'PENDING')}</strong></div></section>
+      <section class="details"><div class="detail"><span>Team</span><strong>${escapeHtml(team.teamName)}</strong></div><div class="detail"><span>Team location</span><strong>${escapeHtml(team.teamLocation || '—')}</strong></div><div class="detail"><span>Team captain</span><strong>${escapeHtml(team.captainName)}</strong></div><div class="detail"><span>Captain phone</span><strong>${escapeHtml(team.captainPhone)}</strong></div><div class="detail"><span>Alternative captain phone</span><strong>${escapeHtml(team.captainAlternatePhone || '—')}</strong></div><div class="detail"><span>Payment method</span><strong>${escapeHtml(team.paymentMode)}</strong></div><div class="detail"><span>Payment status</span><strong>${escapeHtml(team.paymentStatus || 'PENDING')}</strong></div><div class="detail"><span>Organiser approval</span><strong>${escapeHtml(team.organiserApproval || 'PENDING')}</strong></div></section>
+      <h2 class="section-title">CricHeroes team QR</h2><section class="details">${teamQrUrl ? imageMarkup(teamQrUrl, `${team.teamName} CricHeroes team QR`, 'team-logo') : '<p class="empty-roster">No team QR was submitted.</p>'}</section>
       <h2 class="section-title">Player roster · ${roster.length} submitted</h2><section class="player-grid">${playerCards}</section>
       <section class="signature"><div>Captain signature</div><div>Organiser signature and stamp</div></section>
       <footer class="footer"><div class="footer-credit">Organised by Tanish Nirankari · <a class="footer-social" href="https://www.instagram.com/winterbashleague/" target="_blank" rel="noopener noreferrer"><svg class="instagram-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" aria-label="Instagram" role="img"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="#557b31" stroke-width="2.5"/><circle cx="12" cy="12" r="4" fill="none" stroke="#557b31" stroke-width="2.5"/><circle cx="18" cy="6" r="1.5" fill="#557b31"/></svg>@winterbashleague</a></div><div>Winter Bash League · Official registration record · Generated ${escapeHtml(formatDate(new Date()))}</div></footer>
@@ -614,7 +617,7 @@ export default function Admin() {
     .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
   const players = data.teams.flatMap((team) => (
     (team.players || [])
-      .filter((player) => player.name || player.phone || player.photoUrl)
+      .filter((player) => player.name || player.phone || player.photoUrl || player.age != null || player.jerseyNumber != null)
       .map((player) => ({ ...player, teamId: team.id, teamName: team.teamName }))
   ));
   const counts = {
@@ -690,14 +693,14 @@ export default function Admin() {
                     <article className="admin-team-card" key={team.id}>
                       <div className="admin-team-heading">
                         <div className="admin-team-identity">
-                          {team.teamLogoUrl
-                            ? <img className="admin-team-logo" src={team.teamLogoUrl} alt={`${team.teamName} logo`} />
+                          {(team.teamQrUrl || team.teamLogoUrl)
+                            ? <img className="admin-team-logo" src={team.teamQrUrl || team.teamLogoUrl} alt={team.teamQrUrl ? `${team.teamName} CricHeroes QR` : `${team.teamName} logo`} />
                             : <span className="admin-team-logo-placeholder"><ShieldCheck size={22} /></span>}
                           <div><h3>{team.teamName}</h3><p>Registration WBL-{team.id} · Captain {team.captainName}</p></div>
                         </div>
                         <span className={`admin-status-pill ${statusTone(team.organiserApproval)}`}>{formatStatusLabel(team.organiserApproval)}</span>
                       </div>
-                      <div className="admin-team-details"><span>{team.captainPhone}</span>{team.captainAlternatePhone && <span>Alternative: {team.captainAlternatePhone}</span>}<span>Payment method: {team.paymentMode}</span><span>{(team.players || []).filter((player) => player.name || player.phone || player.photoUrl).length} player records</span><span>Registered: {formatDate(team.createdAt)}</span></div>
+                      <div className="admin-team-details"><span>Location: {team.teamLocation || '—'}</span><span>{team.captainPhone}</span>{team.captainAlternatePhone && <span>Alternative: {team.captainAlternatePhone}</span>}<span>Payment method: {team.paymentMode}</span><span>{(team.players || []).filter((player) => player.name || player.phone || player.photoUrl || player.age != null || player.jerseyNumber != null).length} player records</span><span>Registered: {formatDate(team.createdAt)}</span></div>
                       <div className="admin-team-actions">
                         <label>Approval<select value={team.organiserApproval || 'PENDING'} onChange={(event) => patchTeam(team, 'organiserApproval', event.target.value)}>{['PENDING', 'APPROVED', 'REJECTED'].map((status) => <option key={status} value={status}>{formatStatusLabel(status)}</option>)}</select></label>
                         <label>Payment<select value={team.paymentStatus || 'PENDING'} onChange={(event) => patchTeam(team, 'paymentStatus', event.target.value)}>{['PENDING', 'PAID', 'PARTIALLY PAID', 'NOT REQUIRED'].map((status) => <option key={status} value={status}>{formatStatusLabel(status)}</option>)}</select></label>
@@ -709,8 +712,8 @@ export default function Admin() {
                         {(team.players || []).map((player) => (
                           <div className="admin-player-row" key={player.playerIndex}>
                             {player.photoUrl ? <img src={player.photoUrl} alt={player.name ? `${player.name} photo` : 'Player photo'} /> : <span className="admin-player-photo-placeholder"><UserRound size={18} /></span>}
-                            <span><strong>{player.name || `Player ${player.playerIndex}`}</strong><small>{player.phone || 'No phone provided'}</small></span>
-                            <small>Player {player.playerIndex}</small>
+                            <span><strong>{player.name || `Player ${player.playerIndex}`}</strong><small>{player.phone || 'No phone provided'} · Age {player.age ?? '—'} · Jersey {player.jerseyNumber ?? '—'}</small></span>
+                            <small>{player.playerIndex === 1 ? 'Captain' : `Player ${player.playerIndex}`}</small>
                             <button className="admin-action-button danger" onClick={() => deleteRegisteredPlayer({ ...player, teamId: team.id, teamName: team.teamName })} aria-label={`Delete ${player.name || `player ${player.playerIndex}`}`}><Trash2 size={14} /> Delete</button>
                           </div>
                         ))}
@@ -729,7 +732,7 @@ export default function Admin() {
                 <div className="admin-registered-team-list">
                   {data.teams.map((team) => {
                     const teamPlayers = (team.players || [])
-                      .filter((player) => player.name || player.phone || player.photoUrl)
+                      .filter((player) => player.name || player.phone || player.photoUrl || player.age != null || player.jerseyNumber != null)
                       .map((player) => ({ ...player, teamId: team.id, teamName: team.teamName }));
                     if (!teamPlayers.length) return null;
                     return (
@@ -745,7 +748,7 @@ export default function Admin() {
                               {player.photoUrl ? <img src={player.photoUrl} alt={player.name || 'Player'} /> : <span className="admin-player-card-placeholder"><UserRound size={24} /></span>}
                               <div className="admin-registered-player-copy">
                                 <h3>{player.name || `Player ${player.playerIndex}`}</h3>
-                                <small>Player {player.playerIndex} · {player.phone || 'No phone'}</small>
+                                <small>{player.playerIndex === 1 ? 'Captain' : `Player ${player.playerIndex}`} · {player.phone || 'No phone'} · Age {player.age ?? '—'} · Jersey {player.jerseyNumber ?? '—'}</small>
                               </div>
                               <button className="admin-action-button danger" onClick={() => deleteRegisteredPlayer(player)} aria-label={`Delete ${player.name || `player ${player.playerIndex}`} from ${team.teamName}`}><Trash2 size={14} /><span>Delete</span></button>
                             </article>
