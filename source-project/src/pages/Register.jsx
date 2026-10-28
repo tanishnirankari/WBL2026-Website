@@ -136,8 +136,9 @@ function hasImageFileData(file) {
   );
 }
 
-async function saveDraftFile(fieldName, file) {
+async function replaceDraftFile(fieldName, file) {
   const data = await file.arrayBuffer();
+  // put() at the field key atomically replaces any previously saved photo for this field.
   return runDraftTransaction('readwrite', (store) => store.put({
     key: fieldName,
     data,
@@ -261,7 +262,7 @@ export default function Register() {
         name: imageFile.name,
         type: imageFile.type,
       };
-      await saveDraftFile(name, imageFile);
+      await replaceDraftFile(name, imageFile);
       setSavedFiles((current) => ({
         ...current,
         [name]: candidate,
@@ -363,7 +364,7 @@ export default function Register() {
       )}
       {savedFiles[name] && (
         <div style={{ color: 'var(--lime)', fontSize: '12px', marginTop: '6px' }}>
-          Saved for this draft: {savedFiles[name].name}
+          Saved photo (select another image to replace it): {savedFiles[name].name}
         </div>
       )}
     </div>
