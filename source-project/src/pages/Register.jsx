@@ -103,6 +103,28 @@ function readDraftFiles() {
   ));
 }
 
+function getImageFile(file) {
+  if (!file) return null;
+
+  const imageTypesByExtension = {
+    avif: 'image/avif',
+    gif: 'image/gif',
+    heic: 'image/heic',
+    heif: 'image/heif',
+    jpeg: 'image/jpeg',
+    jpg: 'image/jpeg',
+    png: 'image/png',
+    webp: 'image/webp',
+  };
+  const extension = file.name?.split('.').pop()?.toLowerCase();
+  const type = file.type?.startsWith('image/')
+    ? file.type
+    : imageTypesByExtension[extension];
+
+  if (!type?.startsWith('image/')) return null;
+  return file.type === type ? file : new File([file], file.name, { type });
+}
+
 function hasImageFileData(file) {
   return Boolean(
     file
@@ -112,35 +134,6 @@ function hasImageFileData(file) {
     && file.blob.size > 0
     && file.blob.type.startsWith('image/')
   );
-}
-
-async function isRestorableImageFile(file) {
-  if (!hasImageFileData(file)) return false;
-
-  if (typeof createImageBitmap === 'function') {
-    try {
-      const image = await createImageBitmap(file.blob);
-      image.close();
-      return true;
-    } catch {
-      // Fall back to the browser image decoder for mobile formats not handled by createImageBitmap.
-    }
-  }
-
-  const imageUrl = URL.createObjectURL(file.blob);
-  try {
-    await new Promise((resolve, reject) => {
-      const image = new Image();
-      image.onload = resolve;
-      image.onerror = () => reject(new Error('The saved image could not be decoded.'));
-      image.src = imageUrl;
-    });
-    return true;
-  } catch {
-    return false;
-  } finally {
-    URL.revokeObjectURL(imageUrl);
-  }
 }
 
 async function saveDraftFile(fieldName, file) {
@@ -177,7 +170,7 @@ export default function Register() {
   useEffect(() => {
     readDraftFiles()
       .then(async (files) => {
-        const checks = await Promise.all(files.map(isRestorableImageFile));
+        const checks = files.map(hasImageFileData);
         const validFiles = files.filter((_, index) => checks[index]);
         const invalidFiles = files.filter((_, index) => !checks[index]);
         setSavedFiles(Object.fromEntries(validFiles.map((file) => [file.key, file])));
@@ -252,8 +245,11 @@ export default function Register() {
       return;
     }
 
-    if (!file.type.startsWith('image/') || file.size === 0 || file.size > 5 * 1024 * 1024) {
-      setErrorStatus('Choose a valid image file that is smaller than 5 MB.');
+    const imageFile = getImageFile(file);
+    if (!imageFile || imageFile.size === 0 || imageFile.size > 5 * 1024 * 1024) {
+      setErrorStatus(imageFile
+        ? 'This image is larger than 5 MB. Choose a smaller image.'
+        : 'Choose a JPG, PNG, WEBP, GIF, AVIF, or HEIC image.');
       return;
     }
 
@@ -261,15 +257,11 @@ export default function Register() {
     try {
       const candidate = {
         key: name,
-        blob: file.slice(0, file.size, file.type),
-        name: file.name,
-        type: file.type,
+        blob: imageFile.slice(0, imageFile.size, imageFile.type),
+        name: imageFile.name,
+        type: imageFile.type,
       };
-      if (!await isRestorableImageFile(candidate)) {
-        setErrorStatus('This image file could not be opened. Please choose another image.');
-        return;
-      }
-      await saveDraftFile(name, file);
+      await saveDraftFile(name, imageFile);
       setSavedFiles((current) => ({
         ...current,
         [name]: candidate,
@@ -358,7 +350,7 @@ export default function Register() {
   const renderFileInput = (name, label) => (
     <div className="field">
       <label htmlFor={name} style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>{label}</label>
-      <input id={name} type="file" name={name} accept="image/*" onChange={handleFileChange} required={!savedFiles[name]} disabled={isRestoringFiles || savingFile} style={fileStyle} />
+      <input id={name} type="file" name={name} accept="image/*,.heic,.heif" onChange={handleFileChange} required={!savedFiles[name]} disabled={isRestoringFiles || savingFile} style={fileStyle} />
       {isRestoringFiles && (
         <div style={{ color: 'var(--text-muted, #9aa8b5)', fontSize: '12px', marginTop: '6px' }}>
           Checking saved photos…
