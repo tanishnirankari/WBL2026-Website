@@ -3,6 +3,7 @@ import Layout from '../components/Layout';
 import { motion } from 'framer-motion';
 
 const DRAFT_KEY = 'wbl-team-registration-draft-v1';
+const SUCCESS_KEY = 'wbl-team-registration-confirmation-v1';
 const DRAFT_DATABASE = 'wbl-team-registration-files';
 const DRAFT_STORE = 'files';
 const REVIEW_STEP = 16;
@@ -34,6 +35,17 @@ function readDraft() {
       values: emptyValues,
       step: 0,
       error: `Your saved form details could not be loaded: ${error.message}`,
+    };
+  }
+}
+
+function readSavedSuccess() {
+  try {
+    return { id: localStorage.getItem(SUCCESS_KEY), error: null };
+  } catch (error) {
+    return {
+      id: null,
+      error: `Your registration confirmation could not be loaded: ${error.message}`,
     };
   }
 }
@@ -99,12 +111,13 @@ function clearDraftFiles() {
 
 export default function Register() {
   const initialDraft = useState(readDraft)[0];
+  const initialSuccess = useState(readSavedSuccess)[0];
   const [formValues, setFormValues] = useState(initialDraft.values);
   const [step, setStep] = useState(initialDraft.step);
   const [savedFiles, setSavedFiles] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [errorStatus, setErrorStatus] = useState(initialDraft.error);
-  const [successId, setSuccessId] = useState(null);
+  const [errorStatus, setErrorStatus] = useState(initialDraft.error || initialSuccess.error);
+  const [successId, setSuccessId] = useState(initialSuccess.id);
   const [draftEnabled, setDraftEnabled] = useState(true);
 
   useEffect(() => {
@@ -220,12 +233,20 @@ export default function Register() {
       setStep(0);
       setDraftEnabled(false);
 
+      const cleanupErrors = [];
+      try {
+        localStorage.setItem(SUCCESS_KEY, String(data.registrationId));
+      } catch (error) {
+        cleanupErrors.push(`The confirmation could not be saved for refresh: ${error.message}`);
+      }
+
       try {
         localStorage.removeItem(DRAFT_KEY);
         await clearDraftFiles();
       } catch (error) {
-        setErrorStatus(`Registration succeeded, but the saved draft could not be cleared: ${error.message}`);
+        cleanupErrors.push(`The saved draft could not be cleared: ${error.message}`);
       }
+      if (cleanupErrors.length) setErrorStatus(`Registration succeeded. ${cleanupErrors.join(' ')}`);
     } catch (error) {
       setErrorStatus(error.message);
     } finally {
@@ -246,6 +267,22 @@ export default function Register() {
   );
 
   const getSavedFileName = (name) => savedFiles[name]?.name || 'Not selected';
+  const handleStartAnotherRegistration = async () => {
+    try {
+      localStorage.removeItem(SUCCESS_KEY);
+      localStorage.removeItem(DRAFT_KEY);
+      await clearDraftFiles();
+      setSuccessId(null);
+      setFormValues(emptyValues);
+      setSavedFiles({});
+      setStep(0);
+      setDraftEnabled(true);
+      setErrorStatus(null);
+    } catch (error) {
+      setErrorStatus(`A new registration could not be started: ${error.message}`);
+    }
+  };
+
   const reviewPlayers = Array.from({ length: 14 }, (_, index) => {
     const playerIndex = index + 2;
     return {
@@ -275,6 +312,9 @@ export default function Register() {
               <span>Confirmation ID</span>
               <strong>WBL-{successId}</strong>
             </div>
+            <button type="button" className="register-another-button" onClick={handleStartAnotherRegistration}>
+              REGISTER ANOTHER TEAM
+            </button>
           </motion.section>
         )}
 

@@ -1680,6 +1680,26 @@ footer {
     letter-spacing: 0.04em;
 }
 
+.register-another-button {
+    min-height: 46px;
+    margin-top: 20px;
+    padding: 12px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.045);
+    color: #e6edf2;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.05em;
+    transition: background 160ms ease, border-color 160ms ease;
+}
+
+.register-another-button:hover {
+    border-color: rgba(156, 255, 0, 0.35);
+    background: rgba(156, 255, 0, 0.07);
+}
+
 .gallery-page-card {
     height: clamp(210px, 68vw, 270px);
 }
