@@ -10,9 +10,9 @@ const sponsors = [
     illustrative: true,
   },
   {
-    id: 'sponsor-placeholder-2',
+    id: 'HEAD OF LEAGUE',
     name: 'TANISH',
-    category: 'HEAD OF LEAGUE',
+    category: 'TANISH',
     image: `${import.meta.env.BASE_URL}images/tanishs.jpg`,
     description: 'Sponsor placeholder',
     brand: 'partner-preview',
