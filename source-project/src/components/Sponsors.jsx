@@ -12,7 +12,7 @@ const sponsors = [
   },
   {
     id: 'HEAD OF LEAGUE',
-    name: 'TANISH',
+    name: 'FOUNDER',
     category: 'TANISH',
     image: `${import.meta.env.BASE_URL}images/tanishs.jpg`,
     description: 'Sponsor placeholder',
