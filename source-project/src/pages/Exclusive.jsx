@@ -4,22 +4,22 @@ import { motion, useReducedMotion } from 'framer-motion';
 const aboutSections = [
   {
     id: 'founder',
-    eyebrow: 'THE PERSON BEHIND THE LEAGUE',
+    eyebrow: '',
     title: 'Our Founder',
     name: 'Tanish Nirankari',
-    image: 'winner.png',
+    image: 'tanish.jpg',
     imageAlt: 'Trophy presentation at a Winter Bash League event',
     description:
-      'Founded by Tanish Nirankari, Winter Bash League was created to bring local cricket talent together through a well-organized, competitive tournament. His focus on thoughtful planning and community has helped build a stage where players can compete, connect, and grow.',
+      'Founded by Tanish Nirankari, Winter I am Tanish Nirankari, founder of the Winter Bash League, Following the massive success of the 2026 Summer Bash League, I am elevating the standard for the upcoming winter edition with a strict focus on structured tournament management and total team engagement. Dedicated to building anticipation and cultivating a high-energy atmosphere, my goal is to ensure every season is more memorable, fiercely competitive, and expertly executed than the last.',
   },
   {
     id: 'aim',
-    eyebrow: 'WHY WE PLAY',
+    eyebrow: '',
     title: 'Our Aim',
     image: 'gallery8.jpg',
     imageAlt: 'Players and an official discussing play on the cricket ground',
     description:
-      'Our aim is to make competitive cricket more accessible to local players. We work to create a fair, welcoming environment where talent gets noticed, teams build camaraderie, and every match inspires players to reach further.',
+      ' We work to create a fair,Positive and welcoming environment where talent gets noticed, teams build camaraderie, and every match inspires players to reach further.',
   },
 ];
 
