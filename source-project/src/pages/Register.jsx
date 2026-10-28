@@ -1,11 +1,10 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
 import { motion } from 'framer-motion';
 
 const DRAFT_KEY = 'wbl-team-registration-draft-v1';
 const SUCCESS_KEY = 'wbl-team-registration-confirmation-v1';
 const DRAFT_DATABASE = 'wbl-team-registration-files';
-const DRAFT_STORE = 'files';
 const REVIEW_STEP = 16;
 const TOTAL_STEPS = REVIEW_STEP + 1;
 
@@ -17,91 +16,6 @@ const emptyValues = {
   captainAlternatePhone: '',
   paymentMode: 'Cash',
 };
-
-function readDraft() {
-  try {
-    const savedDraft = localStorage.getItem(DRAFT_KEY);
-    if (!savedDraft) return { values: emptyValues, step: 0, error: null };
-
-    const draft = JSON.parse(savedDraft);
-    const savedStep = draft.step >= 2 ? Math.min(draft.step, REVIEW_STEP) : draft.step;
-    return {
-      values: { ...emptyValues, ...draft.values },
-      step: Number.isInteger(draft.step) && draft.step >= 0 ? savedStep : 0,
-      error: null,
-    };
-  } catch (error) {
-    return {
-      values: emptyValues,
-      step: 0,
-      error: `Your saved form details could not be loaded: ${error.message}`,
-    };
-  }
-}
-
-function readSavedSuccess() {
-  try {
-    return { id: localStorage.getItem(SUCCESS_KEY), error: null };
-  } catch (error) {
-    return {
-      id: null,
-      error: `Your registration confirmation could not be loaded: ${error.message}`,
-    };
-  }
-}
-
-function openDraftDatabase() {
-  return new Promise((resolve, reject) => {
-    if (!window.indexedDB) {
-      reject(new Error('This browser does not support saving uploaded files between visits.'));
-      return;
-    }
-
-    const request = window.indexedDB.open(DRAFT_DATABASE, 2);
-    request.onupgradeneeded = () => {
-      if (!request.result.objectStoreNames.contains(DRAFT_STORE)) {
-        request.result.createObjectStore(DRAFT_STORE);
-      }
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error || new Error('Could not open saved registration files.'));
-  });
-}
-
-async function runDraftTransaction(mode, operation) {
-  const database = await openDraftDatabase();
-
-  return new Promise((resolve, reject) => {
-    const transaction = database.transaction(DRAFT_STORE, mode);
-    const request = operation(transaction.objectStore(DRAFT_STORE));
-    request.onerror = () => reject(request.error || new Error('Could not save registration files.'));
-    transaction.oncomplete = () => {
-      database.close();
-      resolve(request.result);
-    };
-    transaction.onerror = () => {
-      database.close();
-      reject(transaction.error || new Error('Could not save registration files.'));
-    };
-    transaction.onabort = () => {
-      database.close();
-      reject(transaction.error || new Error('Could not save registration files.'));
-    };
-  });
-}
-
-function readDraftFiles() {
-  return runDraftTransaction('readonly', (store) => store.getAll()).then((files) => (
-    files.map((file) => ({
-      ...file,
-      blob: file.blob instanceof Blob
-        ? file.blob
-        : file.data instanceof ArrayBuffer
-          ? new Blob([file.data], { type: file.type || 'application/octet-stream' })
-          : null,
-    }))
-  ));
-}
 
 function getImageFile(file) {
   if (!file) return null;
@@ -125,98 +39,32 @@ function getImageFile(file) {
   return file.type === type ? file : new File([file], file.name, { type });
 }
 
-function hasImageFileData(file) {
-  return Boolean(
-    file
-    && typeof file.key === 'string'
-    && typeof file.name === 'string'
-    && file.blob instanceof Blob
-    && file.blob.size > 0
-    && file.blob.type.startsWith('image/')
-  );
-}
-
-async function replaceDraftFile(fieldName, file) {
-  const data = await file.arrayBuffer();
-  // put() at the field key atomically replaces any previously saved photo for this field.
-  return runDraftTransaction('readwrite', (store) => store.put({
-    key: fieldName,
-    data,
-    name: file.name,
-    type: file.type,
-  }, fieldName));
-}
-
-function deleteDraftFile(fieldName) {
-  return runDraftTransaction('readwrite', (store) => store.delete(fieldName));
-}
-
-function clearDraftFiles() {
-  return runDraftTransaction('readwrite', (store) => store.clear());
-}
-
 export default function Register() {
-  const initialDraft = useState(readDraft)[0];
-  const initialSuccess = useState(readSavedSuccess)[0];
-  const [formValues, setFormValues] = useState(initialDraft.values);
-  const [step, setStep] = useState(initialDraft.step);
+  const [formValues, setFormValues] = useState(emptyValues);
+  const [step, setStep] = useState(0);
   const [savedFiles, setSavedFiles] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [savingFile, setSavingFile] = useState(false);
-  const [isRestoringFiles, setIsRestoringFiles] = useState(true);
-  const [errorStatus, setErrorStatus] = useState(initialDraft.error || initialSuccess.error);
-  const [successId, setSuccessId] = useState(initialSuccess.id);
-  const [draftEnabled, setDraftEnabled] = useState(true);
+  const [errorStatus, setErrorStatus] = useState(null);
+  const [successId, setSuccessId] = useState(null);
 
   useEffect(() => {
-    readDraftFiles()
-      .then(async (files) => {
-        const checks = files.map(hasImageFileData);
-        const validFiles = files.filter((_, index) => checks[index]);
-        const invalidFiles = files.filter((_, index) => !checks[index]);
-        setSavedFiles((current) => ({
-          ...Object.fromEntries(validFiles.map((file) => [file.key, file])),
-          ...current,
-        }));
-        return Promise.all(invalidFiles.map((file) => deleteDraftFile(file.key)))
-          .then(() => {
-            if (invalidFiles.length) {
-              setErrorStatus('A previously saved photo could not be restored. Please select that image again to continue.');
-            }
-          });
-      })
-      .catch((error) => {
-        setErrorStatus(`Saved uploads could not be restored: ${error.message}`);
-      })
-      .finally(() => {
-        setIsRestoringFiles(false);
-      });
-  }, []);
-
-  useLayoutEffect(() => {
-    if (!draftEnabled) return;
-
     try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify({ values: formValues, step }));
+      localStorage.removeItem(DRAFT_KEY);
+      localStorage.removeItem(SUCCESS_KEY);
     } catch (error) {
-      setErrorStatus(`Your form progress could not be saved: ${error.message}`);
+      setErrorStatus(`Previous saved registration data could not be cleared: ${error.message}`);
     }
-  }, [draftEnabled, formValues, step]);
 
-  useEffect(() => {
-    const hasEnteredDetails = Object.entries(formValues)
-      .some(([name, value]) => name !== 'paymentMode' && String(value).trim() !== '');
-    const hasProgress = hasEnteredDetails || step > 0 || Object.keys(savedFiles).length > 0;
-    if (!draftEnabled || successId || !hasProgress) return undefined;
+    if (!window.indexedDB) return;
 
-    const warnBeforeLeaving = (event) => {
-      event.preventDefault();
-      event.returnValue = '';
+    const request = window.indexedDB.deleteDatabase(DRAFT_DATABASE);
+    request.onerror = () => {
+      setErrorStatus(`Previous saved photos could not be cleared: ${request.error?.message || 'Storage error.'}`);
     };
-
-    window.addEventListener('beforeunload', warnBeforeLeaving);
-    return () => window.removeEventListener('beforeunload', warnBeforeLeaving);
-  }, [draftEnabled, formValues, savedFiles, step, successId]);
+    request.onblocked = () => {
+      setErrorStatus('Close other registration tabs to clear previously saved photos.');
+    };
+  }, []);
 
   const inputStyle = {
     width: '100%', padding: '12px', borderRadius: '8px',
@@ -244,25 +92,13 @@ export default function Register() {
     setFormValues((current) => ({ ...current, [name]: nextValue }));
   };
 
-  const handleFileChange = async (event) => {
+  const handleFileChange = (event) => {
     const input = event.currentTarget;
     const { name, files } = input;
     const file = files?.[0];
     input.value = '';
 
-    if (!file) {
-      setSavedFiles((current) => {
-        const next = { ...current };
-        delete next[name];
-        return next;
-      });
-      try {
-        await deleteDraftFile(name);
-      } catch (error) {
-        setErrorStatus(`The saved upload could not be removed: ${error.message}`);
-      }
-      return;
-    }
+    if (!file) return;
 
     const imageFile = getImageFile(file);
     if (!imageFile || imageFile.size === 0 || imageFile.size > 5 * 1024 * 1024) {
@@ -272,25 +108,8 @@ export default function Register() {
       return;
     }
 
-    setSavingFile(true);
-    try {
-      const candidate = {
-        key: name,
-        blob: imageFile.slice(0, imageFile.size, imageFile.type),
-        name: imageFile.name,
-        type: imageFile.type,
-      };
-      await replaceDraftFile(name, imageFile);
-      setSavedFiles((current) => ({
-        ...current,
-        [name]: candidate,
-      }));
-      setErrorStatus(null);
-    } catch (error) {
-      setErrorStatus(`The upload could not be saved for refresh: ${error.message}`);
-    } finally {
-      setSavingFile(false);
-    }
+    setSavedFiles((current) => ({ ...current, [name]: imageFile }));
+    setErrorStatus(null);
   };
 
   const handleSubmit = async (event) => {
@@ -304,8 +123,6 @@ export default function Register() {
 
     setIsLoading(true);
     setErrorStatus(null);
-    setSuccessId(null);
-
     const formData = new FormData();
     Object.entries(formValues).forEach(([name, value]) => formData.append(name, value));
     const requiredFiles = [
@@ -317,14 +134,16 @@ export default function Register() {
       fieldName,
       file: savedFiles[fieldName] || (fieldName === 'captainPhoto' ? savedFiles.player1Photo : null),
     }));
-    const missingFile = uploadFiles.find(({ file }) => !hasImageFileData(file));
+    const missingFile = uploadFiles.find(({ file }) => (
+      !file || file.size === 0 || !file.type.startsWith('image/')
+    ));
     if (missingFile) {
       setErrorStatus(`Please upload a valid image for ${missingFile.fieldName.replace(/([A-Z])/g, ' $1')}.`);
       setIsLoading(false);
       return;
     }
     uploadFiles.forEach(({ fieldName, file }) => {
-      formData.append(fieldName, file.blob, file.name);
+      formData.append(fieldName, file, file.name);
     });
 
     try {
@@ -343,22 +162,6 @@ export default function Register() {
       setFormValues(emptyValues);
       setSavedFiles({});
       setStep(0);
-      setDraftEnabled(false);
-
-      const cleanupErrors = [];
-      try {
-        localStorage.setItem(SUCCESS_KEY, String(data.registrationId));
-      } catch (error) {
-        cleanupErrors.push(`The confirmation could not be saved for refresh: ${error.message}`);
-      }
-
-      try {
-        localStorage.removeItem(DRAFT_KEY);
-        await clearDraftFiles();
-      } catch (error) {
-        cleanupErrors.push(`The saved draft could not be cleared: ${error.message}`);
-      }
-      if (cleanupErrors.length) setErrorStatus(`Registration succeeded. ${cleanupErrors.join(' ')}`);
     } catch (error) {
       setErrorStatus(error.message);
     } finally {
@@ -369,40 +172,22 @@ export default function Register() {
   const renderFileInput = (name, label) => (
     <div className="field">
       <label htmlFor={name} style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>{label}</label>
-      <input id={name} type="file" name={name} accept="image/*,.heic,.heif" onChange={handleFileChange} required={!savedFiles[name]} disabled={savingFile} style={fileStyle} />
-      {isRestoringFiles && (
-        <div style={{ color: 'var(--text-muted, #9aa8b5)', fontSize: '12px', marginTop: '6px' }}>
-          Checking saved photos. You can upload now.
-        </div>
-      )}
-      {!isRestoringFiles && savingFile && (
-        <div style={{ color: 'var(--text-muted, #9aa8b5)', fontSize: '12px', marginTop: '6px' }}>
-          Saving selected photo…
-        </div>
-      )}
+      <input id={name} type="file" name={name} accept="image/*,.heic,.heif" onChange={handleFileChange} required={!savedFiles[name]} style={fileStyle} />
       {savedFiles[name] && (
         <div style={{ color: 'var(--lime)', fontSize: '12px', marginTop: '6px' }}>
-          Saved photo (select another image to replace it): {savedFiles[name].name}
+          Selected photo (choose another to replace it): {savedFiles[name].name}
         </div>
       )}
     </div>
   );
 
   const getSavedFileName = (name) => savedFiles[name]?.name || 'Not selected';
-  const handleStartAnotherRegistration = async () => {
-    try {
-      localStorage.removeItem(SUCCESS_KEY);
-      localStorage.removeItem(DRAFT_KEY);
-      await clearDraftFiles();
-      setSuccessId(null);
-      setFormValues(emptyValues);
-      setSavedFiles({});
-      setStep(0);
-      setDraftEnabled(true);
-      setErrorStatus(null);
-    } catch (error) {
-      setErrorStatus(`A new registration could not be started: ${error.message}`);
-    }
+  const handleStartAnotherRegistration = () => {
+    setSuccessId(null);
+    setFormValues(emptyValues);
+    setSavedFiles({});
+    setStep(0);
+    setErrorStatus(null);
   };
 
   const reviewPlayers = Array.from({ length: 14 }, (_, index) => {
@@ -586,10 +371,10 @@ export default function Register() {
             <button
               type="submit"
               className="primary-button register-continue-button"
-              disabled={isLoading || savingFile}
-              style={{ cursor: isLoading || savingFile ? 'not-allowed' : 'pointer', opacity: isLoading || savingFile ? 0.7 : 1 }}
+              disabled={isLoading}
+              style={{ cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.7 : 1 }}
             >
-              {savingFile ? 'SAVING PHOTO...' : isLoading ? 'SUBMITTING...' : step === REVIEW_STEP ? 'CONFIRM & SUBMIT REGISTRATION \u2192' : 'CONTINUE \u2192'}
+              {isLoading ? 'SUBMITTING...' : step === REVIEW_STEP ? 'CONFIRM & SUBMIT REGISTRATION \u2192' : 'CONTINUE \u2192'}
             </button>
           </div>
         </motion.form>}
