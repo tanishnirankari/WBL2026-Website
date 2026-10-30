@@ -1243,6 +1243,28 @@ footer {
     padding: 112px 0 88px;
 }
 
+.home-page-content {
+    min-height: 100vh;
+    min-height: 100svh;
+}
+
+.home-layout {
+    min-height: 0;
+}
+
+.home-layout > .layout-content {
+    flex: 0 0 auto;
+}
+
+.home-layout .home-page-content {
+    min-height: 0;
+    flex: 0 0 auto;
+}
+
+.home-layout > footer {
+    margin-top: 0;
+}
+
 .register-page {
     max-width: 1000px;
     flex: 1 0 auto;
@@ -7408,6 +7430,12 @@ footer {
     .about-card-copy p {
         font-size: 14px;
         line-height: 1.65;
+    }
+}
+
+@media (max-width: 650px) {
+    .home-layout .home-page-content > .hero {
+        min-height: max(420px, calc(100svh - 248px - env(safe-area-inset-top)));
     }
 }
 

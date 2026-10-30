@@ -22,9 +22,11 @@ export default function Home() {
   }, [hash]);
 
   return (
-    <Layout>
-      <Hero />
-      <Sponsors />
+    <Layout className="home-layout">
+      <main className="home-page-content">
+        <Hero />
+        <Sponsors />
+      </main>
     </Layout>
   );
 }
