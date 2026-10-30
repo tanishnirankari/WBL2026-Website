@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="72" y1="48" x2="1090" y2="668" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#102D29"/>
+      <stop offset=".52" stop-color="#0B1E27"/>
+      <stop offset="1" stop-color="#091521"/>
+    </linearGradient>
+    <linearGradient id="orb" x1="327" y1="152" x2="892" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C9FF78"/>
+      <stop offset="1" stop-color="#68C859"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="matrix(398 290 -287 393 833 300)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A7FF59" stop-opacity=".2"/>
+      <stop offset="1" stop-color="#A7FF59" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h1200v680H0z"/>
+  <path fill="url(#glow)" d="M0 0h1200v680H0z"/>
+  <circle cx="786" cy="336" r="221" stroke="#C9FF78" stroke-opacity=".14"/>
+  <circle cx="786" cy="336" r="173" stroke="#C9FF78" stroke-opacity=".2"/>
+  <circle cx="786" cy="336" r="124" fill="url(#orb)" fill-opacity=".09" stroke="#C9FF78" stroke-opacity=".4"/>
+  <path d="m786 230 23 72 75 1-60 45 22 72-60-44-61 44 23-72-60-45 75-1 23-72Z" fill="url(#orb)"/>
+  <path d="M120 144h35v35h-35zm52 0h15v15h-15zm-52 52h15v15h-15z" fill="#C9FF78" fill-opacity=".68"/>
+  <path d="M116 544h282" stroke="#C9FF78" stroke-opacity=".35"/>
+  <text x="116" y="286" fill="#C9FF78" font-family="Arial,sans-serif" font-size="16" font-weight="700" letter-spacing="5">WINTER BASH LEAGUE</text>
+  <text x="112" y="375" fill="#F5F8FB" font-family="Arial,sans-serif" font-size="68" font-weight="700" letter-spacing="-3">SPONSOR A</text>
+  <text x="116" y="433" fill="#AEBCC5" font-family="Arial,sans-serif" font-size="20" letter-spacing="1">POWERING EVERY BOUNDARY</text>
+  <text x="116" y="584" fill="#80918F" font-family="Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="4">FOUNDING PARTNER · 2026</text>
+</svg>

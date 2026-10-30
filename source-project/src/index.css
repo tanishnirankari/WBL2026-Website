@@ -2173,18 +2173,21 @@ footer {
     .hero {
         margin-top: 92px;
         min-height: auto;
-        padding: 14px 18px 26px;
-        border-radius: 22px 22px 20px 20px;
+        padding: 24px 20px 32px;
+        border-radius: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
 
         background:
             linear-gradient(180deg,
-                rgba(3, 12, 21, 0.76),
-                rgba(3, 12, 21, 0.97)),
+                rgba(5, 8, 14, 0.82) 0%,
+                rgba(5, 8, 14, 0.94) 50%,
+                rgba(5, 8, 14, 0.99) 100%),
             var(--hero-mobile-image, var(--hero-image));
 
         background-size: cover;
         background-repeat: no-repeat;
         background-position: 62% center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
 
     .hero-content {
@@ -2192,65 +2195,151 @@ footer {
     }
 
     .eyebrow {
-        max-width: 34ch;
-        margin-bottom: 10px;
-        font-size: 10px;
-        letter-spacing: 0.14em;
-        line-height: 1.5;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 12px;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Plus Jakarta Sans', sans-serif;
+        color: #d1d5db;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        line-height: 1.4;
+        margin-bottom: 14px;
+        text-transform: none;
+    }
+
+    .eyebrow::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--lime);
+        box-shadow: 0 0 8px var(--lime);
+        display: inline-block;
     }
 
     .hero-title {
-        font-size: clamp(36px, 10.5vw, 45px);
-        letter-spacing: -0.055em;
-        line-height: 0.94;
+        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: clamp(38px, 11vw, 48px);
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        line-height: 0.96;
+        text-transform: none;
+    }
+
+    .hero-title span {
+        background: linear-gradient(90deg, #9cff00 0%, #b8ff33 50%, #4ade80 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     .hero-tagline {
-        margin-top: 12px;
-        font-size: 10px;
-        letter-spacing: 0.22em;
+        margin-top: 14px;
+        font-size: 13px;
+        font-weight: 400;
+        letter-spacing: 0.01em;
+        line-height: 1.5;
+        color: #94a3b8;
+        font-family: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif;
+        text-transform: none;
     }
-
 
     .hero-details {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px 12px;
-        margin-top: 18px;
-        margin-bottom: 18px;
+        gap: 16px 16px;
+        margin-top: 24px;
+        margin-bottom: 24px;
+        padding-top: 18px;
+        padding-bottom: 18px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .hero-detail {
         min-width: 0;
         padding: 0;
         border: none;
-    }
-
-    .hero-detail strong {
-        font-size: clamp(12px, 3.7vw, 14px);
-        line-height: 1.35;
-        overflow-wrap: break-word;
+        display: flex;
+        flex-direction: column-reverse;
     }
 
     .hero-detail small {
-        font-size: 9px;
-        letter-spacing: 0.08em;
-        line-height: 1.4;
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Plus Jakarta Sans', sans-serif;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        color: #64748b;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .hero-detail strong {
+        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: clamp(16px, 4.5vw, 20px);
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.01em;
+        line-height: 1.2;
+        overflow-wrap: break-word;
+    }
+
+    .hero-detail:first-child strong {
+        color: var(--lime);
     }
 
     .hero-buttons {
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
         width: 100%;
+        margin-top: 6px;
     }
 
     .primary-button,
     .outline-button {
         width: 100%;
-        min-height: 44px;
+        min-height: 50px;
         text-align: center;
-        padding: 12px 16px;
-        font-size: 13px;
+        padding: 14px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 9999px;
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Plus Jakarta Sans', sans-serif;
+        letter-spacing: 0.01em;
+        transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .primary-button {
+        background: var(--lime);
+        color: #07090e;
+        box-shadow: 0 8px 24px rgba(156, 255, 0, 0.28);
+    }
+
+    .primary-button:hover,
+    .primary-button:active {
+        transform: scale(0.985);
+        background: #adff2f;
+    }
+
+    .outline-button {
+        background: rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: #ffffff;
+    }
+
+    .outline-button:hover,
+    .outline-button:active {
+        transform: scale(0.985);
+        background: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
     }
 
     .league-stats {

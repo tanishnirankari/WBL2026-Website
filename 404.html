@@ -1,13 +1,16 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0;url=/">
-  <title>Redirecting</title>
+  <meta charset="utf-8">
+  <title>Opening WBL page…</title>
+  <script>
+    const base = '/WBL2026-Website';
+    const path = window.location.pathname.startsWith(base)
+      ? window.location.pathname.slice(base.length)
+      : '/';
+    const route = path + window.location.search + window.location.hash;
+    window.location.replace(base + '/?p=' + encodeURIComponent(route));
+  </script>
 </head>
-<body>
-  <p>Returning to the WBL website...</p>
-  <a href="/">Go to homepage</a>
-</body>
+<body>Opening page…</body>
 </html>
