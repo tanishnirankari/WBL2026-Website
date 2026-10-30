@@ -27,13 +27,12 @@ const aboutSections = [
   {
     id: 'founder',
     eyebrow: 'FOUNDER',
-    title: 'Our Founder',
     name: 'Tanish Nirankari',
-    image: 'tanish.jpg',
+    image: 'tanishs.jpg',
     imageAlt: 'Winter Bash League founder Tanish Nirankari',
     description: [
-      'I am Tanish Nirankari, founder of the Winter Bash League.',
-      'Following the massive success of the 2026 Summer Bash League, I am elevating the standard for the upcoming winter edition with a focus on structured tournament management and total team engagement.',
+      '"Myself Tanish Nirankari, Bash cricket.com',
+      'Following the massive success of the 2026 Summer Bash League, me and my team aim to elevate the tournament standard to an exceptionally high standard."',
     ],
   },
   {
@@ -89,12 +88,15 @@ export default function Exclusive() {
                   <img src={`${imageBase}${section.image}`} alt={section.imageAlt} />
                 </div>
                 <div className="about-card-copy">
-                  <span>{section.eyebrow}</span>
-                  <h2 id={`about-${section.id}-title`}>
-                    {SectionIcon && <SectionIcon className="about-card-title-icon" size={22} aria-hidden="true" />}
-                    {section.title}
-                  </h2>
+                  {section.id !== 'founder' && <span>{section.eyebrow}</span>}
+                  {section.title && (
+                    <h2 id={`about-${section.id}-title`}>
+                      {SectionIcon && <SectionIcon className="about-card-title-icon" size={22} aria-hidden="true" />}
+                      {section.title}
+                    </h2>
+                  )}
                   {section.name && <h3>{section.name}</h3>}
+                  {section.id === 'founder' && <span className="about-founder-role">FOUNDER</span>}
                   {section.chiefGuests && (
                     <div className="about-chief-guests">
                       <h3>Chief Guests</h3>
