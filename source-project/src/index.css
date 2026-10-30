@@ -7291,6 +7291,8 @@ footer {
     position: relative;
     z-index: 1;
     width: 100%;
+    overflow: hidden;
+    border-radius: 24px;
 }
 
 .apple-gallery-grid {
@@ -7966,7 +7968,30 @@ footer {
 
 @media (max-width: 650px) {
     .home-layout .home-page-content > .hero {
-        min-height: max(420px, calc(100svh - 248px - env(safe-area-inset-top)));
+        min-height: max(380px, calc(100svh - 292px - env(safe-area-inset-top)));
+        padding-block: 18px 22px;
+    }
+
+    .home-layout .hero-details {
+        gap: 12px;
+        margin-block: 18px 16px;
+        padding-block: 12px;
+    }
+
+    .home-layout .hero-buttons {
+        gap: 8px;
+    }
+
+    .home-layout .hero-buttons .primary-button {
+        min-height: 46px;
+    }
+
+    .home-layout .sponsors {
+        padding-block: 10px;
+    }
+
+    .home-layout .sponsor-card {
+        grid-template-rows: 72px 38px;
     }
 }
 
@@ -8322,6 +8347,10 @@ footer {
         padding-top: calc(104px + env(safe-area-inset-top));
         padding-inline: 12px;
         padding-bottom: 60px;
+    }
+
+    .apple-gallery-grid-wrapper {
+        border-radius: 18px;
     }
 
     .apple-gallery-hero {
