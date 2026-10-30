@@ -8319,7 +8319,7 @@ footer {
 
 @media (max-width: 650px) {
     .apple-gallery-page {
-        padding-top: max(10px, env(safe-area-inset-top));
+        padding-top: calc(104px + env(safe-area-inset-top));
         padding-inline: 12px;
         padding-bottom: 60px;
     }
