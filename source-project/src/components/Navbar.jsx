@@ -72,7 +72,7 @@ export default function Navbar() {
         Register Team &rarr;
       </Link>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <Link
           to="/auction"
           className="mobile-auction-btn"
@@ -83,7 +83,14 @@ export default function Navbar() {
           <Gavel size={14} aria-hidden="true" />
           AUCTION
         </Link>
-        <button className="menu-button" onClick={toggleMenu} aria-label="Toggle Menu" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <button
+          className="menu-button"
+          onClick={toggleMenu}
+          aria-label={isOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isOpen}
+          aria-controls="mobile-menu"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
           {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
@@ -96,6 +103,7 @@ export default function Navbar() {
             exit={{ opacity: 0, y: -15, scale: 0.98 }}
             transition={{ duration: 0.2 }}
             className="mobile-menu show"
+            id="mobile-menu"
           >
             {navLinks.map((link) => (
               <Link
@@ -115,7 +123,7 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
-            <Link to="/register" style={{ color: '#fff', fontWeight: 'bold', borderBottom: 'none' }} onClick={closeMenu}>
+            <Link to="/register" className="mobile-register-link" onClick={closeMenu}>
               Register Your Team &rarr;
             </Link>
             <Link to="/admin" className="organiser-access-link" onClick={closeMenu}>
