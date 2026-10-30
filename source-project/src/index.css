@@ -8305,3 +8305,214 @@ footer {
         border-radius: 16px;
     }
 }
+
+/* =====================================================
+   DEDICATED MOBILE ENHANCEMENTS FOR APPLE GALLERY
+===================================================== */
+.apple-gallery-hero.mobile-enhanced {
+    margin-bottom: clamp(16px, 3.5vw, 36px);
+}
+
+.apple-lightbox-mobile-nav {
+    display: none;
+}
+
+@media (max-width: 650px) {
+    .apple-gallery-page {
+        padding-top: max(10px, env(safe-area-inset-top));
+        padding-inline: 12px;
+        padding-bottom: 60px;
+    }
+
+    .apple-gallery-hero {
+        margin-bottom: 16px;
+    }
+
+    .apple-gallery-hero-badge {
+        margin-bottom: 12px;
+        font-size: 10px;
+        padding: 5px 12px;
+    }
+
+    .apple-filter-capsule-container {
+        justify-content: flex-start;
+        padding: 4px 2px;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+    }
+
+    .apple-filter-capsule {
+        padding: 4px;
+        gap: 3px;
+    }
+
+    .apple-filter-tab {
+        padding: 7px 14px;
+        font-size: 12px;
+        scroll-snap-align: start;
+        touch-action: manipulation;
+    }
+
+    .apple-filter-tab:active {
+        transform: scale(0.96);
+    }
+
+    .apple-gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    .apple-gallery-card {
+        border-radius: 16px !important;
+        aspect-ratio: 1 / 1 !important;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4) !important;
+        touch-action: manipulation;
+    }
+
+    .apple-gallery-card:active {
+        transform: scale(0.97) !important;
+    }
+
+    .apple-gallery-card.card-featured {
+        grid-column: span 2 !important;
+        aspect-ratio: 16 / 9 !important;
+    }
+
+    .apple-card-meta {
+        bottom: 6px !important;
+        left: 6px !important;
+        right: 6px !important;
+        padding: 6px 10px !important;
+        border-radius: 11px !important;
+        backdrop-filter: blur(20px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    }
+
+    .apple-meta-category {
+        font-size: 8px !important;
+        letter-spacing: 0.08em !important;
+        margin-bottom: 1px !important;
+    }
+
+    .apple-meta-title {
+        font-size: 11px !important;
+        font-weight: 600 !important;
+        line-height: 1.25 !important;
+    }
+
+    .apple-meta-action {
+        display: none !important;
+    }
+
+    .apple-gallery-card.card-featured .apple-meta-action {
+        display: flex !important;
+        width: 26px !important;
+        height: 26px !important;
+    }
+
+    /* Apple Lightbox Mobile Dedicated UX */
+    .apple-lightbox {
+        padding: max(10px, env(safe-area-inset-top)) 12px max(14px, env(safe-area-inset-bottom)) !important;
+        height: 100dvh !important;
+        justify-content: space-between !important;
+    }
+
+    .apple-lightbox-topbar {
+        margin-bottom: 6px !important;
+    }
+
+    .apple-lightbox-counter-pill {
+        padding: 5px 12px !important;
+        font-size: 11px !important;
+    }
+
+    .apple-lightbox-close-btn {
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
+        min-height: 38px !important;
+    }
+
+    .apple-lightbox-stage {
+        padding: 4px 0 !important;
+        gap: 0 !important;
+        flex: 1 !important;
+        min-height: 0 !important;
+    }
+
+    .apple-lightbox-nav {
+        display: none !important;
+    }
+
+    .apple-lightbox-photo-box {
+        max-height: min(52dvh, 440px) !important;
+        border-radius: 18px !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95) !important;
+    }
+
+    .apple-lightbox-photo-box img {
+        max-height: min(52dvh, 440px) !important;
+    }
+
+    .apple-lightbox-mobile-nav {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 340px;
+        margin: 6px auto;
+        gap: 10px;
+    }
+
+    .apple-mobile-nav-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.09);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        touch-action: manipulation;
+    }
+
+    .apple-mobile-nav-btn:active {
+        background: rgba(255, 255, 255, 0.22);
+        transform: scale(0.96);
+    }
+
+    .apple-lightbox-drawer {
+        padding: 10px 14px !important;
+        border-radius: 16px !important;
+        max-height: 26dvh !important;
+        overflow-y: auto !important;
+    }
+
+    .apple-drawer-pill {
+        width: 30px !important;
+        height: 3px !important;
+        margin-bottom: 6px !important;
+    }
+
+    .apple-drawer-cat {
+        font-size: 9px !important;
+        margin-bottom: 2px !important;
+    }
+
+    .apple-drawer-title {
+        font-size: 14px !important;
+        margin-bottom: 4px !important;
+    }
+
+    .apple-drawer-desc {
+        font-size: 11px !important;
+        line-height: 1.4 !important;
+    }
+}

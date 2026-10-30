@@ -24,8 +24,8 @@ export default function Gallery() {
             <Sparkles size={12} className="apple-badge-icon" />
             <span>CURATED HIGHLIGHTS</span>
           </div>
-          <h2 className="apple-gallery-title" style={{ fontSize: 'clamp(28px, 4vw, 42px)', margin: 0 }}>
-            Moments in Motion
+          <h2 className="apple-gallery-title" style={{ fontSize: 'clamp(26px, 4vw, 38px)', margin: 0 }}>
+            Gallery Highlights
           </h2>
         </div>
         <Link to="/gallery" className="apple-view-all-pill">

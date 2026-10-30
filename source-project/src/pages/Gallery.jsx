@@ -27,6 +27,10 @@ export default function GalleryPage() {
   const [active, setActive] = useState('All');
   const [selectedIndex, setSelectedIndex] = useState(null);
 
+  // Mobile swipe gestures
+  const [touchStartX, setTouchStartX] = useState(null);
+  const [touchEndX, setTouchEndX] = useState(null);
+
   useEffect(() => {
     fetch(api + '/gallery')
       .then((r) => (r.ok ? r.json() : []))
@@ -70,6 +74,26 @@ export default function GalleryPage() {
     });
   }, [visible.length]);
 
+  // Touch handlers for mobile photo swiping
+  const handleTouchStart = (e) => {
+    setTouchEndX(null);
+    setTouchStartX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX === null || touchEndX === null) return;
+    const distance = touchStartX - touchEndX;
+    if (distance > 45) {
+      handleNext();
+    } else if (distance < -45) {
+      handlePrev();
+    }
+  };
+
   // Keyboard navigation
   useEffect(() => {
     if (selectedIndex === null) return;
@@ -87,43 +111,25 @@ export default function GalleryPage() {
   return (
     <Layout>
       <main className="page content-page gallery-page apple-gallery-page">
-        {/* Apple Keynote Style Hero Header */}
-        <section className="apple-gallery-hero">
+        {/* Mobile-Enhanced Sleek Cupertino Header */}
+        <section className="apple-gallery-hero mobile-enhanced">
           <motion.div
             className="apple-gallery-hero-badge"
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.35 }}
           >
-            <Sparkles size={13} className="apple-badge-icon" />
+            <Sparkles size={12} className="apple-badge-icon" />
             <span>OFFICIAL ARCHIVE &bull; WINTER BASH LEAGUE</span>
           </motion.div>
 
-          <motion.h1
-            className="apple-gallery-title"
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.08 }}
-          >
-            Moments in Motion.
-          </motion.h1>
-
-          <motion.p
-            className="apple-gallery-subtitle"
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.14 }}
-          >
-            High-voltage cricket, championship celebrations, and unfiltered tournament spirit captured in stunning detail.
-          </motion.p>
-
-          {/* Cupertino Segmented Control Capsule */}
+          {/* Cupertino Segmented Control Capsule with Smooth Mobile Touch Pan */}
           <div className="apple-filter-capsule-container">
             <motion.div
               className="apple-filter-capsule"
-              initial={{ opacity: 0, scale: 0.96 }}
+              initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
+              transition={{ duration: 0.35, delay: 0.08 }}
               role="tablist"
               aria-label="Gallery categories"
             >
@@ -157,7 +163,7 @@ export default function GalleryPage() {
           </div>
         </section>
 
-        {/* Apple Bento Gallery Grid */}
+        {/* Apple Bento Gallery Grid with 2-Column Mobile Optimization */}
         <section className="apple-gallery-grid-wrapper">
           <div className="apple-gallery-grid">
             <AnimatePresence mode="popLayout">
@@ -168,10 +174,10 @@ export default function GalleryPage() {
                     layout
                     key={item.id}
                     className={`apple-gallery-card ${isFeatured ? 'card-featured' : ''}`}
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.96 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.35, delay: Math.min(index * 0.025, 0.18) }}
+                    exit={{ opacity: 0, scale: 0.96 }}
+                    transition={{ duration: 0.3, delay: Math.min(index * 0.02, 0.15) }}
                     onClick={() => setSelectedIndex(index)}
                     role="button"
                     tabIndex={0}
@@ -203,7 +209,7 @@ export default function GalleryPage() {
                         <h3 className="apple-meta-title">{item.title}</h3>
                       </div>
                       <div className="apple-meta-action" aria-hidden="true">
-                        <Eye size={15} />
+                        <Eye size={14} />
                       </div>
                     </div>
                   </motion.div>
@@ -213,7 +219,7 @@ export default function GalleryPage() {
           </div>
         </section>
 
-        {/* Apple Photos / QuickLook Modal Lightbox */}
+        {/* Apple Photos / QuickLook Modal Lightbox with Mobile Swipe Support */}
         <AnimatePresence>
           {activeItem && (
             <motion.div
@@ -221,11 +227,14 @@ export default function GalleryPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.22 }}
+              transition={{ duration: 0.2 }}
               onClick={() => setSelectedIndex(null)}
               role="dialog"
               aria-modal="true"
               aria-label={activeItem.title}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
             >
               {/* Top Navigation & Status Bar */}
               <div className="apple-lightbox-topbar" onClick={(e) => e.stopPropagation()}>
@@ -248,7 +257,7 @@ export default function GalleryPage() {
 
               {/* Central Lightbox Stage */}
               <div className="apple-lightbox-stage" onClick={(e) => e.stopPropagation()}>
-                {/* Prev Arrow */}
+                {/* Desktop Prev Arrow */}
                 {visible.length > 1 && (
                   <button
                     className="apple-lightbox-nav prev"
@@ -279,7 +288,7 @@ export default function GalleryPage() {
                   />
                 </motion.div>
 
-                {/* Next Arrow */}
+                {/* Desktop Next Arrow */}
                 {visible.length > 1 && (
                   <button
                     className="apple-lightbox-nav next"
@@ -293,6 +302,28 @@ export default function GalleryPage() {
                   </button>
                 )}
               </div>
+
+              {/* Mobile Quick Tap Navigation Bar */}
+              {visible.length > 1 && (
+                <div className="apple-lightbox-mobile-nav" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    className="apple-mobile-nav-btn"
+                    onClick={handlePrev}
+                    aria-label="Previous photo"
+                  >
+                    <ChevronLeft size={18} />
+                    <span>Previous</span>
+                  </button>
+                  <button
+                    className="apple-mobile-nav-btn"
+                    onClick={handleNext}
+                    aria-label="Next photo"
+                  >
+                    <span>Next</span>
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+              )}
 
               {/* Bottom Metadata Drawer */}
               <motion.div
