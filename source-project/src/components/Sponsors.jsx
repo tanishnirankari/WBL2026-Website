@@ -22,7 +22,7 @@ const sponsors = [
     id: 'sponsor-placeholder-3',
     name: 'T.B.D.',
     category: 'SPONSOR PREVIEW',
-    image: `${import.meta.env.BASE_URL}images/sponser3.jpg`,
+    image: `${import.meta.env.BASE_URL}images/sponsor-a.svg`,
     description: 'Sponsor placeholder',
     brand: 'partner-preview-alt',
   },
@@ -143,10 +143,8 @@ export default function Sponsors() {
     <section className="sponsors" aria-label="Sponsors">
       <motion.div
         className="sponsors-content"
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.45 }}
+        initial={{ opacity: 1, y: 0 }}
+        animate={{ opacity: 1, y: 0 }}
       >
         <div
           ref={marqueeRef}

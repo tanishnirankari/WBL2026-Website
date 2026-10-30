@@ -2182,10 +2182,10 @@ footer {
 
 
     .hero {
-        margin-top: 92px;
-        min-height: auto;
-        padding: 24px 20px 32px;
-        border-radius: 28px;
+        margin-top: 84px !important;
+        min-height: auto !important;
+        padding: 16px 16px 18px !important;
+        border-radius: 22px !important;
         border: 1px solid rgba(255, 255, 255, 0.08);
 
         background:
@@ -2198,7 +2198,7 @@ footer {
         background-size: cover;
         background-repeat: no-repeat;
         background-position: 62% center;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
     }
 
     .hero-content {
@@ -2208,8 +2208,8 @@ footer {
     .eyebrow {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 5px 12px;
+        gap: 6px;
+        padding: 4px 10px;
         border-radius: 9999px;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -2217,30 +2217,30 @@ footer {
         -webkit-backdrop-filter: blur(16px);
         font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Plus Jakarta Sans', sans-serif;
         color: #d1d5db;
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 500;
         letter-spacing: 0.04em;
         line-height: 1.4;
-        margin-bottom: 14px;
+        margin-bottom: 8px;
         text-transform: none;
     }
 
     .eyebrow::before {
         content: "";
-        width: 6px;
-        height: 6px;
+        width: 5px;
+        height: 5px;
         border-radius: 50%;
         background: var(--lime);
-        box-shadow: 0 0 8px var(--lime);
+        box-shadow: 0 0 6px var(--lime);
         display: inline-block;
     }
 
     .hero-title {
         font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: clamp(38px, 11vw, 48px);
+        font-size: clamp(32px, 8.8vw, 40px);
         font-weight: 800;
         letter-spacing: -0.035em;
-        line-height: 0.96;
+        line-height: 0.95;
         text-transform: none;
     }
 
@@ -2251,11 +2251,11 @@ footer {
     }
 
     .hero-tagline {
-        margin-top: 14px;
-        font-size: 13px;
+        margin-top: 8px;
+        font-size: 11px;
         font-weight: 400;
         letter-spacing: 0.01em;
-        line-height: 1.5;
+        line-height: 1.4;
         color: #94a3b8;
         font-family: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif;
         text-transform: none;
@@ -2264,11 +2264,11 @@ footer {
     .hero-details {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 16px 16px;
-        margin-top: 24px;
-        margin-bottom: 24px;
-        padding-top: 18px;
-        padding-bottom: 18px;
+        gap: 10px 14px;
+        margin-top: 14px;
+        margin-bottom: 14px;
+        padding-top: 10px;
+        padding-bottom: 10px;
         border-top: 1px solid rgba(255, 255, 255, 0.08);
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
@@ -2283,17 +2283,17 @@ footer {
 
     .hero-detail small {
         font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Plus Jakarta Sans', sans-serif;
-        font-size: 10px;
+        font-size: 9px;
         font-weight: 600;
         letter-spacing: 0.06em;
         color: #64748b;
         text-transform: uppercase;
-        margin-bottom: 4px;
+        margin-bottom: 2px;
     }
 
     .hero-detail strong {
         font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: clamp(16px, 4.5vw, 20px);
+        font-size: clamp(14px, 4vw, 17px);
         font-weight: 700;
         color: #ffffff;
         letter-spacing: -0.01em;
@@ -2307,33 +2307,29 @@ footer {
 
     .hero-buttons {
         flex-direction: column;
-        gap: 12px;
+        gap: 0;
         width: 100%;
-        margin-top: 6px;
+        margin-top: 2px;
     }
 
     .hero-buttons .outline-button {
         display: none !important;
     }
 
-    .primary-button,
-    .outline-button {
+    .primary-button {
         width: 100%;
-        min-height: 50px;
+        min-height: 44px;
         text-align: center;
-        padding: 14px 20px;
-        font-size: 14px;
+        padding: 11px 18px;
+        font-size: 13px;
         font-weight: 600;
         border-radius: 9999px;
         font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Plus Jakarta Sans', sans-serif;
         letter-spacing: 0.01em;
-        transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .primary-button {
         background: var(--lime);
         color: #07090e;
-        box-shadow: 0 8px 24px rgba(156, 255, 0, 0.28);
+        box-shadow: 0 6px 20px rgba(156, 255, 0, 0.28);
+        transition: transform 0.15s ease;
     }
 
     .primary-button:hover,
@@ -7039,19 +7035,79 @@ footer {
 }
 
 @media (max-width: 650px) {
+    .home-layout .sponsors,
     .sponsors {
-        padding: 16px 14px 14px;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        padding: 12px 10px 14px !important;
+        margin-top: 10px !important;
+        background: rgba(6, 17, 29, 0.82) !important;
+        border-radius: 20px !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .sponsors-content {
+        opacity: 1 !important;
+        visibility: visible !important;
+        width: 100%;
+    }
+
+    .sponsor-marquee {
+        mask-image: none !important;
+        -webkit-mask-image: none !important;
     }
 
     .sponsor-marquee-group {
-        gap: 12px;
-        padding-right: 12px;
+        gap: 10px !important;
+        padding-right: 10px !important;
     }
 
+    .home-layout .sponsor-card,
     .sponsor-card {
-        grid-template-rows: 82px 42px;
-        flex-basis: min(72vw, 236px);
-        border-radius: 10px;
+        grid-template-rows: 64px 32px !important;
+        flex: 0 0 145px !important;
+        border-radius: 12px !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        overflow: hidden;
+    }
+
+    .sponsor-art {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: #0d1e2e !important;
+        padding: 4px !important;
+    }
+
+    .sponsor-art img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
+        max-height: 54px !important;
+    }
+
+    .sponsor-card-info {
+        padding: 3px 8px !important;
+        background: #081725 !important;
+        gap: 2px !important;
+    }
+
+    .sponsor-category {
+        font-size: 6.5px !important;
+        color: var(--lime) !important;
+        letter-spacing: 0.06em !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+    }
+
+    .sponsor-card-info h3 {
+        font-size: 11px !important;
+        font-weight: 800 !important;
+        color: #ffffff !important;
+        line-height: 1.15 !important;
     }
 
     .sponsor-art-caption {
@@ -7559,7 +7615,7 @@ footer {
 
 @media (max-width: 650px) {
     .home-layout .home-page-content > .hero {
-        min-height: max(420px, calc(100svh - 248px - env(safe-area-inset-top)));
+        min-height: auto !important;
     }
 }
 
