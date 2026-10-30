@@ -986,6 +986,36 @@ img {
     margin-inline: auto;
 }
 
+.sponsors-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.sponsors-badge {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 9999px;
+    background: rgba(156, 255, 0, 0.1);
+    border: 1px solid rgba(156, 255, 0, 0.3);
+    color: var(--lime);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-family: 'Outfit', sans-serif;
+}
+
+.sponsors-heading {
+    color: #ffffff;
+    font-size: clamp(20px, 4vw, 28px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+    font-family: 'Outfit', sans-serif;
+}
+
+
 .sponsor-marquee {
     overflow: hidden;
     width: 100%;
@@ -2299,6 +2329,10 @@ footer {
         gap: 12px;
         width: 100%;
         margin-top: 6px;
+    }
+
+    .hero-buttons .outline-button {
+        display: none !important;
     }
 
     .primary-button,
@@ -7025,18 +7059,49 @@ footer {
 
 @media (max-width: 650px) {
     .sponsors {
-        padding: 16px 14px 14px;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        padding: 36px 16px 28px !important;
+        background: #071522;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        margin-top: 12px;
+    }
+
+    .sponsors-content {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    .sponsors-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .sponsors-badge {
+        font-size: 10px;
+        padding: 4px 12px;
+        letter-spacing: 0.16em;
+    }
+
+    .sponsors-heading {
+        font-size: 19px;
+        font-weight: 800;
     }
 
     .sponsor-marquee-group {
-        gap: 12px;
-        padding-right: 12px;
+        gap: 14px;
+        padding-right: 14px;
     }
 
     .sponsor-card {
-        grid-template-rows: 82px 42px;
-        flex-basis: min(72vw, 236px);
-        border-radius: 10px;
+        grid-template-rows: 100px 48px !important;
+        flex-basis: min(76vw, 250px) !important;
+        border-radius: 14px !important;
+        border: 1px solid rgba(255, 255, 255, 0.14) !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35) !important;
     }
 
     .sponsor-art-caption {
