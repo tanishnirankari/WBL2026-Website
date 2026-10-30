@@ -47,3 +47,4 @@ Team registration availability is controlled from the Admin Portal. Use the
 public Registration page displays “Registration starts soon · Stay tuned,” and
 the API rejects new registration submissions. The setting is stored in
 PostgreSQL and defaults to open for existing deployments.
+Production deployment trigger – October 30, 2026.
