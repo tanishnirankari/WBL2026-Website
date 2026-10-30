@@ -7,17 +7,16 @@ const names = [
   ['winner.png', 'Trophy Awarding Ceremony', 'Awards', 'Respected Sir Keshav Chaudhry, IPS officer, awarding the prestigious championship trophy to the tournament winners.'],
   ['gallery4.jpg', 'Newspaper & National Press Coverage', 'Press', 'Extensive multi-regional media coverage capturing the competitive energy and community excitement of Winter Bash League.'],
   ['gallery7.jpg', 'Medal Winners & Finalists', 'Awards', 'Recognizing the tournament MVPs, outstanding bowlers, aggressive batters, and finalist champions on stage.'],
-  ['jersey.jpg', 'Official Tournament Jersey', 'Behind the Scenes', 'The signature Winter Bash League kit crafted with breathable high-performance athletic fabric.'],
+  ['jersey.jpg', 'Official Tournament Jersey', 'Extra', 'The signature Winter Bash League kit crafted with breathable high-performance athletic fabric.'],
   ['awards.jpg', 'Silverware & Championship Accolades', 'Awards', 'Glittering custom trophies, individual honours, and mementos lined up for the grand presentation ceremony.'],
   ['gallery2.jpg', 'Match Day Clashes & Intensity', 'Matches', 'High-stakes cricket under the open sky featuring decisive tactical bowling and sharp slip fielding.'],
   ['gallery3.jpg', 'Powerplay Batting Explosions', 'Matches', 'Electric batting spells and towering sixes dominating the high-octane opening powerplay overs.'],
   ['gallery6.jpg', 'Fast Bowling at Full Throttle', 'Matches', 'Deadly yorkers, seam variation, and high-velocity spells rattling the opposition batting lineup.'],
   ['gallery8.jpg', 'The Battle Arena Grounds', 'Matches', 'Pristine emerald outfield, laser-aligned wickets, and scenic grounds prepared for tournament battle.'],
-  ['umpire.jpg', 'Match Officials & Fair Play', 'Behind the Scenes', 'Accredited match umpires and tournament referees upholding sportsmanship, fairness, and league laws.'],
+  ['umpire.jpg', 'Match Officials & Fair Play', 'Extra', 'Accredited match umpires and tournament referees upholding sportsmanship, fairness, and league laws.'],
   ['streaming.jpg', 'Live Broadcast & Multi-Cam Studio', 'Press', 'Professional livestream production crew operating high-definition cameras, live scoreboards, and replay feeds.'],
   ['gallery5.jpg', 'Strategic Team Timeout', 'Matches', 'Captains and veteran players huddling during mid-innings strategic timeouts to formulate game plans.'],
-  ['memorable.jpg', 'Unforgettable Celebration Moments', 'Awards', 'Unfiltered euphoria, winning celebrations, and team bonding captured in timeless frames.'],
-  ['refreshments.jpg', 'Player Lounge & Recovery Zones', 'Behind the Scenes', 'Hydration bars, nutritional meals, and active recovery amenities reserved for competing squads.']
+  ['memorable.jpg', 'Unforgettable Celebration Moments', 'Awards', 'Unfiltered euphoria, winning celebrations, and team bonding captured in timeless frames.']
 ];
 
 export default function GalleryPage() {
@@ -26,6 +25,7 @@ export default function GalleryPage() {
   const [uploaded, setUploaded] = useState([]);
   const [active, setActive] = useState('All');
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [slideDirection, setSlideDirection] = useState(1);
 
   // Mobile swipe gestures
   const [touchStartX, setTouchStartX] = useState(null);
@@ -55,12 +55,13 @@ export default function GalleryPage() {
     }))
   ];
 
-  const categories = ['All', 'Matches', 'Awards', 'Press', 'Behind the Scenes'];
+  const categories = ['All', 'Matches', 'Awards', 'Press', 'Extra'];
 
   const visible = items.filter((x) => active === 'All' || x.category === active);
 
   // Navigation handlers for Lightbox
   const handlePrev = useCallback(() => {
+    setSlideDirection(-1);
     setSelectedIndex((current) => {
       if (current === null) return null;
       return current > 0 ? current - 1 : visible.length - 1;
@@ -68,6 +69,7 @@ export default function GalleryPage() {
   }, [visible.length]);
 
   const handleNext = useCallback(() => {
+    setSlideDirection(1);
     setSelectedIndex((current) => {
       if (current === null) return null;
       return current < visible.length - 1 ? current + 1 : 0;
@@ -239,11 +241,22 @@ export default function GalleryPage() {
               {/* Top Navigation & Status Bar */}
               <div className="apple-lightbox-topbar" onClick={(e) => e.stopPropagation()}>
                 <div className="apple-lightbox-counter-pill">
-                  <span className="apple-counter-text">
-                    {selectedIndex + 1} / {visible.length}
-                  </span>
-                  <span className="apple-counter-divider">&bull;</span>
-                  <span className="apple-counter-tag">{activeItem.category}</span>
+                  <AnimatePresence initial={false} mode="wait">
+                    <motion.div
+                      key={`counter-${activeItem.id}`}
+                      className="apple-lightbox-counter-content"
+                      initial={{ opacity: 0, x: slideDirection * 18 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: slideDirection * -18 }}
+                      transition={{ duration: 0.18, ease: 'easeInOut' }}
+                    >
+                      <span className="apple-counter-text">
+                        {selectedIndex + 1} / {visible.length}
+                      </span>
+                      <span className="apple-counter-divider">&bull;</span>
+                      <span className="apple-counter-tag">{activeItem.category}</span>
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
 
                 <button
@@ -272,21 +285,21 @@ export default function GalleryPage() {
                 )}
 
                 {/* Main Image Container */}
-                <motion.div
-                  key={activeItem.id}
-                  className="apple-lightbox-photo-box"
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <img
-                    src={activeItem.src}
-                    alt={activeItem.title}
-                    decoding="async"
-                    fetchPriority="high"
-                  />
-                </motion.div>
+                <div className="apple-lightbox-photo-box">
+                  <AnimatePresence initial={false} mode="wait">
+                    <motion.img
+                      key={activeItem.id}
+                      src={activeItem.src}
+                      alt={activeItem.title}
+                      decoding="async"
+                      fetchPriority="high"
+                      initial={{ x: slideDirection * 48 }}
+                      animate={{ x: 0 }}
+                      exit={{ x: slideDirection * -48 }}
+                      transition={{ duration: 0.2, ease: 'easeInOut' }}
+                    />
+                  </AnimatePresence>
+                </div>
 
                 {/* Desktop Next Arrow */}
                 {visible.length > 1 && (
@@ -327,19 +340,24 @@ export default function GalleryPage() {
 
               {/* Bottom Metadata Drawer */}
               <motion.div
-                key={'meta-' + activeItem.id}
                 className="apple-lightbox-drawer"
                 onClick={(e) => e.stopPropagation()}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
               >
                 <div className="apple-drawer-pill" />
-                <div className="apple-drawer-content">
-                  <span className="apple-drawer-cat">{activeItem.category}</span>
-                  <h2 className="apple-drawer-title">{activeItem.title}</h2>
-                  <p className="apple-drawer-desc">{activeItem.caption}</p>
-                </div>
+                <AnimatePresence initial={false} mode="wait">
+                  <motion.div
+                    key={`meta-${activeItem.id}`}
+                    className="apple-drawer-content"
+                    initial={{ opacity: 0, x: slideDirection * 18 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: slideDirection * -18 }}
+                    transition={{ duration: 0.18, ease: 'easeInOut' }}
+                  >
+                    <span className="apple-drawer-cat">{activeItem.category}</span>
+                    <h2 className="apple-drawer-title">{activeItem.title}</h2>
+                    <p className="apple-drawer-desc">{activeItem.caption}</p>
+                  </motion.div>
+                </AnimatePresence>
               </motion.div>
             </motion.div>
           )}

@@ -3,14 +3,6 @@ import { motion } from 'framer-motion';
 
 const sponsors = [
   {
-    name: 'Starbucks',
-    category: 'ILLUSTRATIVE SPONSOR CONCEPT',
-    image: `${import.meta.env.BASE_URL}images/starbucks-wordmark.svg`,
-    description: 'Starbucks wordmark',
-    brand: 'starbucks',
-    illustrative: true,
-  },
-  {
     id: 'HEAD OF LEAGUE',
     name: 'FOUNDER',
     category: 'TANISH',
@@ -20,11 +12,9 @@ const sponsors = [
   },
   {
     id: 'sponsor-placeholder-3',
-    name: 'T.B.D.',
-    category: 'SPONSOR PREVIEW',
-    image: `${import.meta.env.BASE_URL}images/sponser3.jpg`,
-    description: 'Sponsor placeholder',
-    brand: 'partner-preview-alt',
+    name: 'Sponsor Us',
+    category: 'SPONSORSHIP OPEN',
+    brand: 'sponsor-callout',
   },
 ];
 
@@ -43,15 +33,24 @@ function SponsorGroup({ duplicate = false }) {
           role={duplicate ? undefined : 'listitem'}
         >
           <div className={`sponsor-art${sponsor.brand ? ` sponsor-art--${sponsor.brand}` : ''}`}>
-            <img
-              src={sponsor.image}
-              alt={duplicate ? '' : sponsor.description}
-              onError={(event) => {
-                event.currentTarget.hidden = true;
-                event.currentTarget.nextElementSibling.hidden = false;
-              }}
-            />
-            <div className="sponsor-art-fallback" hidden>{sponsor.name}</div>
+            {sponsor.image ? (
+              <>
+                <img
+                  src={sponsor.image}
+                  alt={duplicate ? '' : sponsor.description}
+                  onError={(event) => {
+                    event.currentTarget.hidden = true;
+                    event.currentTarget.nextElementSibling.hidden = false;
+                  }}
+                />
+                <div className="sponsor-art-fallback" hidden>{sponsor.name}</div>
+              </>
+            ) : (
+              <div className="sponsor-art-callout" aria-hidden="true">
+                <span>PARTNER WITH WBL</span>
+                <strong>Your brand belongs here.</strong>
+              </div>
+            )}
           </div>
           <div className="sponsor-card-info">
             <span className="sponsor-category">{sponsor.category}</span>

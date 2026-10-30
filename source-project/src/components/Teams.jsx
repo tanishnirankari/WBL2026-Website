@@ -1,35 +1,23 @@
 import { motion } from 'framer-motion';
 
 export default function Teams() {
-  const assetBase = `${import.meta.env.BASE_URL}images/`;
-  const teams = [
-    { name: 'Nightmare', img: `${assetBase}nightmare.png` },
-    { name: 'Phoenix', img: `${assetBase}phoenix.png` },
-    { name: 'GZB GIANTS', img: `${assetBase}gg.png` },
-    { name: 'Fire Falcons', img: `${assetBase}firefalcons.png` },
-    { name: 'Revengers', img: `${assetBase}revengers.png` },
-    { name: 'VNN warriors', img: `${assetBase}vnn.png` },
-    { name: 'Death Warriors', img: `${assetBase}firefalcons.png` },
-    { name: 'WSK', img: `${assetBase}wsk.png` },
-    { name: 'INVADERS', img: `${assetBase}invaders.png` },
-    { name: 'Dominators', img: `${assetBase}dominators.png` },
-  ];
+  const teamSlots = Array.from({ length: 10 }, (_, index) => index + 1);
 
   return (
     <section id="teams" className="teams-section">
       <div className="team-grid">
-        {teams.map((team, idx) => (
+        {teamSlots.map((slot) => (
           <motion.div
-            key={idx}
-            className="team-card"
+            key={slot}
+            className="team-card team-card-placeholder"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: idx * 0.05 }}
+            transition={{ duration: 0.4, delay: (slot - 1) * 0.05 }}
             whileHover={{ y: -5, borderColor: 'var(--lime)' }}
           >
-            <img src={team.img} alt={team.name} loading="lazy" decoding="async" />
-            <h3>{team.name}</h3>
+            <span className="team-placeholder-mark" aria-hidden="true">T.B.D.</span>
+            <h3>T.B.D.</h3>
           </motion.div>
         ))}
       </div>

@@ -7,6 +7,7 @@ const Exclusive = lazy(() => import('./pages/Exclusive'));
 const Auction = lazy(() => import('./pages/Auction'));
 const GalleryPage = lazy(() => import('./pages/Gallery'));
 const TeamsPage = lazy(() => import('./pages/Teams'));
+const RuleBook = lazy(() => import('./pages/RuleBook'));
 const Admin = lazy(() => import('./pages/Admin'));
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path="/auction" element={<Auction />} />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/teams" element={<TeamsPage />} />
+          <Route path="/rule-book" element={<RuleBook />} />
           <Route path="/register" element={<Register />} />
           <Route path="/exclusive" element={<Exclusive />} />
           <Route path="/admin" element={<Admin />} />

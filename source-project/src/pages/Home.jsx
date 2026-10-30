@@ -14,7 +14,7 @@ export default function Home() {
     const scrollTimer = window.setTimeout(() => {
       const target = document.getElementById(sectionId);
       if (target) {
-        window.scrollTo({ top: target.offsetTop - 5, behavior: 'auto' });
+        target.scrollIntoView({ behavior: 'auto', block: 'start' });
       }
     }, 0);
 

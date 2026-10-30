@@ -7,6 +7,14 @@ const SUCCESS_KEY = 'wbl-team-registration-confirmation-v1';
 const DRAFT_DATABASE = 'wbl-team-registration-files';
 const REVIEW_STEP = 16;
 const TOTAL_STEPS = REVIEW_STEP + 1;
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+
+async function getRegistrationStatus() {
+  const response = await fetch(`${apiUrl}/registrations/status`);
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || 'Could not check registration availability.');
+  return result;
+}
 
 const emptyValues = {
   teamName: '',
@@ -46,6 +54,26 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorStatus, setErrorStatus] = useState(null);
   const [successId, setSuccessId] = useState(null);
+  const [registrationStatus, setRegistrationStatus] = useState({ loading: true, open: false, error: '' });
+
+  useEffect(() => {
+    let active = true;
+    getRegistrationStatus()
+      .then((result) => {
+        if (active) setRegistrationStatus({ loading: false, open: result.open === true, error: '' });
+      })
+      .catch((error) => {
+        if (active) setRegistrationStatus({ loading: false, open: false, error: error.message || 'Could not check registration availability.' });
+      });
+    return () => { active = false; };
+  }, []);
+
+  const refreshRegistrationStatus = () => {
+    setRegistrationStatus({ loading: true, open: false, error: '' });
+    getRegistrationStatus()
+      .then((result) => setRegistrationStatus({ loading: false, open: result.open === true, error: '' }))
+      .catch((error) => setRegistrationStatus({ loading: false, open: false, error: error.message || 'Could not check registration availability.' }));
+  };
 
   useEffect(() => {
     try {
@@ -114,6 +142,7 @@ export default function Register() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!registrationStatus.open) return;
 
     if (step < TOTAL_STEPS - 1) {
       setStep((current) => current + 1);
@@ -147,7 +176,6 @@ export default function Register() {
     });
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
       const response = await fetch(`${apiUrl}/registrations`, {
         method: 'POST',
         body: formData,
@@ -205,6 +233,22 @@ export default function Register() {
   return (
     <Layout>
       <main className="page content-page register-page">
+        {registrationStatus.loading && (
+          <section className="registration-closed" role="status" aria-live="polite">
+            <p>Checking registration availability…</p>
+          </section>
+        )}
+
+        {!registrationStatus.loading && !registrationStatus.open && (
+          <motion.section className="registration-closed" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="confirmation-eyebrow">{registrationStatus.error ? 'REGISTRATION STATUS' : 'TEAM REGISTRATION'}</div>
+            <h1>{registrationStatus.error ? 'Registration status unavailable' : 'Registration starts soon'}</h1>
+            <p>{registrationStatus.error || 'Stay tuned'}</p>
+            {registrationStatus.error && <button type="button" className="register-another-button" onClick={refreshRegistrationStatus}>Try again</button>}
+          </motion.section>
+        )}
+
+        {!registrationStatus.loading && registrationStatus.open && <>
         {successId && (
           <motion.section className="registration-confirmation" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
             <div className="confirmation-icon" aria-hidden="true">✓</div>
@@ -378,6 +422,7 @@ export default function Register() {
             </button>
           </div>
         </motion.form>}
+        </>}
       </main>
     </Layout>
   );

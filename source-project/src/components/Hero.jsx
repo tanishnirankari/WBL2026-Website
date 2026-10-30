@@ -5,6 +5,7 @@ import { prefetchAuctionPage } from '../utils/auctionPlayerData';
 export default function Hero() {
   return (
     <section
+      id="hero"
       className="hero"
       style={{
         '--hero-image': `url("${import.meta.env.BASE_URL}images/hero.jpg")`,

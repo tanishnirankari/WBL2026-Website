@@ -228,6 +228,11 @@ export default function Admin() {
   const [paymentFilter, setPaymentFilter] = useState('ALL');
   const [file, setFile] = useState(null);
   const [caption, setCaption] = useState('');
+  const [editingTeamId, setEditingTeamId] = useState(null);
+  const [teamNameDraft, setTeamNameDraft] = useState('');
+  const [teamLogoFile, setTeamLogoFile] = useState(null);
+  const [savingTeamProfileId, setSavingTeamProfileId] = useState(null);
+  const [savingRegistrationSetting, setSavingRegistrationSetting] = useState(false);
   const [loading, setLoading] = useState(false);
   const headers = { 'x-admin-password': password, 'Content-Type': 'application/json' };
 
@@ -275,11 +280,66 @@ export default function Admin() {
     }
   };
 
+  const toggleRegistration = async () => {
+    if (savingRegistrationSetting) return;
+    setSavingRegistrationSetting(true);
+    try {
+      const response = await fetch(`${api}/admin/registration-settings`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ open: !data.registrationOpen }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Unable to update registration availability.');
+      setData((current) => ({ ...current, registrationOpen: result.open }));
+      setNote(result.open ? 'Team registration is now open.' : 'Team registration is now closed.');
+    } catch (error) {
+      setNote(error.message || 'Unable to update registration availability.');
+    } finally {
+      setSavingRegistrationSetting(false);
+    }
+  };
+
   const patchTeam = (team, key, value) => {
     setData((current) => ({
       ...current,
       teams: current.teams.map((item) => item.id === team.id ? { ...item, [key]: value } : item),
     }));
+  };
+
+  const beginTeamEdit = (team) => {
+    setEditingTeamId(team.id);
+    setTeamNameDraft(team.teamName);
+    setTeamLogoFile(null);
+    setNote('');
+  };
+
+  const saveTeamProfile = async (event, team) => {
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append('teamName', teamNameDraft);
+    if (teamLogoFile) formData.append('teamLogo', teamLogoFile);
+    setSavingTeamProfileId(team.id);
+    try {
+      const response = await fetch(`${api}/admin/teams/${team.id}/profile`, {
+        method: 'PATCH',
+        headers: { 'x-admin-password': password },
+        body: formData,
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Unable to update team profile.');
+      setData((current) => ({
+        ...current,
+        teams: current.teams.map((item) => item.id === team.id ? { ...item, ...result } : item),
+      }));
+      setEditingTeamId(null);
+      setTeamLogoFile(null);
+      setNote('Team name and image updated.');
+    } catch (error) {
+      setNote(error.message || 'Unable to update team profile.');
+    } finally {
+      setSavingTeamProfileId(null);
+    }
   };
 
   // Auction Bids & Player Management State
@@ -665,6 +725,25 @@ export default function Admin() {
             ))}
           </div>
 
+          <section className="admin-registration-setting" aria-labelledby="registration-setting-title">
+            <div>
+              <span className="admin-kicker">PUBLIC REGISTRATION</span>
+              <h2 id="registration-setting-title">Team registration</h2>
+              <p>{data.registrationOpen ? 'Teams can submit registrations on the website.' : 'The registration page will show “Registration starts soon · Stay tuned”.'}</p>
+            </div>
+            <button
+              type="button"
+              className={`admin-registration-toggle${data.registrationOpen ? ' is-open' : ''}`}
+              role="switch"
+              aria-checked={data.registrationOpen}
+              onClick={toggleRegistration}
+              disabled={savingRegistrationSetting}
+            >
+              {data.registrationOpen ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+              {savingRegistrationSetting ? 'Saving…' : data.registrationOpen ? 'Registration on' : 'Registration off'}
+            </button>
+          </section>
+
           {tab === 'teams' && (
             <AdminPanel>
               <div className="admin-panel-heading">
@@ -699,7 +778,28 @@ export default function Admin() {
                         <span className={`admin-status-pill ${statusTone(team.organiserApproval)}`}>{formatStatusLabel(team.organiserApproval)}</span>
                       </div>
                       <div className="admin-team-details"><span>Location: {team.teamLocation || '—'}</span><span>{team.captainPhone}</span>{team.captainAlternatePhone && <span>Alternative: {team.captainAlternatePhone}</span>}<span>Payment method: {team.paymentMode}</span><span>{(team.players || []).filter((player) => player.name || player.phone || player.photoUrl || player.age != null || player.jerseyNumber != null).length} player records</span><span>Registered: {formatDate(team.createdAt)}</span></div>
+                      {editingTeamId === team.id && (
+                        <form className="admin-team-profile-form" onSubmit={(event) => saveTeamProfile(event, team)}>
+                          <label>Team name<input value={teamNameDraft} onChange={(event) => setTeamNameDraft(event.target.value)} maxLength={100} required /></label>
+                          <label>Team image<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => {
+                            const selectedFile = event.target.files?.[0] || null;
+                            if (selectedFile && selectedFile.size > 5 * 1024 * 1024) {
+                              setTeamLogoFile(null);
+                              setNote('Team images must be 5 MB or smaller.');
+                              event.target.value = '';
+                              return;
+                            }
+                            setTeamLogoFile(selectedFile);
+                            setNote('');
+                          }} /><small>{teamLogoFile ? `Selected: ${teamLogoFile.name}` : 'Choose a new image to replace the current one (5 MB max).'}</small></label>
+                          <div className="admin-team-profile-actions">
+                            <button type="submit" className="admin-action-button primary" disabled={savingTeamProfileId === team.id || !teamNameDraft.trim()}>{savingTeamProfileId === team.id ? 'Saving…' : 'Save team profile'}</button>
+                            <button type="button" className="admin-action-button" onClick={() => { setEditingTeamId(null); setTeamLogoFile(null); }}>Cancel</button>
+                          </div>
+                        </form>
+                      )}
                       <div className="admin-team-actions">
+                        <button className="admin-action-button" onClick={() => beginTeamEdit(team)} disabled={savingTeamProfileId === team.id}><Upload size={14} /> Edit name / image</button>
                         <label>Approval<select value={team.organiserApproval || 'PENDING'} onChange={(event) => patchTeam(team, 'organiserApproval', event.target.value)}>{['PENDING', 'APPROVED', 'REJECTED'].map((status) => <option key={status} value={status}>{formatStatusLabel(status)}</option>)}</select></label>
                         <label>Payment<select value={team.paymentStatus || 'PENDING'} onChange={(event) => patchTeam(team, 'paymentStatus', event.target.value)}>{['PENDING', 'PAID', 'PARTIALLY PAID', 'NOT REQUIRED'].map((status) => <option key={status} value={status}>{formatStatusLabel(status)}</option>)}</select></label>
                         <button className="admin-action-button primary" onClick={() => save(team)}><CheckCircle2 size={15} /> Save review</button>

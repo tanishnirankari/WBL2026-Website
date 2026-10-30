@@ -518,9 +518,15 @@ export default function Auction() {
           </div>
 
           {visiblePlayers.length === 0 && !isLoadingPlayerData && (
-            <p className="auction-player-data-message" role={catalogueError ? 'alert' : 'status'}>
-              {catalogueError || 'No player information is available right now.'}
-            </p>
+            catalogueError ? (
+              <p className="auction-player-data-message" role="alert">{catalogueError}</p>
+            ) : (
+              <section className="auction-empty-state" role="status" aria-labelledby="auction-empty-title">
+                <span className="auction-empty-icon" aria-hidden="true"><Clock size={22} /></span>
+                <span className="auction-empty-eyebrow">WINTER BASH LEAGUE</span>
+                <h2 id="auction-empty-title">Auction Starts Soon</h2>
+              </section>
+            )
           )}
           <div className="sr-only" role="status" aria-live="polite">
             {regSuccess ? `Player nomination submitted under registration ${regSuccess}. Under organiser review.` : ''}
