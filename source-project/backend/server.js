@@ -13,6 +13,18 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (req,file,cb) => file.mimetype?.startsWith('image/') ? cb(null,true) : cb(new Error('Only image files are allowed.')) });
 const asyncHandler = fn => (req,res,next) => Promise.resolve(fn(req,res,next)).catch(next);
 const cloudReady = () => process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_UPLOAD_PRESET;
+async function mapWithConcurrency(items, concurrency, callback) {
+  const results = new Array(items.length);
+  let nextIndex = 0;
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+    while (nextIndex < items.length) {
+      const index = nextIndex++;
+      results[index] = await callback(items[index], index);
+    }
+  });
+  await Promise.all(workers);
+  return results;
+}
 async function saveImage(file, folder='wbl-2026') {
   if (!file) return null;
   if (!cloudReady()) throw new Error('Image storage is not configured yet.');
@@ -79,10 +91,14 @@ app.post('/api/registrations',asyncHandler(async(req,res,next)=>{
     if(!req.files?.['player'+i+'Photo']?.[0])return res.status(400).json({error:`Player ${i} photo is required.`});
   }
   if((await pool.query('SELECT id FROM wbl_registrations WHERE LOWER(team_name)=LOWER($1)',[teamName.trim()])).rows.length)return res.status(409).json({error:'A team with this name is already registered.'});
-  const teamLogo=await saveImage(req.files.teamLogo[0],'wbl-2026/team-logos');
-  const captainPhoto=await saveImage(req.files.captainPhoto[0]);
+  const imagesToSave=[
+    {file:req.files.teamLogo[0],folder:'wbl-2026/team-logos'},
+    {file:req.files.captainPhoto[0]},
+    ...Array.from({length:14},(_,index)=>({file:req.files['player'+(index+2)+'Photo'][0]}))
+  ];
+  const [teamLogo,captainPhoto,...playerPhotos]=await mapWithConcurrency(imagesToSave,4,({file,folder})=>saveImage(file,folder));
   const roster=[{playerIndex:1,name:captainName.trim(),phone:captainPhone,age:Number(captainAge),jerseyNumber:Number(captainJerseyNumber),photoPath:captainPhoto.secure_url}];
-  for(let i=2;i<=15;i++){const f=req.files['player'+i+'Photo'][0];const photo=(await saveImage(f)).secure_url;roster.push({playerIndex:i,name:req.body['player'+i+'Name'].trim(),phone:req.body['player'+i+'Phone'],age:Number(req.body['player'+i+'Age']),jerseyNumber:Number(req.body['player'+i+'JerseyNumber']),photoPath:photo})}
+  for(let i=2;i<=15;i++){roster.push({playerIndex:i,name:req.body['player'+i+'Name'].trim(),phone:req.body['player'+i+'Phone'],age:Number(req.body['player'+i+'Age']),jerseyNumber:Number(req.body['player'+i+'JerseyNumber']),photoPath:playerPhotos[i-2].secure_url})}
   const result=await pool.query('INSERT INTO wbl_registrations (team_name,team_location,captain_name,captain_phone,captain_alternate_phone,payment_mode,team_logo_path,players) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id',[teamName.trim(),teamLocation.trim(),captainName.trim(),captainPhone.trim(),captainAlternatePhone.trim(),paymentMode,teamLogo.secure_url,JSON.stringify(roster)]);res.status(201).json({message:'Team successfully registered!',registrationId:result.rows[0].id});
 }));
 app.get('/api/admin/dashboard',admin,asyncHandler(async(req,res)=>{

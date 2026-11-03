@@ -81,16 +81,6 @@ export default function Navbar() {
       </Link>
 
       <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <Link
-          to="/auction"
-          className="mobile-auction-btn"
-          onMouseEnter={prefetchAuctionPage}
-          onFocus={prefetchAuctionPage}
-          onTouchStart={prefetchAuctionPage}
-        >
-          <Gavel size={14} aria-hidden="true" />
-          AUCTION
-        </Link>
         <button
           className={`menu-button${isOpen ? ' is-open' : ''}`}
           onClick={toggleMenu}

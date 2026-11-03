@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Layout from '../components/Layout';
 import { motion } from 'framer-motion';
 
@@ -9,11 +9,81 @@ const REVIEW_STEP = 16;
 const TOTAL_STEPS = REVIEW_STEP + 1;
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
+async function optimizeImage(file) {
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)
+    || file.size < 350 * 1024
+    || typeof createImageBitmap !== 'function') {
+    return file;
+  }
+
+  const image = await createImageBitmap(file);
+  try {
+    const scale = Math.min(1, 1600 / Math.max(image.width, image.height));
+    if (scale === 1 && file.size < 750 * 1024) return file;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(image.width * scale));
+    canvas.height = Math.max(1, Math.round(image.height * scale));
+    canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/webp', 0.82));
+    if (!blob) throw new Error('This image could not be optimized. Please choose another image.');
+    if (blob.size >= file.size) return file;
+
+    const name = file.name.replace(/\.[^.]+$/, '') || 'image';
+    return new File([blob], `${name}.webp`, { type: 'image/webp', lastModified: Date.now() });
+  } finally {
+    image.close();
+  }
+}
+
 async function getRegistrationStatus() {
   const response = await fetch(`${apiUrl}/registrations/status`);
   const result = await response.json();
   if (!response.ok) throw new Error(result.error || 'Could not check registration availability.');
   return result;
+}
+
+function submitRegistration(formData, onProgress) {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open('POST', `${apiUrl}/registrations`);
+    request.upload.addEventListener('progress', (event) => {
+      if (event.lengthComputable) {
+        onProgress({
+          percent: Math.min(100, Math.round((event.loaded / event.total) * 100)),
+          loaded: event.loaded,
+          total: event.total,
+          phase: 'uploading',
+        });
+      }
+    });
+    request.upload.addEventListener('load', (event) => {
+      onProgress({
+        percent: 100,
+        loaded: event.loaded,
+        total: event.total,
+        phase: 'processing',
+      });
+    });
+    request.addEventListener('load', () => {
+      let result;
+      try {
+        result = JSON.parse(request.responseText || '{}');
+      } catch {
+        reject(new Error('The server returned an invalid response. Please try again.'));
+        return;
+      }
+
+      if (request.status < 200 || request.status >= 300) {
+        reject(new Error(result.error || 'Server responded with an error.'));
+        return;
+      }
+      resolve(result);
+    });
+    request.addEventListener('error', () => reject(new Error('Network error while uploading. Check your connection and try again.')));
+    request.addEventListener('abort', () => reject(new Error('The upload was cancelled. Please try again.')));
+    request.send(formData);
+  });
 }
 
 const emptyValues = {
@@ -22,6 +92,8 @@ const emptyValues = {
   captainName: '',
   captainPhone: '',
   captainAlternatePhone: '',
+  captainAge: '',
+  captainJerseyNumber: '',
   paymentMode: 'Cash',
 };
 
@@ -52,9 +124,23 @@ export default function Register() {
   const [step, setStep] = useState(0);
   const [savedFiles, setSavedFiles] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [optimizingFile, setOptimizingFile] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(null);
   const [errorStatus, setErrorStatus] = useState(null);
   const [successId, setSuccessId] = useState(null);
   const [registrationStatus, setRegistrationStatus] = useState({ loading: true, open: false, error: '' });
+  const imagePreviews = useMemo(() => Object.fromEntries(
+    Object.entries(savedFiles).map(([name, file]) => [name, URL.createObjectURL(file)]),
+  ), [savedFiles]);
+  const hasUnsavedChanges = !successId && (
+    isLoading
+    || Object.values(formValues).some((value) => value !== '')
+    || Object.keys(savedFiles).length > 0
+  );
+
+  useEffect(() => () => {
+    Object.values(imagePreviews).forEach((url) => URL.revokeObjectURL(url));
+  }, [imagePreviews]);
 
   useEffect(() => {
     let active = true;
@@ -94,6 +180,18 @@ export default function Register() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!hasUnsavedChanges) return undefined;
+
+    const warnBeforeLeaving = (event) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', warnBeforeLeaving);
+    return () => window.removeEventListener('beforeunload', warnBeforeLeaving);
+  }, [hasUnsavedChanges]);
+
   const inputStyle = {
     width: '100%', padding: '12px', borderRadius: '8px',
     border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.03)', color: 'white'
@@ -120,7 +218,7 @@ export default function Register() {
     setFormValues((current) => ({ ...current, [name]: nextValue }));
   };
 
-  const handleFileChange = (event) => {
+  const handleFileChange = async (event) => {
     const input = event.currentTarget;
     const { name, files } = input;
     const file = files?.[0];
@@ -129,15 +227,25 @@ export default function Register() {
     if (!file) return;
 
     const imageFile = getImageFile(file);
-    if (!imageFile || imageFile.size === 0 || imageFile.size > 5 * 1024 * 1024) {
-      setErrorStatus(imageFile
-        ? 'This image is larger than 5 MB. Choose a smaller image.'
-        : 'Choose a JPG, PNG, WEBP, GIF, AVIF, or HEIC image.');
+    if (!imageFile || imageFile.size === 0) {
+      setErrorStatus('Choose a JPG, PNG, WEBP, GIF, AVIF, or HEIC image.');
       return;
     }
 
-    setSavedFiles((current) => ({ ...current, [name]: imageFile }));
-    setErrorStatus(null);
+    setOptimizingFile(name);
+    try {
+      const optimizedFile = await optimizeImage(imageFile);
+      if (optimizedFile.size > 5 * 1024 * 1024) {
+        setErrorStatus('This image is larger than 5 MB. Choose a smaller image.');
+        return;
+      }
+      setSavedFiles((current) => ({ ...current, [name]: optimizedFile }));
+      setErrorStatus(null);
+    } catch (error) {
+      setErrorStatus(error.message || 'This image could not be prepared. Please choose another image.');
+    } finally {
+      setOptimizingFile(null);
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -150,7 +258,6 @@ export default function Register() {
       return;
     }
 
-    setIsLoading(true);
     setErrorStatus(null);
     const formData = new FormData();
     Object.entries(formValues).forEach(([name, value]) => formData.append(name, value));
@@ -168,23 +275,21 @@ export default function Register() {
     ));
     if (missingFile) {
       setErrorStatus(`Please upload a valid image for ${missingFile.fieldName.replace(/([A-Z])/g, ' $1')}.`);
-      setIsLoading(false);
       return;
     }
     uploadFiles.forEach(({ fieldName, file }) => {
       formData.append(fieldName, file, file.name);
     });
 
+    setIsLoading(true);
+    setUploadProgress({ percent: 0, loaded: 0, total: 0, phase: 'uploading' });
     try {
-      const response = await fetch(`${apiUrl}/registrations`, {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Server responded with an error');
-      }
+      const data = await submitRegistration(formData, setUploadProgress);
+      setUploadProgress((current) => ({
+        ...current,
+        percent: 100,
+        phase: 'processing',
+      }));
 
       setSuccessId(data.registrationId);
       setFormValues(emptyValues);
@@ -194,16 +299,20 @@ export default function Register() {
       setErrorStatus(error.message);
     } finally {
       setIsLoading(false);
+      setUploadProgress(null);
     }
   };
 
   const renderFileInput = (name, label) => (
     <div className="field">
       <label htmlFor={name} style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>{label}</label>
-      <input id={name} type="file" name={name} accept="image/*,.heic,.heif" onChange={handleFileChange} required={!savedFiles[name]} style={fileStyle} />
+      <input id={name} type="file" name={name} accept="image/*,.heic,.heif" onChange={handleFileChange} required={!savedFiles[name]} disabled={Boolean(optimizingFile)} style={fileStyle} />
+      {optimizingFile === name && (
+        <div className="register-file-status" role="status">Preparing image…</div>
+      )}
       {savedFiles[name] && (
         <div style={{ color: 'var(--lime)', fontSize: '12px', marginTop: '6px' }}>
-          Selected photo (choose another to replace it): {savedFiles[name].name}
+          Ready to upload (choose another to replace it): {savedFiles[name].name}
         </div>
       )}
     </div>
@@ -217,6 +326,9 @@ export default function Register() {
     setStep(0);
     setErrorStatus(null);
   };
+  const uploadedSize = uploadProgress?.total
+    ? `${(uploadProgress.loaded / 1024 / 1024).toFixed(1)} of ${(uploadProgress.total / 1024 / 1024).toFixed(1)} MB`
+    : 'Preparing your photos…';
 
   const reviewPlayers = Array.from({ length: 14 }, (_, index) => {
     const playerIndex = index + 2;
@@ -226,12 +338,12 @@ export default function Register() {
       phone: formValues[`player${playerIndex}Phone`] || '—',
       age: formValues[`player${playerIndex}Age`] || '—',
       jerseyNumber: formValues[`player${playerIndex}JerseyNumber`] ?? '—',
-      photo: getSavedFileName(`player${playerIndex}Photo`),
+      photoUrl: imagePreviews[`player${playerIndex}Photo`],
     };
   });
 
   return (
-    <Layout>
+    <Layout className={uploadProgress ? 'registration-submitting' : ''}>
       <main className="page content-page register-page">
         {registrationStatus.loading && (
           <section className="registration-closed" role="status" aria-live="polite">
@@ -275,7 +387,47 @@ export default function Register() {
           </motion.div>
         )}
 
-        {!successId && <motion.form
+        {!successId && (uploadProgress ? (
+          <motion.section
+            className="register-submit-screen"
+            role="status"
+            aria-live="polite"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="register-submit-icon" aria-hidden="true">
+              <span />
+            </div>
+            <div className="confirmation-eyebrow">PLEASE KEEP THIS PAGE OPEN</div>
+            <h1>{uploadProgress.phase === 'uploading' ? 'Submitting your registration' : 'Saving your team details'}</h1>
+            <p className="register-submit-copy">
+              {uploadProgress.phase === 'uploading'
+                ? 'Your team photos are uploading securely. This may take a little while.'
+                : 'Photos received. We are saving your registration now.'}
+            </p>
+            <div className="register-upload-progress">
+              <div className="register-upload-progress-heading">
+                <strong>{uploadProgress.phase === 'uploading' ? 'Photo upload' : 'Finalizing registration'}</strong>
+                <span>{uploadProgress.phase === 'uploading' ? `${uploadProgress.percent}%` : 'Almost done'}</span>
+              </div>
+              <div
+                className="register-upload-progress-track"
+                role="progressbar"
+                aria-label="Registration submission progress"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={uploadProgress.percent}
+              >
+                <span style={{ width: `${uploadProgress.percent}%` }} />
+              </div>
+              <span className="register-upload-progress-detail">
+                {uploadProgress.phase === 'uploading'
+                  ? uploadedSize
+                  : 'Photos received. Saving your team details…'}
+              </span>
+            </div>
+          </motion.section>
+        ) : <motion.form
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -289,6 +441,10 @@ export default function Register() {
             <div className="register-step-count" aria-live="polite">
               Step {step + 1} of {TOTAL_STEPS}
             </div>
+          </div>
+
+          <div className="register-step-meter" aria-hidden="true">
+            <span style={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }} />
           </div>
 
           {step === 0 ? (
@@ -349,11 +505,14 @@ export default function Register() {
                 <dl className="review-grid">
                   <div><dt>Team name</dt><dd>{formValues.teamName}</dd></div>
                   <div><dt>Team location</dt><dd>{formValues.teamLocation}</dd></div>
-                  <div><dt>Team logo</dt><dd>{getSavedFileName('teamLogo')}</dd></div>
+                  <div className="review-image-detail">
+                    {imagePreviews.teamLogo && <img src={imagePreviews.teamLogo} alt="Team logo preview" />}
+                    <div><dt>Team logo</dt><dd>{getSavedFileName('teamLogo')}</dd></div>
+                  </div>
                   <div><dt>Payment mode</dt><dd>{formValues.paymentMode}</dd></div>
                 </dl>
               </section>
-              <section className="review-section">
+              <section className="review-section review-captain-section">
                 <div className="review-section-heading"><h2>Captain details</h2><button type="button" onClick={() => setStep(1)}>Edit</button></div>
                 <dl className="review-grid">
                   <div><dt>Name</dt><dd>{formValues.captainName}</dd></div>
@@ -361,19 +520,27 @@ export default function Register() {
                   <div><dt>Alternative phone</dt><dd>{formValues.captainAlternatePhone}</dd></div>
                   <div><dt>Age</dt><dd>{formValues.captainAge}</dd></div>
                   <div><dt>Jersey number</dt><dd>{formValues.captainJerseyNumber}</dd></div>
-                  <div className="review-wide"><dt>Captain photo</dt><dd>{getSavedFileName('captainPhoto')}</dd></div>
+                  <div className="review-image-detail">
+                    {imagePreviews.captainPhoto && <img src={imagePreviews.captainPhoto} alt="Captain photo preview" />}
+                    <div>
+                      <dt>Captain photo</dt>
+                      <dd>{getSavedFileName('captainPhoto')}</dd>
+                    </div>
+                  </div>
                 </dl>
               </section>
-              <section className="review-section">
+              <section className="review-section review-roster-section">
                 <div className="review-section-heading"><h2>Player roster</h2><span>14 players</span></div>
                 <div className="review-player-list">
                   {reviewPlayers.map((player) => (
                     <article className="review-player" key={player.playerIndex}>
-                      <span className="review-player-number">{player.playerIndex}</span>
+                      {player.photoUrl
+                        ? <img className="review-player-photo" src={player.photoUrl} alt={`${player.name} photo`} />
+                        : <span className="review-player-number">{player.playerIndex}</span>}
                       <div className="review-player-info">
                         <strong>{player.name}</strong>
-                        <span>{player.phone} · Age {player.age} · Jersey {player.jerseyNumber}</span>
-                        <small>Photo: {player.photo}</small>
+                        <span>#{player.jerseyNumber} · Age {player.age}</span>
+                        <small>{player.phone}</small>
                       </div>
                       <button type="button" onClick={() => setStep(player.playerIndex)}>Edit</button>
                     </article>
@@ -408,20 +575,20 @@ export default function Register() {
 
           <div className="register-actions">
             {step > 0 && (
-              <button type="button" className="register-back-button" onClick={() => setStep((current) => current - 1)}>
+              <button type="button" className="register-back-button" disabled={isLoading || Boolean(optimizingFile)} onClick={() => setStep((current) => current - 1)}>
                 &larr; BACK
               </button>
             )}
             <button
               type="submit"
               className="primary-button register-continue-button"
-              disabled={isLoading}
-              style={{ cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.7 : 1 }}
+              disabled={isLoading || Boolean(optimizingFile)}
+              style={{ cursor: isLoading || optimizingFile ? 'not-allowed' : 'pointer', opacity: isLoading || optimizingFile ? 0.7 : 1 }}
             >
-              {isLoading ? 'SUBMITTING...' : step === REVIEW_STEP ? 'CONFIRM & SUBMIT REGISTRATION \u2192' : 'CONTINUE \u2192'}
+              {isLoading ? 'UPLOADING…' : optimizingFile ? 'PREPARING IMAGE…' : step === REVIEW_STEP ? 'CONFIRM & SUBMIT REGISTRATION \u2192' : 'CONTINUE \u2192'}
             </button>
           </div>
-        </motion.form>}
+        </motion.form>)}
         </>}
       </main>
     </Layout>

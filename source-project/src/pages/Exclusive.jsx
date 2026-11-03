@@ -42,8 +42,7 @@ const aboutSections = [
     image: 'logo.png',
     imageAlt: 'Winter Bash League logo',
     description: [
-      'Winter Bash League carries that momentum into a new season, bringing players together for organized matches, spirited competition, and a welcoming cricket community.',
-      'The focus is on a well-run tournament where teams can compete, connect, and make the most of every matchday.',
+      'Winter Bash League is the upcoming swinger ball cricket league scheduled in Ghaziabad, India, from 1 December 2026 with swinger or wind ball .',
     ],
   },
   {
