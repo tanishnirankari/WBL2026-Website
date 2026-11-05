@@ -75,6 +75,11 @@ export default function Sponsors() {
     const group = track?.firstElementChild;
     if (!marquee || !track || !group) return undefined;
 
+    if (window.matchMedia('(max-width: 650px)').matches) {
+      track.style.transform = 'none';
+      return undefined;
+    }
+
     const normalizeOffset = (offset) => {
       const loopWidth = loopWidthRef.current;
       if (!loopWidth) return offset;
@@ -111,6 +116,7 @@ export default function Sponsors() {
   }, []);
 
   const handlePointerDown = (event) => {
+    if (window.matchMedia('(max-width: 650px)').matches) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     dragRef.current = { pointerId: event.pointerId, startX: event.clientX, startOffset: offsetRef.current };
     event.currentTarget.classList.add('is-dragging');

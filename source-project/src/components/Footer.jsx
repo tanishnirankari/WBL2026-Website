@@ -35,7 +35,7 @@ const contactItems = [
   },
   {
     label: 'Venue',
-    value: 'Nehru Yuva Kendra, Ghaziabad',
+    value: 'UNDECIDED',
     icon: MapPin,
   },
   {
