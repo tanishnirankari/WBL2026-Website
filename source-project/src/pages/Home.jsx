@@ -5,21 +5,21 @@ import Hero from '../components/Hero';
 import Sponsors from '../components/Sponsors';
 
 export default function Home() {
-  const { hash, pathname } = useLocation();
+  const { hash } = useLocation();
 
   useEffect(() => {
-    const sectionId = hash ? decodeURIComponent(hash.slice(1)) : 'hero';
+    if (!hash) return;
+
+    const sectionId = decodeURIComponent(hash.slice(1));
     const scrollTimer = window.setTimeout(() => {
       const target = document.getElementById(sectionId);
       if (target) {
         target.scrollIntoView({ behavior: 'auto', block: 'start' });
-      } else {
-        window.scrollTo({ top: 0, behavior: 'auto' });
       }
     }, 0);
 
     return () => window.clearTimeout(scrollTimer);
-  }, [hash, pathname]);
+  }, [hash]);
 
   return (
     <Layout className="home-layout">

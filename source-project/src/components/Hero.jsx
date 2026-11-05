@@ -42,7 +42,7 @@ export default function Hero() {
             <small>TOURNAMENT</small>
           </div>
           <div className="hero-detail">
-            <strong>UNDECIDED</strong>
+            <strong>NEHRU YUVA KENDRA</strong>
             <small>VENUE</small>
           </div>
           <div className="hero-detail">
