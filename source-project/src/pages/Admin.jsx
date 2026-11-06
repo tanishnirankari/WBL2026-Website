@@ -512,7 +512,7 @@ export default function Admin() {
         .footer-social{display:inline-flex;align-items:center;gap:3px;color:#557b31;text-decoration:none;font-weight:700}
         .instagram-icon{width:12px;height:12px;display:block;flex:none}
         @media screen{body{max-width:800px;margin:24px auto;padding:0 22px}.print-hint{margin:12px 0;padding:10px;border-radius:7px;background:#f3f7ec;color:#55752e;font-size:11px}}
-        @media print{.print-hint{display:none}html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.footer{position:fixed;right:0;bottom:-23mm;left:0;gap:3px;margin:0;padding:7px 0 0;border-top:1px solid #cfd8df;background:#fff}.footer-credit,.footer-social{color:#405b32!important}.footer-details{color:#536273!important}.instagram-icon{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+        @media print{.print-hint{display:none}html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.footer{position:fixed;right:0;bottom:-22mm;left:0;z-index:1;gap:3px;margin:0;padding:7px 0 0;border-top:1px solid #cfd8df;background:#fff;break-inside:avoid;page-break-inside:avoid}.footer-credit,.footer-social{color:#405b32!important}.footer-details{color:#536273!important}.instagram-icon{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
       </style></head><body>
       <div class="print-hint">Choose “Save as PDF” in the print dialog. For clear player photos, use A4 paper and default or high print quality.</div>
       <div class="topline"></div>
