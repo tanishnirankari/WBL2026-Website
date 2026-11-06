@@ -38,7 +38,7 @@ export default function Hero() {
             <small>PRIZE POOL</small>
           </div>
           <div className="hero-detail hero-detail-date hero-detail-right">
-            <strong>4 December</strong>
+            <strong>6 December</strong>
             <small>TOURNAMENT</small>
           </div>
           <div className="hero-detail hero-detail-venue">
