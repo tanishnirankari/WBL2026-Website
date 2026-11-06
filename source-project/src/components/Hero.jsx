@@ -42,7 +42,7 @@ export default function Hero() {
             <small>TOURNAMENT</small>
           </div>
           <div className="hero-detail hero-detail-venue">
-            <strong>Shastri Cricket Stadium, Ghaziabad</strong>
+            <strong>Lal Bahadur Shastri<br />Cricket stadium</strong>
             <small>VENUE</small>
           </div>
           <div className="hero-detail hero-detail-teams hero-detail-right">
