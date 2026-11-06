@@ -2369,14 +2369,14 @@ footer {
 
         background:
             linear-gradient(180deg,
-                rgba(5, 8, 14, 0.82) 0%,
-                rgba(5, 8, 14, 0.94) 50%,
-                rgba(5, 8, 14, 0.99) 100%),
+                rgba(5, 8, 14, 0.68) 0%,
+                rgba(5, 8, 14, 0.89) 48%,
+                rgba(5, 8, 14, 0.98) 100%),
             var(--hero-mobile-image, var(--hero-image));
 
         background-size: cover;
         background-repeat: no-repeat;
-        background-position: 62% center;
+        background-position: 58% 38%;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
 
@@ -8315,6 +8315,13 @@ footer {
         gap: 12px;
         margin-block: 18px 16px;
         padding-block: 12px;
+    }
+
+    .home-layout .hero-detail-venue strong,
+    .home-layout .hero-detail-date strong,
+    .home-layout .hero-detail-teams strong {
+        font-size: clamp(14px, 4vw, 16px);
+        line-height: 1.15;
     }
 
     .home-layout .hero-buttons {

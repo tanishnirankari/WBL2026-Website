@@ -25,7 +25,7 @@ export default function Hero() {
 
         <h1 className="hero-title">
           WINTER BASH<br />
-          <span>LEAGUE</span>
+          <span>2026</span>
         </h1>
 
         <p className="hero-tagline">
@@ -37,15 +37,15 @@ export default function Hero() {
             <strong>₹30,000+</strong>
             <small>PRIZE POOL</small>
           </div>
-          <div className="hero-detail">
-            <strong>DECEMBER</strong>
+          <div className="hero-detail hero-detail-date">
+            <strong>4 December</strong>
             <small>TOURNAMENT</small>
           </div>
-          <div className="hero-detail">
-            <strong>Shastri Cricket Stadium</strong>
+          <div className="hero-detail hero-detail-venue">
+            <strong>Shastri Cricket Stadium, Ghaziabad</strong>
             <small>VENUE</small>
           </div>
-          <div className="hero-detail">
+          <div className="hero-detail hero-detail-teams">
             <strong>10 TEAMS</strong>
             <small>15 PLAYERS / TEAM</small>
           </div>
@@ -53,7 +53,7 @@ export default function Hero() {
 
         <div className="hero-buttons">
           <Link to="/register" className="primary-button">
-            REGISTER YOUR TEAM &rarr;
+            ENTER THE ARENA &rarr;
           </Link>
           <Link
             to="/auction"
