@@ -35,7 +35,7 @@ const contactItems = [
   },
   {
     label: 'Venue',
-    value: 'Nehru Yuva Kendra, Ghaziabad',
+    value: 'Lal Bahadur Shastri Cricket Stadium',
     icon: MapPin,
   },
   {
