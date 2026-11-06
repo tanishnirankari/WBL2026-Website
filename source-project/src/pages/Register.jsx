@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { motion } from 'framer-motion';
 
@@ -122,6 +123,7 @@ function getImageFile(file) {
 export default function Register() {
   const [formValues, setFormValues] = useState(emptyValues);
   const [step, setStep] = useState(0);
+  const [rulesAcknowledged, setRulesAcknowledged] = useState(false);
   const [savedFiles, setSavedFiles] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [optimizingFile, setOptimizingFile] = useState(null);
@@ -293,6 +295,7 @@ export default function Register() {
 
       setSuccessId(data.registrationId);
       setFormValues(emptyValues);
+      setRulesAcknowledged(false);
       setSavedFiles({});
       setStep(0);
     } catch (error) {
@@ -322,6 +325,7 @@ export default function Register() {
   const handleStartAnotherRegistration = () => {
     setSuccessId(null);
     setFormValues(emptyValues);
+    setRulesAcknowledged(false);
     setSavedFiles({});
     setStep(0);
     setErrorStatus(null);
@@ -467,6 +471,22 @@ export default function Register() {
                         {mode}
                       </label>
                     ))}
+                  </div>
+                </div>
+                <div className="register-rules-acknowledgement">
+                  <input
+                    id="rulesAcknowledged"
+                    type="checkbox"
+                    name="rulesAcknowledged"
+                    checked={rulesAcknowledged}
+                    onChange={(event) => setRulesAcknowledged(event.target.checked)}
+                    required
+                  />
+                  <div>
+                    <label htmlFor="rulesAcknowledged">
+                      I have read and promise to follow all rules decided by the organisers.
+                    </label>
+                    <Link to="/rule-book" target="_blank" rel="noreferrer">Read the Rule Book</Link>
                   </div>
                 </div>
             </div>

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   ArrowLeft, CheckCircle2, Eye, EyeOff, Gavel, Image, LockKeyhole, Phone,
   LogOut, Printer, RefreshCw, Search, ShieldCheck, Upload, UserRound, Users,
-  Check, XCircle, ToggleLeft, ToggleRight, DollarSign, Tag, CheckSquare, Trash2
+  Check, XCircle, DollarSign, Tag, CheckSquare, Trash2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AdminPortalLogo from '../components/AdminPortalLogo';
@@ -232,7 +232,6 @@ export default function Admin() {
   const [teamNameDraft, setTeamNameDraft] = useState('');
   const [teamLogoFile, setTeamLogoFile] = useState(null);
   const [savingTeamProfileId, setSavingTeamProfileId] = useState(null);
-  const [savingRegistrationSetting, setSavingRegistrationSetting] = useState(false);
   const [loading, setLoading] = useState(false);
   const headers = { 'x-admin-password': password, 'Content-Type': 'application/json' };
 
@@ -277,26 +276,6 @@ export default function Admin() {
       setNote('Team review status saved.');
     } catch (error) {
       setNote(error.message);
-    }
-  };
-
-  const toggleRegistration = async () => {
-    if (savingRegistrationSetting) return;
-    setSavingRegistrationSetting(true);
-    try {
-      const response = await fetch(`${api}/admin/registration-settings`, {
-        method: 'PATCH',
-        headers,
-        body: JSON.stringify({ open: !data.registrationOpen }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Unable to update registration availability.');
-      setData((current) => ({ ...current, registrationOpen: result.open }));
-      setNote(result.open ? 'Team registration is now open.' : 'Team registration is now closed.');
-    } catch (error) {
-      setNote(error.message || 'Unable to update registration availability.');
-    } finally {
-      setSavingRegistrationSetting(false);
     }
   };
 
@@ -533,7 +512,7 @@ export default function Admin() {
         .footer-social{display:inline-flex;align-items:center;gap:3px;color:#557b31;text-decoration:none;font-weight:700}
         .instagram-icon{width:12px;height:12px;display:block;flex:none}
         @media screen{body{max-width:800px;margin:24px auto;padding:0 22px}.print-hint{margin:12px 0;padding:10px;border-radius:7px;background:#f3f7ec;color:#55752e;font-size:11px}}
-        @media print{.print-hint{display:none}html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.footer{position:fixed;right:0;bottom:-20mm;left:0;gap:3px;margin:0;padding:7px 0 0;border-top:1px solid #cfd8df;background:#fff}.footer-credit,.footer-social{color:#405b32!important}.footer-details{color:#536273!important}.instagram-icon{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+        @media print{.print-hint{display:none}html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.footer{position:fixed;right:0;bottom:-23mm;left:0;gap:3px;margin:0;padding:7px 0 0;border-top:1px solid #cfd8df;background:#fff}.footer-credit,.footer-social{color:#405b32!important}.footer-details{color:#536273!important}.instagram-icon{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
       </style></head><body>
       <div class="print-hint">Choose “Save as PDF” in the print dialog. For clear player photos, use A4 paper and default or high print quality.</div>
       <div class="topline"></div>
@@ -543,7 +522,7 @@ export default function Admin() {
       <section class="details"><div class="detail"><span>Team</span><strong>${escapeHtml(team.teamName)}</strong></div><div class="detail"><span>Team location</span><strong>${escapeHtml(team.teamLocation || '—')}</strong></div><div class="detail"><span>Team captain</span><strong>${escapeHtml(team.captainName)}</strong></div><div class="detail"><span>Captain phone</span><strong>${escapeHtml(team.captainPhone)}</strong></div><div class="detail"><span>Alternative captain phone</span><strong>${escapeHtml(team.captainAlternatePhone || '—')}</strong></div><div class="detail"><span>Payment method</span><strong>${escapeHtml(team.paymentMode)}</strong></div><div class="detail"><span>Payment status</span><strong>${escapeHtml(team.paymentStatus || 'PENDING')}</strong></div><div class="detail"><span>Organiser approval</span><strong>${escapeHtml(team.organiserApproval || 'PENDING')}</strong></div></section>
       <h2 class="section-title">Player roster · ${roster.length} submitted</h2><section class="player-grid">${playerCards}</section>
       <section class="signature"><div>Captain signature</div><div>Organiser signature and stamp</div></section>
-      <footer class="footer"><div class="footer-credit">Organised by BashCricket Community</div><div class="footer-details">+91 9711621524 · winterbashleague@gmail.com · Lal Bahadur Shastri Cricket Stadium, Ghaziabad</div><div class="footer-details">Winter Bash League · Official registration record · Generated ${escapeHtml(formatDate(new Date()))} · <a class="footer-social" href="https://www.instagram.com/winterbashleague/" target="_blank" rel="noopener noreferrer"><svg class="instagram-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" aria-label="Instagram" role="img"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="#557b31" stroke-width="2.5"/><circle cx="12" cy="12" r="4" fill="none" stroke="#557b31" stroke-width="2.5"/><circle cx="18" cy="6" r="1.5" fill="#557b31"/></svg>@winterbashleague</a></div></footer>
+      <footer class="footer"><div class="footer-credit">Organised by BashCricket Community</div><div class="footer-details">winterbashleague@gmail.com · Lal Bahadur Shastri Cricket Stadium, Ghaziabad</div><div class="footer-details">Winter Bash League · Official registration record · <a class="footer-social" href="https://www.instagram.com/winterbashleague/" target="_blank" rel="noopener noreferrer"><svg class="instagram-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" aria-label="Instagram" role="img"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="#557b31" stroke-width="2.5"/><circle cx="12" cy="12" r="4" fill="none" stroke="#557b31" stroke-width="2.5"/><circle cx="18" cy="6" r="1.5" fill="#557b31"/></svg>@winterbashleague</a></div></footer>
       </body></html>`;
     printWindow.document.open();
     printWindow.document.write(html);
@@ -725,25 +704,6 @@ export default function Admin() {
               </button>
             ))}
           </div>
-
-          <section className="admin-registration-setting" aria-labelledby="registration-setting-title">
-            <div>
-              <span className="admin-kicker">PUBLIC REGISTRATION</span>
-              <h2 id="registration-setting-title">Team registration</h2>
-              <p>{data.registrationOpen ? 'Teams can submit registrations on the website.' : 'The registration page will show “Registration starts soon · Stay tuned”.'}</p>
-            </div>
-            <button
-              type="button"
-              className={`admin-registration-toggle${data.registrationOpen ? ' is-open' : ''}`}
-              role="switch"
-              aria-checked={data.registrationOpen}
-              onClick={toggleRegistration}
-              disabled={savingRegistrationSetting}
-            >
-              {data.registrationOpen ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
-              {savingRegistrationSetting ? 'Saving…' : data.registrationOpen ? 'Registration on' : 'Registration off'}
-            </button>
-          </section>
 
           {tab === 'teams' && (
             <AdminPanel>

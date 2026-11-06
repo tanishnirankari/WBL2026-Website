@@ -107,29 +107,20 @@ app.post('/api/registrations',asyncHandler(async(req,res,next)=>{
 }));
 app.get('/api/admin/dashboard',admin,asyncHandler(async(req,res)=>{
   await init();
-  const [t,a,g,b,c,s]=await Promise.all([
+  const [t,a,g,b,c]=await Promise.all([
     pool.query('SELECT * FROM wbl_registrations ORDER BY created_at DESC,id DESC'),
     pool.query('SELECT * FROM wbl_auction_registrations ORDER BY created_at DESC,id DESC'),
     pool.query('SELECT id,image_url,caption,created_at FROM wbl_gallery_images ORDER BY created_at DESC,id DESC'),
     pool.query('SELECT * FROM wbl_auction_bids ORDER BY created_at DESC,id DESC'),
-    pool.query('SELECT * FROM wbl_auction_catalogue ORDER BY id'),
-    pool.query("SELECT setting_value FROM wbl_site_settings WHERE setting_key='team_registration_open'")
+    pool.query('SELECT * FROM wbl_auction_catalogue ORDER BY id')
   ]);
   res.json({
     bids:b.rows.map(x=>({id:x.id,playerId:x.player_id,playerName:x.player_name,bidderName:x.bidder_name,phone:x.phone,email:x.email,bidAmount:Number(x.bid_amount),status:x.status,createdAt:x.created_at})),
     teams:t.rows.map(x=>({id:x.id,teamName:x.team_name,teamLocation:x.team_location,captainName:x.captain_name,captainPhone:x.captain_phone,captainAlternatePhone:x.captain_alternate_phone,paymentMode:x.payment_mode,organiserApproval:x.organiser_approval,paymentStatus:x.payment_status,createdAt:x.created_at,teamLogoUrl:x.team_logo_path,players:players(x.players,req)})),
     auctionPlayers:a.rows.map(x=>({id:x.id,fullName:x.full_name,phone:x.phone,age:x.age,role:x.playing_role,battingStyle:x.batting_style,bowlingStyle:x.bowling_style,clubName:x.club_name,basePrice:x.base_price,photoUrl:x.photo_url,category:x.auction_category,matches:x.matches,primaryStat:x.primary_stat,strikeRate:x.strike_rate,economy:x.economy,average:x.average,best:x.best,status:x.status,createdAt:x.created_at})),
     cataloguePlayers:c.rows.map(x=>({id:x.id,name:x.name,role:x.role,category:x.category,battingStyle:x.batting_style,bowlingStyle:x.bowling_style,stats:{average:x.average||'—',strikeRate:x.strike_rate||'—',economy:x.economy||'—',best:x.best||'—'},basePrice:Number(x.base_price),status:x.status,published:x.published,photoUrl:x.photo_url,badgeColor:x.badge_color})),
-    gallery:g.rows.map(x=>({id:x.id,url:x.image_url,caption:x.caption||'',createdAt:x.created_at})),
-    registrationOpen:s.rows[0]?.setting_value ?? true
+    gallery:g.rows.map(x=>({id:x.id,url:x.image_url,caption:x.caption||'',createdAt:x.created_at}))
   });
-}));
-app.patch('/api/admin/registration-settings',admin,asyncHandler(async(req,res)=>{
-  if(typeof req.body.open!=='boolean')return res.status(400).json({error:'Registration status must be enabled or disabled.'});
-  await init();
-  const result=await pool.query("UPDATE wbl_site_settings SET setting_value=$1 WHERE setting_key='team_registration_open' RETURNING setting_value",[req.body.open]);
-  if(!result.rows[0])return res.status(500).json({error:'Registration setting could not be saved.'});
-  res.json({open:result.rows[0].setting_value});
 }));
 app.patch('/api/admin/teams/:id/review',admin,asyncHandler(async(req,res)=>{await init();const approval=String(req.body.organiserApproval||'').toUpperCase(),payment=String(req.body.paymentStatus||'').toUpperCase();if(!['PENDING','APPROVED','REJECTED'].includes(approval)||!['PENDING','PAID','PARTIALLY PAID','NOT REQUIRED'].includes(payment))return res.status(400).json({error:'Invalid status.'});const r=await pool.query('UPDATE wbl_registrations SET organiser_approval=$1,payment_status=$2 WHERE id=$3 RETURNING id,organiser_approval,payment_status',[approval,payment,req.params.id]);if(!r.rows[0])return res.status(404).json({error:'Registration not found.'});res.json({id:r.rows[0].id,organiserApproval:r.rows[0].organiser_approval,paymentStatus:r.rows[0].payment_status})}));
 app.patch('/api/admin/teams/:id/profile',admin,upload.single('teamLogo'),asyncHandler(async(req,res)=>{

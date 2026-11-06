@@ -52,6 +52,20 @@ const ruleSections = [
       'Inform the umpire before making an Impact Player or substitute fielder change. The umpire confirms when the change takes effect.',
     ],
   },
+  {
+    icon: ShieldCheck,
+    title: 'Disciplinary conduct',
+    rules: [
+      'Players, captains, and team representatives must treat opponents, umpires, organisers, volunteers, and spectators respectfully.',
+      'Verbal abuse, discriminatory or threatening language, intimidation, and physical aggression are prohibited.',
+      'Do not damage venue infrastructure, equipment, or another person’s property. The responsible player or team may be held accountable for repair or replacement costs.',
+      'Captains must provide complete and truthful information in the team registration form and ensure all submitted player details are accurate.',
+      'Players must accept umpire decisions. Only the captain may request clarification, calmly and without delaying play.',
+      'Cheating, deliberate interference with the ball or equipment, and knowingly fielding an ineligible or unregistered player may result in disciplinary action.',
+      'Captains are responsible for making sure their teams follow match-official instructions and venue safety requirements.',
+      'Umpires, match officials, and organisers may impose a penalty, suspend a player or team, or disqualify a player or team, depending on the seriousness of the conduct. They may remove anyone who poses an immediate safety risk from play or the venue.',
+    ],
+  },
 ];
 
 export default function RuleBook() {
