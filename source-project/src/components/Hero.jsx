@@ -37,7 +37,7 @@ export default function Hero() {
             <strong>₹30,000+</strong>
             <small>PRIZE POOL</small>
           </div>
-          <div className="hero-detail hero-detail-date">
+          <div className="hero-detail hero-detail-date hero-detail-right">
             <strong>4 December</strong>
             <small>TOURNAMENT</small>
           </div>
@@ -45,15 +45,15 @@ export default function Hero() {
             <strong>Shastri Cricket Stadium, Ghaziabad</strong>
             <small>VENUE</small>
           </div>
-          <div className="hero-detail hero-detail-teams">
+          <div className="hero-detail hero-detail-teams hero-detail-right">
             <strong>10 TEAMS</strong>
             <small>15 PLAYERS / TEAM</small>
           </div>
         </div>
 
         <div className="hero-buttons">
-          <Link to="/register" className="primary-button">
-            ENTER THE ARENA &rarr;
+          <Link to="/register" className="primary-button hero-register-link">
+            REGISTER YOUR SQUAD &rarr;
           </Link>
           <Link
             to="/auction"

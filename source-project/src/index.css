@@ -346,6 +346,10 @@ img {
     gap: 13px;
 }
 
+.hero-register-link {
+    word-spacing: 0.16em;
+}
+
 .primary-button {
 
     display: inline-flex;
@@ -4579,12 +4583,8 @@ footer {
     background: #04070c;
     padding-top: 92px !important;
 }
-
+ 
 .auction-page-inner { width: min(100%, 1280px); margin: 0 auto; padding: 0 20px; }
-.auction-page-heading { display: grid; justify-items: center; gap: 5px; margin: 0 auto 24px; text-align: center; }
-.auction-page-heading h1 { margin: 0; color: #f8fafc; font: 800 clamp(20px, 3vw, 28px)/1.1 'Outfit', sans-serif; letter-spacing: .055em; }
-.auction-page-heading p { margin: 0; color: var(--lime); font: 800 9px/1.3 'Outfit', sans-serif; letter-spacing: .2em; text-shadow: 0 0 7px rgba(156, 255, 0, .72), 0 0 18px rgba(156, 255, 0, .42); animation: auction-heading-glow 2.4s ease-in-out infinite; }
-@keyframes auction-heading-glow { 0%, 100% { opacity: .78; text-shadow: 0 0 5px rgba(156, 255, 0, .5), 0 0 12px rgba(156, 255, 0, .24); } 50% { opacity: 1; text-shadow: 0 0 8px rgba(156, 255, 0, .9), 0 0 22px rgba(156, 255, 0, .55); } }
 .auction-player-grid { align-items: stretch; margin-top: 0; }
 .auction-player-card { min-width: 0; }
 .auction-player-loading-card {
@@ -4711,9 +4711,6 @@ footer {
 @media (max-width: 650px) {
     .auction-page-shell { padding-top: 100px !important; padding-bottom: max(108px, calc(env(safe-area-inset-bottom) + 88px)) !important; }
     .auction-page-inner { padding-right: 16px !important; padding-left: 16px !important; }
-    .auction-page-heading { gap: 5px; margin-bottom: 22px; }
-    .auction-page-heading h1 { font-size: 20px; letter-spacing: .045em; }
-    .auction-page-heading p { font-size: 8px; letter-spacing: .17em; }
     .auction-player-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 15px !important; }
     .auction-player-card { border: 1px solid rgba(255, 255, 255, .11) !important; border-radius: 16px !important; background: linear-gradient(145deg, #101720 0%, #090d12 58%, #070a0e 100%) !important; box-shadow: 0 14px 32px rgba(0, 0, 0, .38), inset 0 1px 0 rgba(255, 255, 255, .035) !important; }
     .auction-player-portrait { height: 136px; min-height: 136px; aspect-ratio: auto; background: linear-gradient(110deg, rgba(156, 255, 0, .035), transparent 38%); }
@@ -4768,8 +4765,7 @@ footer {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .auction-player-emblem-type,
-    .auction-page-heading p { animation: none; }
+    .auction-player-emblem-type { animation: none; }
 }
 
 @media (max-width: 380px) {
@@ -8324,6 +8320,12 @@ footer {
         line-height: 1.15;
     }
 
+    .home-layout .hero-detail-right {
+        align-items: flex-end;
+        margin-right: 14px;
+        text-align: right;
+    }
+
     .home-layout .hero-buttons {
         gap: 8px;
     }
@@ -8791,6 +8793,46 @@ footer {
     transition: color 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 
+.navbar-auction-mark {
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    margin-right: 6px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(156, 255, 0, 0.28);
+    border-radius: 50%;
+    background: rgba(156, 255, 0, 0.045);
+    color: #f0cb72;
+    text-decoration: none;
+    filter: drop-shadow(0 0 7px rgba(255, 202, 92, 0.62)) drop-shadow(0 0 15px rgba(255, 174, 45, 0.38));
+    animation: navbar-auction-glow 2.8s ease-in-out infinite;
+    transition: color 180ms ease, filter 180ms ease, transform 180ms ease;
+}
+
+.navbar-auction-mark:hover,
+.navbar-auction-mark:focus-visible {
+    color: #fff0bd;
+    filter: drop-shadow(0 0 10px rgba(255, 219, 137, 0.9)) drop-shadow(0 0 20px rgba(255, 174, 45, 0.62));
+}
+
+.navbar-auction-mark:focus-visible {
+    outline: 2px solid rgba(235, 206, 145, 0.72);
+    outline-offset: 3px;
+}
+
+@keyframes navbar-auction-glow {
+    0%, 100% { filter: drop-shadow(0 0 6px rgba(255, 202, 92, 0.48)) drop-shadow(0 0 12px rgba(255, 174, 45, 0.24)); }
+    50% { filter: drop-shadow(0 0 11px rgba(255, 225, 153, 0.95)) drop-shadow(0 0 24px rgba(255, 174, 45, 0.72)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar-auction-mark {
+        animation: none;
+    }
+}
+
 .menu-button svg {
     filter: drop-shadow(0 0 7px rgba(156, 255, 0, 0.3));
     transition: transform 200ms ease, filter 180ms ease;
@@ -9243,39 +9285,23 @@ footer {
     color: var(--lime);
 }
 
-.site-layout > footer.site-footer .footer-navigation .footer-youtube-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #ff8585;
-    font: inherit;
-}
-
-.site-layout > footer.site-footer .footer-navigation .footer-youtube-link:hover,
-.site-layout > footer.site-footer .footer-navigation .footer-youtube-link:focus-visible {
-    color: #fff;
-}
-
 .site-layout > footer.site-footer .footer-contact-list {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
     width: 100%;
 }
 
 .site-layout > footer.site-footer .footer-contact-item {
     display: flex;
     min-width: 0;
-    min-height: 64px;
-    flex-direction: column;
+    min-height: 76px;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.085);
-    border-radius: 14px;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018));
-    text-align: center;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.025);
 }
 
 .site-layout > footer.site-footer .footer-contact-icon {
@@ -9298,15 +9324,12 @@ footer {
 
 .site-layout > footer.site-footer .footer-contact-item-instagram {
     align-items: center;
-    justify-content: center;
 }
 
 .site-layout > footer.site-footer .footer-contact-item > div {
     display: grid;
     min-width: 0;
     gap: 4px;
-    justify-items: center;
-    text-align: center;
 }
 
 .site-layout > footer.site-footer .footer-contact-label {
@@ -9337,19 +9360,16 @@ footer {
     justify-content: center;
     align-items: center;
     width: 100%;
-    text-align: center;
     padding-top: 15px;
     border-top: 1px solid rgba(255, 255, 255, 0.09);
     color: #8c9aa6;
     font-size: 11px;
     line-height: 1.5;
-    text-align: center;
 }
 
 .site-layout > footer.site-footer .footer-bottom > span {
     display: block;
-    width: fit-content;
-    justify-self: center;
+    width: 100%;
     text-align: center;
 }
 
@@ -9381,39 +9401,41 @@ footer {
     }
 
     .footer-navigation-links {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 7px;
+        display: grid;
+        width: 100%;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0 14px;
     }
 
     .site-layout > footer.site-footer .footer-navigation a {
-        display: inline-flex;
-        min-height: 38px;
+        display: flex;
+        min-height: 36px;
         align-items: center;
-        padding: 0 12px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.035);
+        padding: 0 2px;
+        border: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 0;
+        background: transparent;
         font-size: 11px;
     }
 
     .site-layout > footer.site-footer .footer-contact-list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
+        gap: 10px;
     }
 
     .site-layout > footer.site-footer .footer-contact-item {
         min-height: 68px;
-        gap: 8px;
+        gap: 9px;
         padding: 10px;
-        border-radius: 12px;
+        border-radius: 10px;
     }
 
     .site-layout > footer.site-footer .footer-contact-icon {
-        width: 29px;
-        height: 29px;
-        flex-basis: 29px;
-        border-radius: 9px;
+        width: 30px;
+        height: 30px;
+        flex-basis: 30px;
+        border-radius: 8px;
     }
 
     .site-layout > footer.site-footer .footer-contact-item a,
@@ -9421,10 +9443,15 @@ footer {
         font-size: 11px;
     }
 
+    .site-layout > footer.site-footer .footer-contact-item:nth-child(2) a {
+        font-size: 10px;
+    }
+
     .site-layout > footer.site-footer .footer-bottom {
         min-height: 40px;
         padding-top: 12px;
         font-size: 10px;
+        text-align: center;
     }
 }
 

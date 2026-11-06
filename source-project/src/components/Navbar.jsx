@@ -81,6 +81,11 @@ export default function Navbar() {
       </Link>
 
       <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {location.pathname === '/' && (
+          <Link to="/auction" className="navbar-auction-mark" aria-label="Auction page" title="Auction">
+            <Gavel size={17} strokeWidth={2} aria-hidden="true" />
+          </Link>
+        )}
         <button
           className={`menu-button${isOpen ? ' is-open' : ''}`}
           onClick={toggleMenu}

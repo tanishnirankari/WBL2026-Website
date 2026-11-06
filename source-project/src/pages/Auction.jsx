@@ -261,9 +261,6 @@ export default function Auction() {
         }}
       >
         <div className="auction-page-inner">
-          <header className="auction-page-heading">
-            <p>WINTER BASH LEAGUE AUCTION 2026</p>
-          </header>
           <div
             className="auction-player-grid"
             aria-label="Auction players"

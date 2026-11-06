@@ -58,16 +58,6 @@ export default function Footer() {
             {footerLinks.map(({ label, to }) => (
               <Link key={to} to={to}>{label}</Link>
             ))}
-            <a
-              className="footer-youtube-link"
-              href="https://www.youtube.com/@summerbashleague"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Summer Bash League on YouTube"
-              title="Summer Bash League on YouTube"
-            >
-              <span>YouTube</span>
-            </a>
           </div>
         </nav>
 
@@ -83,10 +73,12 @@ export default function Footer() {
                   <Icon size={16} aria-hidden="true" />
                 </span>
                 <div>
-                  {label !== 'Instagram' && <span className="footer-contact-label">{label}</span>}
+                  <span className="footer-contact-label">{label}</span>
                   {href ? (
                     <a href={href} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}>
-                      {value}
+                      {label === 'Email'
+                        ? <>{value.split('@')[0]}<wbr />@{value.split('@')[1]}</>
+                        : value}
                     </a>
                   ) : links ? (
                     links.map(({ value: linkValue, href: linkHref }) => (
