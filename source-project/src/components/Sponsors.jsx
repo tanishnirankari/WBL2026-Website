@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
 const sponsors = [
@@ -68,12 +68,19 @@ export default function Sponsors() {
   const loopWidthRef = useRef(0);
   const offsetRef = useRef(0);
   const dragRef = useRef(null);
+  const [groupCount, setGroupCount] = useState(2);
 
   useEffect(() => {
     const marquee = marqueeRef.current;
     const track = trackRef.current;
     const group = track?.firstElementChild;
     if (!marquee || !track || !group) return undefined;
+
+    const updateGroupCount = () => {
+      const groupWidth = group.getBoundingClientRect().width;
+      if (!groupWidth) return;
+      setGroupCount(Math.max(2, Math.ceil(marquee.clientWidth / groupWidth) + 1));
+    };
 
     const normalizeOffset = (offset) => {
       const loopWidth = loopWidthRef.current;
@@ -90,6 +97,11 @@ export default function Sponsors() {
     updateLoopWidth();
     const resizeObserver = new ResizeObserver(updateLoopWidth);
     resizeObserver.observe(group);
+    resizeObserver.observe(marquee);
+    updateGroupCount();
+
+    const groupCountObserver = new ResizeObserver(updateGroupCount);
+    groupCountObserver.observe(group);
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let frameId;
@@ -107,8 +119,9 @@ export default function Sponsors() {
     return () => {
       cancelAnimationFrame(frameId);
       resizeObserver.disconnect();
+      groupCountObserver.disconnect();
     };
-  }, []);
+  }, [groupCount]);
 
   const handlePointerDown = (event) => {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
@@ -158,8 +171,9 @@ export default function Sponsors() {
           onPointerCancel={handlePointerUp}
         >
           <div ref={trackRef} className="sponsor-marquee-track">
-            <SponsorGroup />
-            <SponsorGroup duplicate />
+            {Array.from({ length: groupCount }, (_, index) => (
+              <SponsorGroup key={index} duplicate={index > 0} />
+            ))}
           </div>
         </div>
       </motion.div>

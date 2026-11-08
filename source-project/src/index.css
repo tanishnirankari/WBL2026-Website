@@ -8431,8 +8431,8 @@ footer {
     }
 
     .home-layout .sponsor-card {
-        grid-template-rows: 126px 52px;
-        flex-basis: clamp(230px, 22vw, 300px);
+        grid-template-rows: 88px 42px;
+        flex-basis: clamp(190px, 16vw, 220px);
     }
 }
 
