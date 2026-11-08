@@ -10383,3 +10383,436 @@ footer {
         grid-column: auto;
     }
 }
+
+/* Match the admin portal to the public site's navy and lime palette. */
+.admin-app {
+    color: #e8eef4;
+    background:
+        radial-gradient(ellipse at 85% 0%, rgba(156, 255, 0, .07), transparent 30rem),
+        #071522;
+}
+
+.admin-sidebar {
+    color: #e8eef4;
+    border-color: rgba(255, 255, 255, .09);
+    background: linear-gradient(180deg, #0b1c2b, #071522);
+    box-shadow: 8px 0 28px rgba(0, 0, 0, .18);
+}
+
+.admin-portal-brand,
+.admin-sidebar .admin-portal-brand,
+.admin-mobile-brand .admin-portal-brand {
+    color: #f5f8fb;
+}
+
+.admin-portal-mark,
+.admin-sidebar .admin-portal-mark,
+.admin-login-showcase .admin-portal-mark,
+.admin-mobile-brand .admin-portal-mark {
+    color: #a8f52e;
+    border-color: rgba(156, 255, 0, .26);
+    background: linear-gradient(145deg, rgba(156, 255, 0, .15), rgba(156, 255, 0, .035));
+}
+
+.admin-sidebar .admin-portal-wordmark small,
+.admin-sidebar .admin-user-chip small,
+.admin-mobile-brand .admin-portal-wordmark small {
+    color: #91a0ad;
+}
+
+.admin-sidebar-brand {
+    border-color: rgba(255, 255, 255, .09);
+}
+
+.admin-sidebar-label {
+    color: #718291;
+}
+
+.admin-side-nav button {
+    color: #aab8c4;
+}
+
+.admin-side-nav button:hover {
+    color: #f5f8fb;
+    background: rgba(255, 255, 255, .055);
+}
+
+.admin-side-nav button.active {
+    color: #c8ff80;
+    border-color: rgba(156, 255, 0, .17);
+    background: linear-gradient(105deg, rgba(156, 255, 0, .13), rgba(156, 255, 0, .035));
+    box-shadow: inset 3px 0 0 #9cff00;
+}
+
+.admin-nav-count {
+    color: #c2ced8;
+    background: rgba(255, 255, 255, .08);
+}
+
+.admin-sidebar-bottom {
+    border-color: rgba(255, 255, 255, .09);
+}
+
+.admin-user-chip strong {
+    color: #e8eef4;
+}
+
+.admin-user-avatar {
+    color: #14210a;
+    background: #9cff00;
+}
+
+.admin-return-link,
+.admin-back-link {
+    color: #9eacb8;
+}
+
+.admin-return-link:hover,
+.admin-back-link:hover {
+    color: #b7ff5a;
+    background: rgba(255, 255, 255, .05);
+}
+
+.admin-topbar {
+    color: #dce5ed;
+    border-color: rgba(255, 255, 255, .08);
+    background: rgba(7, 21, 34, .94);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .12);
+}
+
+.admin-breadcrumb {
+    color: #8293a2;
+}
+
+.admin-breadcrumb-divider {
+    color: #526475;
+}
+
+.admin-topbar strong {
+    color: #f2f6f9;
+}
+
+.admin-live-status {
+    color: #aab8c4;
+}
+
+.admin-refresh {
+    color: #d7e1e9;
+    border-color: rgba(255, 255, 255, .12);
+    background: #102437;
+}
+
+.admin-refresh:hover:not(:disabled) {
+    color: #fff;
+    border-color: rgba(156, 255, 0, .3);
+    background: #152c40;
+}
+
+.admin-content {
+    color: #e8eef4;
+}
+
+.admin-page-heading h1,
+.admin-panel-heading h2 {
+    color: #f3f7fa;
+}
+
+.admin-page-heading p,
+.admin-panel-heading p {
+    color: #93a2af;
+}
+
+.admin-kicker {
+    color: #a8ef45;
+}
+
+.admin-season-pill {
+    color: #c8f89a;
+    border-color: rgba(156, 255, 0, .19);
+    background: rgba(156, 255, 0, .08);
+}
+
+.admin-stat-card,
+.admin-panel,
+.admin-team-card,
+.admin-nomination-card,
+.admin-gallery-card,
+.admin-player-card,
+.admin-registered-team {
+    color: #e5edf3;
+    border-color: rgba(255, 255, 255, .1);
+    background: linear-gradient(145deg, #102438, #0b1c2b);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .15);
+}
+
+.admin-stat-card:hover,
+.admin-stat-card.selected,
+.admin-team-card:hover,
+.admin-nomination-card:hover,
+.admin-gallery-card:hover {
+    border-color: rgba(156, 255, 0, .32);
+    background: linear-gradient(145deg, #142d41, #0e2232);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .23);
+}
+
+.admin-stat-icon {
+    color: #b6ff63;
+    border-color: rgba(156, 255, 0, .16);
+    background: rgba(156, 255, 0, .09);
+}
+
+.admin-stat-copy small {
+    color: #a0afbb;
+}
+
+.admin-stat-copy strong,
+.admin-team-identity h3,
+.admin-player-card h3 {
+    color: #f1f5f8;
+}
+
+.admin-team-identity p,
+.admin-team-details,
+.admin-player-card small,
+.admin-panel .admin-empty {
+    color: #a2b0bc;
+}
+
+.admin-team-details,
+.admin-player-details,
+.admin-player-row,
+.admin-auction-row {
+    border-color: rgba(255, 255, 255, .09);
+}
+
+.admin-team-actions label,
+.admin-player-details summary {
+    color: #aab8c4;
+}
+
+.admin-search,
+.admin-filter select,
+.admin-team-actions select,
+.admin-auction-profile-edit input,
+.admin-auction-profile-edit select,
+.admin-auction-profile-edit textarea,
+.admin-caption-input,
+.admin-file-picker {
+    color: #e4edf3;
+    border-color: rgba(255, 255, 255, .13);
+    background-color: #091a28;
+}
+
+.admin-search input,
+.admin-caption-input,
+.admin-app input:not(.admin-search input),
+.admin-app select,
+.admin-app textarea {
+    color: #e5edf3;
+}
+
+.admin-search input::placeholder,
+.admin-app input::placeholder,
+.admin-app textarea::placeholder {
+    color: #8394a1;
+}
+
+.admin-action-button {
+    color: #dbe5ed;
+    border-color: rgba(255, 255, 255, .14);
+    background: #112638;
+}
+
+.admin-action-button:hover {
+    color: #fff;
+    border-color: rgba(156, 255, 0, .28);
+    background: #173147;
+}
+
+.admin-action-button.primary {
+    color: #102007;
+    border-color: #a8ef45;
+    background: #a8ef45;
+}
+
+.admin-action-button.primary:hover {
+    color: #102007;
+    border-color: #c0ff70;
+    background: #c0ff70;
+}
+
+.admin-action-button.danger {
+    color: #ffaaa4;
+    border-color: rgba(255, 116, 105, .25);
+    background: rgba(255, 116, 105, .07);
+}
+
+.admin-status-pill {
+    color: #f5d17c;
+    background: rgba(246, 196, 83, .12);
+}
+
+.admin-status-pill.approved {
+    color: #b9f18d;
+    background: rgba(156, 255, 0, .1);
+}
+
+.admin-status-pill.rejected {
+    color: #ffaaa4;
+    background: rgba(255, 116, 105, .1);
+}
+
+.admin-notice,
+.admin-content > .admin-notice {
+    color: #c8f89a;
+    border-color: rgba(156, 255, 0, .18);
+    background: rgba(156, 255, 0, .075);
+}
+
+.admin-bids-heading {
+    border-color: rgba(255, 255, 255, .1);
+    background: rgba(255, 255, 255, .035);
+}
+
+.admin-bids-heading strong,
+.admin-bids-table {
+    color: #e5edf3;
+}
+
+.admin-bids-heading small,
+.admin-admin-footer,
+.admin-empty {
+    color: #99a8b4;
+}
+
+.admin-login {
+    color: #f1f5f8;
+    background: #071522;
+}
+
+.admin-login-showcase {
+    color: #f1f5f8;
+    background:
+        radial-gradient(ellipse at 78% 82%, rgba(156, 255, 0, .12), transparent 36%),
+        radial-gradient(ellipse at 10% 18%, rgba(52, 124, 169, .14), transparent 38%),
+        linear-gradient(145deg, #071522, #0b1e2e 65%, #071522);
+}
+
+.admin-login-showcase .admin-portal-brand,
+.admin-showcase-copy h1 {
+    color: #f5f8fb;
+}
+
+.admin-showcase-copy p,
+.admin-showcase-note small {
+    color: #a2b1bd;
+}
+
+.admin-showcase-note {
+    color: #b7ff5a;
+}
+
+.admin-showcase-note strong {
+    color: #edf3f7;
+}
+
+.admin-login-area {
+    color: #edf3f7;
+    background:
+        radial-gradient(ellipse at 100% 0%, rgba(156, 255, 0, .055), transparent 32rem),
+        #0a1b29;
+}
+
+.admin-login-card h2 {
+    color: #f5f8fb;
+}
+
+.admin-login-description,
+.admin-login-foot,
+.admin-copyright {
+    color: #9cabb7;
+}
+
+.admin-login-card form > label {
+    color: #d8e2e9;
+}
+
+.admin-login-icon {
+    color: #b7ff5a;
+    border: 1px solid rgba(156, 255, 0, .18);
+    background: rgba(156, 255, 0, .08);
+}
+
+.admin-password-field {
+    color: #a8b6c1;
+    border-color: rgba(255, 255, 255, .14);
+    background: #071522;
+}
+
+.admin-password-field input {
+    color: #f0f5f8;
+}
+
+.admin-password-field input::placeholder {
+    color: #8293a0;
+}
+
+.admin-password-toggle {
+    color: #a6b4bf;
+}
+
+.admin-password-toggle:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, .08);
+}
+
+.admin-sign-in {
+    color: #112008;
+    background: #a8ef45;
+}
+
+.admin-sign-in:hover:not(:disabled) {
+    color: #112008;
+    background: #c0ff70;
+}
+
+.admin-login-foot svg {
+    color: #b7ff5a;
+}
+
+.admin-app [style*="background: #fff"],
+.admin-app [style*="background: '#fff'"],
+.admin-app [style*="background: white"],
+.admin-app [style*="background: 'white'"],
+.admin-app [style*="background-color: white"] {
+    color: #e4edf3 !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+    background: #102438 !important;
+}
+
+.admin-app [style*="color: #334036"],
+.admin-app [style*="color: '#334036'"],
+.admin-app [style*="color: #344238"],
+.admin-app [style*="color: '#344238'"],
+.admin-app [style*="color: #263329"],
+.admin-app [style*="color: '#263329'"] {
+    color: #e4edf3 !important;
+}
+
+@media (max-width: 650px) {
+    .admin-sidebar {
+        border-color: rgba(255, 255, 255, .1);
+        background: rgba(7, 21, 34, .97);
+        box-shadow: 0 -8px 24px rgba(0, 0, 0, .24);
+    }
+
+    .admin-side-nav button {
+        color: #9eacb8;
+    }
+
+    .admin-side-nav button.active {
+        color: #c8ff80;
+        background: rgba(156, 255, 0, .1);
+        box-shadow: inset 0 -2px 0 #9cff00;
+    }
+}
