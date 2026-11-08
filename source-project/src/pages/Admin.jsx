@@ -481,7 +481,27 @@ export default function Admin() {
     const html = `<!doctype html>
       <html lang="en"><head><meta charset="utf-8"><title>WBL-${escapeHtml(team.id)} · ${escapeHtml(team.teamName)} registration</title>
       <style>
-        @page{size:A4;margin:13mm 13mm 27mm}
+        @page{
+          size:A4;
+          margin:22mm 13mm 24mm;
+          @top-center{
+            content:"WINTER BASH LEAGUE  ·  TEAM REGISTRATION RECORD  ·  2026 SEASON";
+            color:#5c752f;
+            font:800 9px/1.3 Arial,Helvetica,sans-serif;
+            letter-spacing:1px;
+            vertical-align:middle;
+            border-bottom:1px solid #dce3e9;
+          }
+          @bottom-center{
+            content:"Organised by BashCricket Community  ·  winterbashleague@gmail.com\A Lal Bahadur Shastri Cricket stadium  ·  @winterbashleague";
+            color:#536273;
+            font:8px/1.5 Arial,Helvetica,sans-serif;
+            text-align:center;
+            white-space:pre-line;
+            vertical-align:middle;
+            border-top:1px solid #cfd8df;
+          }
+        }
         *{box-sizing:border-box}
         body{margin:0;color:#15253a;font:12px/1.45 Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
         .topline{height:5px;background:#81bd34;margin-bottom:18px}
@@ -512,7 +532,7 @@ export default function Admin() {
         .footer-social{display:inline-flex;align-items:center;gap:3px;color:#557b31;text-decoration:none;font-weight:700}
         .instagram-icon{width:12px;height:12px;display:block;flex:none}
         @media screen{body{max-width:800px;margin:24px auto;padding:0 22px}.print-hint{margin:12px 0;padding:10px;border-radius:7px;background:#f3f7ec;color:#55752e;font-size:11px}}
-        @media print{.print-hint{display:none}html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.footer{position:fixed;right:0;bottom:-22mm;left:0;z-index:1;gap:3px;margin:0;padding:7px 0 0;border-top:1px solid #cfd8df;background:#fff;break-inside:avoid;page-break-inside:avoid}.footer-credit,.footer-social{color:#405b32!important}.footer-details{color:#536273!important}.instagram-icon{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+        @media print{.print-hint,.topline,.brand,.footer{display:none}html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
       </style></head><body>
       <div class="print-hint">Choose “Save as PDF” in the print dialog. For clear player photos, use A4 paper and default or high print quality.</div>
       <div class="topline"></div>
