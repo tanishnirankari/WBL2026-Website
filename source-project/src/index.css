@@ -10799,6 +10799,95 @@ footer {
     color: #e4edf3 !important;
 }
 
+.admin-app .admin-nomination-card {
+    color: #e5edf3;
+    border-color: rgba(255, 255, 255, .1) !important;
+    background: linear-gradient(145deg, #102438, #0b1c2b) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .15);
+}
+
+.admin-app .admin-nomination-title h3,
+.admin-app .admin-nomination-meta > span,
+.admin-app .admin-nomination-contact a {
+    color: #eef4f8;
+}
+
+.admin-app .admin-nomination-role,
+.admin-app .admin-nomination-contact,
+.admin-app .admin-nomination-date {
+    color: #a2b1bd;
+}
+
+.admin-app .admin-nomination-meta small,
+.admin-app .admin-nomination-price small {
+    color: #91a2ae;
+}
+
+.admin-app .admin-nomination-avatar,
+.admin-app .admin-nomination-price {
+    color: #dce8f0;
+    border-color: rgba(255, 255, 255, .1);
+    background: #0a1b29;
+}
+
+.admin-app .admin-nomination-price strong {
+    color: #c4ff7c;
+}
+
+.admin-app .admin-nomination-actions {
+    border-color: rgba(255, 255, 255, .1);
+}
+
+.admin-app .admin-registered-team > summary {
+    color: #e8eef4;
+}
+
+.admin-app .admin-registered-team-copy strong {
+    color: #f1f5f8;
+}
+
+.admin-app .admin-registered-team-copy small {
+    color: #9cabb7;
+}
+
+.admin-app .admin-registered-team-mark,
+.admin-app .admin-registered-team-count {
+    color: #c8f89a;
+    border-color: rgba(156, 255, 0, .18);
+    background: rgba(156, 255, 0, .08);
+}
+
+.admin-app .admin-registered-team > summary::after {
+    border-color: #9eafbc;
+}
+
+.admin-app .admin-registered-team-players .admin-player-card {
+    color: #e5edf3;
+    border-color: rgba(255, 255, 255, .1);
+    background: #0a1b29 !important;
+}
+
+.admin-app .admin-registered-team-players .admin-player-card h3 {
+    color: #f1f5f8;
+}
+
+.admin-app .admin-registered-team-players .admin-player-card small {
+    color: #a2b0bc;
+}
+
+.admin-app .admin-footer {
+    padding: 18px 0 8px;
+    color: #91a0ad;
+    border-top: 1px solid rgba(255, 255, 255, .09);
+    background: transparent;
+    font-size: 11px;
+    text-align: center;
+}
+
+.admin-app .admin-footer span {
+    color: #a8ef45;
+}
+
 @media (max-width: 650px) {
     .admin-sidebar {
         border-color: rgba(255, 255, 255, .1);
