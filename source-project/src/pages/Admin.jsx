@@ -481,7 +481,7 @@ export default function Admin() {
     const html = `<!doctype html>
       <html lang="en"><head><meta charset="utf-8"><title>WBL-${escapeHtml(team.id)} · ${escapeHtml(team.teamName)} registration</title>
       <style>
-        @page{size:A4;margin:13mm 13mm 27mm}
+        @page{size:A4;margin:31mm 13mm 27mm}
         *{box-sizing:border-box}
         body{margin:0;color:#15253a;font:12px/1.45 Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
         .topline{height:5px;background:#81bd34;margin-bottom:18px}
@@ -512,11 +512,11 @@ export default function Admin() {
         .footer-social{display:inline-flex;align-items:center;gap:3px;color:#557b31;text-decoration:none;font-weight:700}
         .instagram-icon{width:12px;height:12px;display:block;flex:none}
         @media screen{body{max-width:800px;margin:24px auto;padding:0 22px}.print-hint{margin:12px 0;padding:10px;border-radius:7px;background:#f3f7ec;color:#55752e;font-size:11px}}
-        @media print{.print-hint{display:none}html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.footer{position:fixed;right:0;bottom:-22mm;left:0;z-index:1;gap:3px;margin:0;padding:7px 0 0;border-top:1px solid #cfd8df;background:#fff;break-inside:avoid;page-break-inside:avoid}.footer-credit,.footer-social{color:#405b32!important}.footer-details{color:#536273!important}.instagram-icon{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+        @media print{.print-hint{display:none}html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.page-header{position:fixed;top:-23mm;right:0;left:0;z-index:1;background:#fff}.topline{margin-bottom:10px}.brand{padding-bottom:8px}.footer{position:fixed;right:0;bottom:-20mm;left:0;z-index:1;gap:3px;margin:0;padding:7px 0 0;border-top:1px solid #cfd8df;background:#fff;break-inside:avoid;page-break-inside:avoid}.footer-credit,.footer-social{color:#405b32!important}.footer-details{color:#536273!important}.instagram-icon{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
       </style></head><body>
       <div class="print-hint">Choose “Save as PDF” in the print dialog. For clear player photos, use A4 paper and default or high print quality.</div>
-      <div class="topline"></div>
-      <header class="brand"><div class="brand-identity"><img class="wbl-logo" src="${escapeHtml(wblLogoDataUrl)}" alt="Winter Bash League logo"><div><div class="brand-title">WINTER BASH LEAGUE</div><div class="brand-subtitle">TEAM REGISTRATION RECORD · 2026 SEASON</div></div></div><div class="registration-id"><strong>WBL-${escapeHtml(team.id)}</strong>Registered ${date}</div></header>
+      <div class="page-header"><div class="topline"></div>
+      <header class="brand"><div class="brand-identity"><img class="wbl-logo" src="${escapeHtml(wblLogoDataUrl)}" alt="Winter Bash League logo"><div><div class="brand-title">WINTER BASH LEAGUE</div><div class="brand-subtitle">TEAM REGISTRATION RECORD · 2026 SEASON</div></div></div><div class="registration-id"><strong>WBL-${escapeHtml(team.id)}</strong>Registered ${date}</div></header></div>
       <section class="team-header">${logoMarkup}<div><h1>${escapeHtml(team.teamName)}</h1><p class="team-meta">Location: ${escapeHtml(team.teamLocation || '—')}</p><p class="team-meta">Captain: ${escapeHtml(team.captainName)} · ${escapeHtml(team.captainPhone)}</p><div class="status-row"><span class="status">Approval: ${escapeHtml(team.organiserApproval || 'PENDING')}</span><span class="status">Payment: ${escapeHtml(team.paymentStatus || 'PENDING')}</span></div></div></section>
       <h2 class="section-title">Registration details</h2>
       <section class="details"><div class="detail"><span>Team</span><strong>${escapeHtml(team.teamName)}</strong></div><div class="detail"><span>Team location</span><strong>${escapeHtml(team.teamLocation || '—')}</strong></div><div class="detail"><span>Team captain</span><strong>${escapeHtml(team.captainName)}</strong></div><div class="detail"><span>Captain phone</span><strong>${escapeHtml(team.captainPhone)}</strong></div><div class="detail"><span>Alternative captain phone</span><strong>${escapeHtml(team.captainAlternatePhone || '—')}</strong></div><div class="detail"><span>Payment method</span><strong>${escapeHtml(team.paymentMode)}</strong></div><div class="detail"><span>Payment status</span><strong>${escapeHtml(team.paymentStatus || 'PENDING')}</strong></div><div class="detail"><span>Organiser approval</span><strong>${escapeHtml(team.organiserApproval || 'PENDING')}</strong></div></section>

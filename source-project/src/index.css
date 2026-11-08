@@ -8436,6 +8436,42 @@ footer {
     }
 }
 
+@media (min-width: 900px) {
+    .home-layout .sponsors-content {
+        max-width: 1440px;
+    }
+
+    .home-layout .sponsor-marquee {
+        overflow: visible;
+        mask-image: none;
+        cursor: default;
+        touch-action: auto;
+    }
+
+    .home-layout .sponsor-marquee-track {
+        width: 100%;
+        gap: 0;
+        transform: none !important;
+    }
+
+    .home-layout .sponsor-marquee-group {
+        width: 100%;
+        justify-content: center;
+        gap: 20px;
+        padding-right: 0;
+    }
+
+    .home-layout .sponsor-marquee-group[aria-hidden="true"] {
+        display: none;
+    }
+
+    .home-layout .sponsor-card {
+        grid-template-rows: clamp(150px, 17vw, 220px) 58px;
+        flex: 1 1 0;
+        max-width: 700px;
+    }
+}
+
 @media (min-width: 651px) and (max-height: 760px) {
     .home-layout .home-page-content > .hero {
         padding-block: 24px;
@@ -9566,48 +9602,6 @@ footer {
     }
 }
 
-.registration-closed {
-    display: grid;
-    min-height: 280px;
-    align-content: center;
-    justify-items: center;
-    gap: 12px;
-    padding: clamp(24px, 6vw, 56px);
-    text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    background:
-        radial-gradient(ellipse at 50% 0%, rgba(156, 255, 0, 0.07), transparent 55%),
-        linear-gradient(145deg, rgba(13, 30, 47, 0.98), rgba(7, 20, 33, 0.98));
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
-}
-
-.registration-closed .confirmation-eyebrow {
-    color: var(--lime);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.2em;
-}
-
-.registration-closed h1 {
-    color: #f5f8fb;
-    font-size: clamp(27px, 5vw, 40px);
-}
-
-.registration-closed p {
-    max-width: 520px;
-    color: #aab6c1;
-    font-size: 16px;
-    line-height: 1.6;
-}
-
-@media (max-width: 600px) {
-    .registration-closed {
-        min-height: 240px;
-        border-radius: 18px;
-    }
-}
-
 .rule-book-page {
     max-width: 1120px;
     padding-top: 132px;
@@ -9758,6 +9752,351 @@ footer {
 
 .rule-accordion-indicator::after {
     transform: rotate(90deg);
+}
+
+@media (max-width: 650px) {
+    .admin-app {
+        background: #f5f7f4;
+    }
+
+    .admin-topbar {
+        height: 50px;
+        padding-inline: 14px;
+    }
+
+    .admin-topbar > div:first-child {
+        min-width: 0;
+        gap: 6px;
+    }
+
+    .admin-topbar-actions {
+        flex: 0 0 auto;
+        gap: 6px;
+    }
+
+    .admin-live-status {
+        gap: 5px;
+        font-size: 10px;
+    }
+
+    .admin-refresh {
+        min-height: 34px;
+        padding-inline: 9px;
+        font-size: 10px;
+    }
+
+    .admin-content {
+        padding: 18px 13px 20px;
+    }
+
+    .admin-page-heading {
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .admin-page-heading h1 {
+        margin-top: 5px;
+        font-size: 22px;
+        letter-spacing: -.7px;
+    }
+
+    .admin-page-heading p {
+        max-width: 230px;
+        margin-top: 4px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    .admin-kicker {
+        font-size: 8px;
+        letter-spacing: .12em;
+    }
+
+    .admin-season-pill {
+        flex: 0 0 auto;
+        padding: 6px 8px;
+        font-size: 8px;
+    }
+
+    .admin-stat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 13px;
+    }
+
+    .admin-stat-card {
+        min-height: 66px;
+        padding: 10px;
+        gap: 9px;
+        border-radius: 11px;
+    }
+
+    .admin-stat-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+    }
+
+    .admin-stat-icon svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .admin-stat-copy {
+        gap: 3px;
+    }
+
+    .admin-stat-copy small {
+        font-size: 10px;
+    }
+
+    .admin-stat-copy strong {
+        font-size: 18px;
+    }
+
+    .admin-panel {
+        padding: 13px 11px;
+        border-radius: 12px;
+        box-shadow: 0 3px 12px rgba(31, 45, 35, .035);
+    }
+
+    .admin-panel-heading {
+        gap: 10px;
+        margin-bottom: 13px;
+    }
+
+    .admin-panel-heading h2 {
+        font-size: 14px;
+    }
+
+    .admin-panel-heading p {
+        margin-top: 3px;
+        font-size: 10px;
+        line-height: 1.4;
+    }
+
+    .admin-registration-tools {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+    }
+
+    .admin-registration-tools .admin-search {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
+    .admin-registration-tools .admin-filter {
+        min-width: 0;
+        display: grid;
+        gap: 4px;
+        font-size: 9px;
+    }
+
+    .admin-registration-tools .admin-filter select {
+        width: 100%;
+        max-width: none;
+        min-height: 38px;
+        font-size: 11px;
+    }
+
+    .admin-team-list {
+        gap: 9px;
+    }
+
+    .admin-team-card {
+        padding: 11px;
+        border-radius: 11px;
+    }
+
+    .admin-team-heading {
+        align-items: flex-start;
+        gap: 7px;
+    }
+
+    .admin-team-identity {
+        gap: 9px;
+    }
+
+    .admin-team-logo,
+    .admin-team-logo-placeholder {
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+    }
+
+    .admin-team-identity h3 {
+        max-width: 48vw;
+        font-size: 12px;
+    }
+
+    .admin-team-identity p {
+        margin-top: 3px;
+        font-size: 9px;
+    }
+
+    .admin-status-pill {
+        padding: 5px 7px;
+        font-size: 8px;
+    }
+
+    .admin-team-details {
+        gap: 6px 12px;
+        margin: 10px 0;
+        padding: 9px 0;
+        font-size: 9px;
+    }
+
+    .admin-team-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+    }
+
+    .admin-team-actions label {
+        min-width: 0;
+        display: grid;
+        gap: 4px;
+        font-size: 9px;
+    }
+
+    .admin-team-actions select {
+        width: 100%;
+        min-height: 38px;
+        padding-inline: 8px;
+        font-size: 11px;
+    }
+
+    .admin-team-actions .admin-action-button {
+        min-width: 0;
+        min-height: 38px;
+        justify-content: center;
+        gap: 5px;
+        padding-inline: 7px;
+        font-size: 10px;
+    }
+
+    .admin-team-profile-form {
+        gap: 9px;
+        margin-top: 10px;
+        padding: 10px;
+    }
+
+    .admin-team-profile-form label {
+        font-size: 10px;
+    }
+
+    .admin-team-profile-form input {
+        min-height: 38px;
+        font-size: 12px;
+    }
+
+    .admin-registered-team summary {
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .admin-registered-team-mark {
+        width: 34px;
+        height: 34px;
+    }
+
+    .admin-registered-team-copy strong {
+        font-size: 11px;
+    }
+
+    .admin-registered-team-count {
+        padding: 4px 6px;
+        font-size: 9px;
+    }
+
+    .admin-player-card {
+        padding: 9px;
+        gap: 9px;
+    }
+
+    .admin-auction-tabs {
+        max-width: 100%;
+        overflow-x: auto;
+        scrollbar-width: thin;
+    }
+
+    .admin-auction-tab {
+        flex: 0 0 auto;
+        min-height: 36px;
+        padding-inline: 10px;
+        font-size: 10px;
+    }
+
+    .admin-status-filters {
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    .admin-filter-chip {
+        min-height: 34px;
+        padding-inline: 9px;
+        gap: 5px;
+        font-size: 10px;
+    }
+
+    .admin-nomination-card,
+    .admin-gallery-card {
+        padding: 11px;
+    }
+
+    .admin-sidebar {
+        height: calc(60px + env(safe-area-inset-bottom));
+        padding: 4px 8px env(safe-area-inset-bottom);
+    }
+
+    .admin-side-nav button {
+        font-size: 9px;
+    }
+
+    .admin-side-nav button svg {
+        width: 17px;
+        height: 17px;
+    }
+}
+
+@media (max-width: 380px) {
+    .admin-content {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+
+    .admin-page-heading h1 {
+        font-size: 20px;
+    }
+
+    .admin-page-heading p {
+        max-width: 200px;
+    }
+
+    .admin-season-pill {
+        padding: 5px 6px;
+        font-size: 7px;
+    }
+
+    .admin-team-actions {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .admin-team-actions label,
+    .admin-team-actions .admin-action-button {
+        width: 100%;
+    }
+
+    .admin-live-status {
+        font-size: 0;
+    }
+
+    .admin-live-status i {
+        width: 8px;
+        height: 8px;
+    }
 }
 
 .rule-accordion[open] .rule-accordion-indicator::after {
