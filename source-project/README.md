@@ -42,9 +42,7 @@ are documented in `backend/.env.example`; the frontend uses `.env.example`.
 Create local `.env` files from those examples and configure the API URL and
 database connection for your environment. Do not commit `.env` files.
 
-Team registration availability is controlled from the Admin Portal. Use the
-**Team registration** switch to open or close submissions. When closed, the
-public Registration page displays “Registration starts soon · Stay tuned,” and
-the API rejects new registration submissions. The setting is stored in
-PostgreSQL and defaults to open for existing deployments.
+Team registration is always available. The Registration page does not check
+an availability setting before showing the form, and the API accepts
+submissions without a registration open/closed switch.
 Production deployment trigger – October 30, 2026.

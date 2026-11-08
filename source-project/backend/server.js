@@ -39,18 +39,12 @@ async function saveAuctionPhoto(dataUrl) {
   if (buffer.length > 5 * 1024 * 1024) throw new Error('Player photos must be 5 MB or smaller.');
   return (await saveImage({ buffer, mimetype: match[1], originalname: 'auction-player' }, 'wbl-2026/auction-players')).secure_url;
 }
-let registrationSettingsReady;
-const ensureRegistrationSettings = () => registrationSettingsReady || (registrationSettingsReady=(async()=>{
-  await pool.query('CREATE TABLE IF NOT EXISTS wbl_site_settings (setting_key VARCHAR(80) PRIMARY KEY, setting_value BOOLEAN NOT NULL)');
-  await pool.query("INSERT INTO wbl_site_settings(setting_key,setting_value) VALUES('team_registration_open',TRUE) ON CONFLICT(setting_key) DO NOTHING");
-})().catch(error=>{registrationSettingsReady=null;throw error}));
 const ensure = async () => {
   await pool.query("ALTER TABLE wbl_registrations ADD COLUMN IF NOT EXISTS organiser_approval VARCHAR(20) NOT NULL DEFAULT 'PENDING'");
   await pool.query("ALTER TABLE wbl_registrations ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) NOT NULL DEFAULT 'PENDING'");
   await pool.query('ALTER TABLE wbl_registrations ADD COLUMN IF NOT EXISTS captain_alternate_phone VARCHAR(20)');
   await pool.query('ALTER TABLE wbl_registrations ADD COLUMN IF NOT EXISTS team_location VARCHAR(160)');
   await pool.query('ALTER TABLE wbl_registrations ADD COLUMN IF NOT EXISTS team_logo_path TEXT');
-  await ensureRegistrationSettings();
   await pool.query('CREATE TABLE IF NOT EXISTS wbl_gallery_images (id SERIAL PRIMARY KEY, image_url TEXT NOT NULL, cloudinary_public_id TEXT, caption VARCHAR(240), created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)');
   await pool.query("CREATE TABLE IF NOT EXISTS wbl_auction_registrations (id SERIAL PRIMARY KEY, full_name VARCHAR(120) NOT NULL, phone VARCHAR(30) NOT NULL, age SMALLINT NOT NULL CHECK (age BETWEEN 14 AND 50), playing_role VARCHAR(60) NOT NULL, batting_style VARCHAR(40), bowling_style VARCHAR(40), club_name VARCHAR(120), base_price VARCHAR(20) NOT NULL, photo_url TEXT, status VARCHAR(40) NOT NULL DEFAULT 'PENDING', created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)");
   await pool.query("ALTER TABLE wbl_auction_registrations ADD COLUMN IF NOT EXISTS photo_url TEXT");
@@ -70,13 +64,7 @@ const ensure = async () => {
 let ready; const init=()=>ready||(ready=ensure().catch(e=>{ready=null;throw e}));
 function admin(req,res,next){const a=Buffer.from(process.env.ADMIN_PASSWORD||'');const b=Buffer.from(req.get('x-admin-password')||'');if(!a.length||a.length!==b.length||!crypto.timingSafeEqual(a,b))return res.status(401).json({error:'Enter the correct admin password.'});next()}
 function players(value,req){let list=value;if(typeof list==='string'){try{list=JSON.parse(list)}catch{list=[]}}return (Array.isArray(list)?list:[]).map(p=>({...p,photoUrl:/^https?:/i.test(p.photoPath||'')?p.photoPath:null}))}
-app.get('/api/registrations/status',asyncHandler(async(req,res)=>{await ensureRegistrationSettings();const result=await pool.query("SELECT setting_value FROM wbl_site_settings WHERE setting_key='team_registration_open'");res.json({open:result.rows[0]?.setting_value ?? true})}));
-app.post('/api/registrations',asyncHandler(async(req,res,next)=>{
-  await ensureRegistrationSettings();
-  const registrationSetting=await pool.query("SELECT setting_value FROM wbl_site_settings WHERE setting_key='team_registration_open'");
-  if(registrationSetting.rows[0]?.setting_value===false)return res.status(403).json({error:'Team registration is currently closed.'});
-  next();
-}),upload.fields([{name:'teamLogo',maxCount:1},{name:'captainPhoto',maxCount:1},...Array.from({length:14},(_,i)=>({name:'player'+(i+2)+'Photo',maxCount:1}))]),asyncHandler(async(req,res)=>{
+app.post('/api/registrations',upload.fields([{name:'teamLogo',maxCount:1},{name:'captainPhoto',maxCount:1},...Array.from({length:14},(_,i)=>({name:'player'+(i+2)+'Photo',maxCount:1}))]),asyncHandler(async(req,res)=>{
   const {teamName,teamLocation,captainName,captainPhone,captainAlternatePhone,paymentMode}=req.body;
   if(typeof teamName!=='string'||!teamName.trim()||typeof teamLocation!=='string'||!teamLocation.trim()||!req.files?.teamLogo?.[0])return res.status(400).json({error:'Team name, team location, and team logo are required.'});
   if(typeof captainName!=='string'||!captainName.trim()||!captainPhone||!captainAlternatePhone||!req.files?.captainPhoto?.[0])return res.status(400).json({error:'Complete all required captain details, including the captain photo.'});
