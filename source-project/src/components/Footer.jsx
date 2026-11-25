@@ -35,7 +35,7 @@ const contactItems = [
   },
   {
     label: 'Venue',
-    value: 'Lal Bahadur Shastri Cricket Stadium',
+    value: 'Nehru Yuva Kendra',
     icon: MapPin,
   },
   {

@@ -38,11 +38,11 @@ export default function Hero() {
             <small>PRIZE POOL</small>
           </div>
           <div className="hero-detail hero-detail-date hero-detail-right">
-            <strong>6 December</strong>
+            <strong>December</strong>
             <small>TOURNAMENT</small>
           </div>
           <div className="hero-detail hero-detail-venue">
-            <strong>Lal Bahadur Shastri<br />Cricket stadium</strong>
+            <strong>Nehru Yuva Kendra</strong>
             <small>VENUE</small>
           </div>
           <div className="hero-detail hero-detail-teams hero-detail-right">
