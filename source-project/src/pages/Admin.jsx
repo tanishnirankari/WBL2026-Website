@@ -493,7 +493,7 @@ export default function Admin() {
             border-bottom:1px solid #dce3e9;
           }
           @bottom-center{
-            content:"Organised by BashCricket Community  ·  winterbashleague@gmail.com\A Nehru Yuva Kendra  ·  @winterbashleague";
+            content:"Organised by BashCricket.com  ·  winterbashleague@gmail.com\\A Nehru Yuva Kendra";
             color:#536273;
             font:8px/1.5 Arial,Helvetica,sans-serif;
             text-align:center;
@@ -529,8 +529,6 @@ export default function Admin() {
         .footer{display:grid;gap:4px;margin-top:18px;padding-top:9px;border-top:1px solid #e3e8ed;color:#8491a0;font-size:8px;text-align:center}
         .footer-credit{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px;color:#405b32;font-size:9px;font-weight:700}
         .footer-details{color:#637286;font-size:7.5px;line-height:1.5}
-        .footer-social{display:inline-flex;align-items:center;gap:3px;color:#557b31;text-decoration:none;font-weight:700}
-        .instagram-icon{width:12px;height:12px;display:block;flex:none}
         @media screen{body{max-width:800px;margin:24px auto;padding:0 22px}.print-hint{margin:12px 0;padding:10px;border-radius:7px;background:#f3f7ec;color:#55752e;font-size:11px}}
         @media print{.print-hint,.topline,.brand,.footer{display:none}html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
       </style></head><body>
@@ -542,7 +540,7 @@ export default function Admin() {
       <section class="details"><div class="detail"><span>Team</span><strong>${escapeHtml(team.teamName)}</strong></div><div class="detail"><span>Team location</span><strong>${escapeHtml(team.teamLocation || '—')}</strong></div><div class="detail"><span>Team captain</span><strong>${escapeHtml(team.captainName)}</strong></div><div class="detail"><span>Captain phone</span><strong>${escapeHtml(team.captainPhone)}</strong></div><div class="detail"><span>Alternative captain phone</span><strong>${escapeHtml(team.captainAlternatePhone || '—')}</strong></div><div class="detail"><span>Payment method</span><strong>${escapeHtml(team.paymentMode)}</strong></div><div class="detail"><span>Payment status</span><strong>${escapeHtml(team.paymentStatus || 'PENDING')}</strong></div><div class="detail"><span>Organiser approval</span><strong>${escapeHtml(team.organiserApproval || 'PENDING')}</strong></div></section>
       <h2 class="section-title">Player roster · ${roster.length} submitted</h2><section class="player-grid">${playerCards}</section>
       <section class="signature"><div>Captain signature</div><div>Organiser signature and stamp</div></section>
-      <footer class="footer"><div class="footer-credit">Organised by BashCricket Community</div><div class="footer-details">winterbashleague@gmail.com</div><div class="footer-details">Nehru Yuva Kendra</div><div class="footer-details">Winter Bash League · Official registration record · <a class="footer-social" href="https://www.instagram.com/winterbashleague/" target="_blank" rel="noopener noreferrer"><svg class="instagram-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" aria-label="Instagram" role="img"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="#557b31" stroke-width="2.5"/><circle cx="12" cy="12" r="4" fill="none" stroke="#557b31" stroke-width="2.5"/><circle cx="18" cy="6" r="1.5" fill="#557b31"/></svg>@winterbashleague</a></div></footer>
+      <footer class="footer"><div class="footer-credit">Organised by BashCricket.com</div><div class="footer-details">winterbashleague@gmail.com</div><div class="footer-details">Nehru Yuva Kendra</div><div class="footer-details">Winter Bash League · Official registration record</div></footer>
       </body></html>`;
     printWindow.document.open();
     printWindow.document.write(html);
